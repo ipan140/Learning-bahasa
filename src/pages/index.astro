@@ -2,112 +2,209 @@
 import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 import { defaultLanguageTables } from '../data/languages';
+import { worldCountries } from '../data/countries';
 ---
 
-<Base title="Tabel Belajar Bahasa - Aksara & Karakter Dinamis" description="Aplikasi tabel belajar aksara bahasa Jepang, Korea, Arab, Rusia, Yunani, dan pembuat tabel dinamis kustom.">
+<Base title="Tabel Belajar Bahasa & Katalog Aksara Negara Dunia" description="Aplikasi tabel belajar aksara bahasa dan penyimpan target belajar negara: Jepang, Jerman, Korea, Arab, Tiongkok, Rusia, dan pembuat tabel dinamis.">
   
-  <!-- [01] Hero & App Main Section -->
-  <Section top={false} inner="px-6 pt-12 pb-16 lg:pt-16 lg:pb-20 max-md:px-5">
+  <!-- [01] Hero & Main Navigation Section -->
+  <Section top={false} inner="px-6 pt-12 pb-14 lg:pt-16 lg:pb-18 max-md:px-5">
     <div class="max-w-4xl">
-      <p class="label"><b>[01]</b> Aplikasi Tabel Belajar Bahasa</p>
+      <p class="label"><b>[01]</b> Belajar Aksara & Target Negara</p>
       <h1 class="mt-4 text-[clamp(32px,4.5vw,56px)] leading-[1.08] font-bold tracking-[-0.04em]">
-        Tabel Belajar Aksara & Bahasa
+        Tabel Belajar Bahasa & Aksara Dunia
       </h1>
       <p class="mt-4 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
-        Pilih bahasa di bawah ini untuk melihat tabel aksara teks lengkap, dengarkan pelafalan suara aslinya dengan mengeklik huruf, atau buat tabel materi bahasa Anda sendiri secara dinamis.
+        Pilih bahasa untuk membuka tabel aksara teks interaktif dengan audio lafal asli, atau jelajahi katalog negara untuk menyimpan daftar negara yang ingin Anda pelajari.
       </p>
+
+      <!-- View Switcher Tabs (Tabel vs Katalog Negara) -->
+      <div class="mt-8 flex flex-wrap items-center gap-3 border-b border-rule pb-4">
+        <button 
+          type="button" 
+          id="btn-view-tables" 
+          class="px-5 py-2.5 text-[14px] font-mono border-2 border-ink bg-ink text-canvas font-bold flex items-center gap-2 cursor-pointer transition-colors"
+        >
+          <span>📖</span> Tabel Aksara & Huruf
+        </button>
+        <button 
+          type="button" 
+          id="btn-view-countries" 
+          class="px-5 py-2.5 text-[14px] font-mono border-2 border-rule bg-canvas text-steel hover:text-ink hover:border-ink flex items-center gap-2 cursor-pointer transition-colors"
+        >
+          <span>🌍</span> Katalog Negara & Target Belajar 
+          <span id="target-count-badge" class="px-2 py-0.2 text-[11px] bg-cta text-cta-ink font-bold">0</span>
+        </button>
+      </div>
     </div>
 
-    <!-- App Container -->
-    <div id="language-app" class="mt-10" data-defaults={JSON.stringify(defaultLanguageTables)}>
-      
-      <!-- Top Navigation Tabs (Language Selector) -->
-      <div class="border-b border-rule flex flex-wrap items-center gap-2 pb-3" id="tab-bar">
-        <!-- Rendered dynamically by client script -->
-      </div>
-
-      <!-- Action & Search Toolbar -->
-      <div class="mt-6 flex flex-wrap items-center justify-between gap-4 p-4 border border-rule bg-canvas">
-        <div class="flex items-center gap-3 flex-1 min-w-[240px]">
-          <span class="text-smoke text-[13px] font-mono select-none">CARI:</span>
-          <input 
-            type="text" 
-            id="search-input" 
-            placeholder="Ketik romaji atau karakter (misal: Ka, あ, ㄱ, Alif)..." 
-            class="w-full max-w-sm px-3 py-1.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
-          />
-        </div>
-        <div class="flex items-center gap-2 flex-wrap text-[13px]">
-          <button 
-            type="button" 
-            id="toggle-audio-btn" 
-            class="btn btn-secondary btn-s"
-            title="Aktifkan/Nonaktifkan Suara Pengucapan saat kotak diklik"
-          >
-            🔊 Suara: <span id="audio-status-label" class="text-ok font-bold">AKTIF</span>
-          </button>
-          <button 
-            type="button" 
-            id="copy-all-btn" 
-            class="btn btn-secondary btn-s"
-            title="Salin seluruh isi tabel ke clipboard"
-          >
-            📋 Salin Teks
-          </button>
-          <button 
-            type="button" 
-            id="open-creator-btn" 
-            class="btn btn-primary btn-s"
-          >
-            + Buat Tabel Sendiri
-          </button>
-        </div>
-      </div>
+    <!-- App Data Container -->
+    <div 
+      id="main-app" 
+      class="mt-8"
+      data-defaults={JSON.stringify(defaultLanguageTables)}
+      data-countries={JSON.stringify(worldCountries)}
+    >
 
       <!-- Notification Toast -->
-      <div id="toast" class="hidden mt-4 px-4 py-2 text-[13px] border border-ok text-ok bg-canvas flex items-center justify-between">
-        <span id="toast-message">Teks berhasil disalin!</span>
+      <div id="toast" class="hidden mb-6 px-4 py-2 text-[13px] border border-ok text-ok bg-canvas flex items-center justify-between">
+        <span id="toast-message">Berhasil disimpan!</span>
         <button type="button" id="toast-close" class="text-smoke hover:text-ink font-bold ml-4">✕</button>
       </div>
 
-      <!-- Main Table Card -->
-      <div id="viewer-container" class="mt-8">
-        <!-- Table Title & Description -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-rule pb-4 mb-6">
-          <div>
-            <div class="flex items-center gap-3">
-              <span id="table-badge" class="px-2 py-0.5 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider">Hiragana Dasar</span>
-              <h2 id="table-title" class="text-[22px] sm:text-[26px] font-bold text-ink tracking-tight">
-                A. Tabel Huruf Hiragana Dasar
-              </h2>
-            </div>
-            <p id="table-description" class="mt-1 text-[14px] text-steel">
-              Aksara fonetik utama dalam bahasa Jepang.
-            </p>
+      <!-- ========================================== -->
+      <!-- VIEW 1: TABEL AKSARA & HURUF -->
+      <!-- ========================================== -->
+      <div id="section-tables" class="space-y-8">
+        
+        <!-- Language Switcher Bar -->
+        <div>
+          <span class="label block mb-2">Pilih Aksara Bahasa:</span>
+          <div class="border-b border-rule flex flex-wrap items-center gap-2 pb-3" id="tab-bar">
+            <!-- Rendered by client script -->
           </div>
-          <div id="custom-table-actions" class="hidden items-center gap-2">
-            <button type="button" id="delete-table-btn" class="px-3 py-1 text-[12px] border border-rule text-smoke hover:text-ink hover:border-ink">
-              Hapus Tabel Ini
+        </div>
+
+        <!-- Action & Search Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 p-4 border border-rule bg-canvas">
+          <div class="flex items-center gap-3 flex-1 min-w-[240px]">
+            <span class="text-smoke text-[13px] font-mono select-none">CARI:</span>
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Cari huruf atau romaji (misal: Ka, あ, Ä, ㄱ)..." 
+              class="w-full max-w-sm px-3 py-1.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+            />
+          </div>
+          <div class="flex items-center gap-2 flex-wrap text-[13px]">
+            <button 
+              type="button" 
+              id="toggle-audio-btn" 
+              class="btn btn-secondary btn-s"
+              title="Aktifkan/Nonaktifkan Suara Pengucapan saat kotak diklik"
+            >
+              🔊 Suara: <span id="audio-status-label" class="text-ok font-bold">AKTIF</span>
+            </button>
+            <button 
+              type="button" 
+              id="copy-all-btn" 
+              class="btn btn-secondary btn-s"
+              title="Salin seluruh isi tabel ke clipboard"
+            >
+              📋 Salin Teks
+            </button>
+            <button 
+              type="button" 
+              id="open-creator-btn" 
+              class="btn btn-primary btn-s"
+            >
+              + Buat Tabel Sendiri
             </button>
           </div>
         </div>
 
-        <!-- The Text Grid / Table (Formatted exact to user's image) -->
-        <div class="w-full overflow-x-auto pb-4">
-          <div id="table-grid-wrapper" class="inline-block min-w-full align-middle">
-            <!-- Table will be rendered here -->
+        <!-- Main Viewer Table Card -->
+        <div id="viewer-container">
+          <!-- Table Title & Description -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-rule pb-4 mb-6">
+            <div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <span id="table-badge" class="px-2 py-0.5 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider">Hiragana Dasar</span>
+                <h2 id="table-title" class="text-[22px] sm:text-[26px] font-bold text-ink tracking-tight">
+                  A. Tabel Huruf Hiragana Dasar
+                </h2>
+              </div>
+              <p id="table-description" class="mt-1 text-[14px] text-steel">
+                Aksara fonetik utama dalam bahasa Jepang.
+              </p>
+            </div>
+            <div id="custom-table-actions" class="hidden items-center gap-2">
+              <button type="button" id="delete-table-btn" class="px-3 py-1 text-[12px] border border-rule text-smoke hover:text-ink hover:border-ink">
+                Hapus Tabel Kustom Ini
+              </button>
+            </div>
+          </div>
+
+          <!-- The Text Grid / Table (Formatted exact to user's image) -->
+          <div class="w-full overflow-x-auto pb-4">
+            <div id="table-grid-wrapper" class="inline-block min-w-full align-middle">
+              <!-- Table will be rendered here -->
+            </div>
+          </div>
+
+          <!-- Instructions footer -->
+          <div class="mt-6 p-4 border border-dashed border-rule text-[13px] text-smoke flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span>💡 <strong>Tips:</strong> Klik kotak huruf untuk mendengarkan pengucapan audio aslinya.</span>
+            <span class="font-mono text-[12px]">Format: [Romaji/Cara Baca] = [Aksara]</span>
           </div>
         </div>
 
-        <!-- Instructions footer -->
-        <div class="mt-6 p-4 border border-dashed border-rule text-[13px] text-smoke flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <span>💡 <strong>Tips:</strong> Klik kotak huruf untuk mendengarkan pengucapan audio aslinya.</span>
-          <span class="font-mono text-[12px]">Format: [Romaji/Cara Baca] = [Aksara]</span>
-        </div>
       </div>
 
-      <!-- Custom Table Creator Panel -->
-      <div id="buat-tabel" class="pt-10">
+      <!-- ========================================== -->
+      <!-- VIEW 2: KATALOG NEGARA & TARGET BELAJAR -->
+      <!-- ========================================== -->
+      <div id="section-countries" class="hidden space-y-6">
+        
+        <!-- Controls & Filters for Countries -->
+        <div class="p-5 border border-rule bg-canvas space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-[20px] font-bold text-ink flex items-center gap-2">
+                <span>🌍</span> Daftar Negara & Target Belajar Saya
+              </h2>
+              <p class="text-[13px] text-steel mt-0.5">
+                Tandai bintang ⭐ pada negara yang ingin Anda pelajari. Daftar tersimpan otomatis di browser tanpa perlu login.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btn-export-backup" class="btn btn-secondary btn-s text-[12px]" title="Simpan file cadangan target belajar & tabel kustom">
+                📥 Backup JSON
+              </button>
+              <label class="btn btn-secondary btn-s text-[12px] cursor-pointer" title="Pulihkan cadangan dari file JSON">
+                📤 Import JSON
+                <input type="file" id="input-import-file" accept=".json" class="hidden" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Filter Pills & Search -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-rule">
+            <div class="flex flex-wrap items-center gap-2 text-[13px]" id="country-region-filters">
+              <button type="button" data-filter="targets" class="px-3 py-1 font-mono border border-ink bg-ink text-canvas font-bold">
+                ⭐ Target Saya (<span id="filter-target-count">0</span>)
+              </button>
+              <button type="button" data-filter="all" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">
+                Semua Negara (<span id="total-country-count">0</span>)
+              </button>
+              <button type="button" data-filter="Asia" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Asia</button>
+              <button type="button" data-filter="Eropa" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Eropa</button>
+              <button type="button" data-filter="Timur Tengah" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Timur Tengah</button>
+              <button type="button" data-filter="Lainnya" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Amerika & Afrika</button>
+            </div>
+
+            <div class="w-full sm:w-64">
+              <input 
+                type="text" 
+                id="country-search-input" 
+                placeholder="Cari negara / bahasa..." 
+                class="w-full px-3 py-1.5 text-[13px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Country Cards Grid -->
+        <div id="countries-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Rendered dynamically by client script -->
+        </div>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- CUSTOM TABLE CREATOR MODAL -->
+      <!-- ========================================== -->
+      <div id="buat-tabel" class="pt-8">
         <div id="creator-modal" class="hidden p-6 border-2 border-ink bg-canvas">
           <div class="flex items-center justify-between border-b border-rule pb-4 mb-6">
             <div>
@@ -157,13 +254,14 @@ import { defaultLanguageTables } from '../data/languages';
                 <label for="form-voice" class="block text-[13px] font-mono text-steel mb-1.5">Kode Suara Audio (Opsional)</label>
                 <select id="form-voice" class="w-full px-3 py-2 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink">
                   <option value="ja-JP">Jepang (ja-JP)</option>
+                  <option value="de-DE">Jerman (de-DE)</option>
                   <option value="ko-KR">Korea (ko-KR)</option>
                   <option value="zh-CN">Mandarin (zh-CN)</option>
                   <option value="ar-SA">Arab (ar-SA)</option>
                   <option value="ru-RU">Rusia (ru-RU)</option>
-                  <option value="de-DE">Jerman (de-DE)</option>
                   <option value="fr-FR">Prancis (fr-FR)</option>
                   <option value="es-ES">Spanyol (es-ES)</option>
+                  <option value="it-IT">Italia (it-IT)</option>
                   <option value="en-US">Inggris (en-US)</option>
                   <option value="id-ID">Indonesia (id-ID)</option>
                 </select>
@@ -214,62 +312,58 @@ import { defaultLanguageTables } from '../data/languages';
     </div>
   </Section>
 
-  <!-- [02] Cara Kerja / Panduan Ringkas -->
-  <Section inner="px-6 py-16 max-md:px-5 max-md:py-12" label="Panduan">
-    <p class="label"><b>[02]</b> Fitur & Panduan</p>
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="p-6 border border-rule bg-canvas">
-        <span class="text-cta text-[18px] font-bold">[01]</span>
-        <h3 class="mt-3 text-[17px] font-bold text-ink">Format Tabel Teks Bersih</h3>
-        <p class="mt-2 text-[14px] text-steel leading-[1.6]">
-          Struktur tabel seragam yang menampilkan huruf Latin dan karakter aslinya dengan garis kisi rapi tanpa gangguan elemen rumit.
-        </p>
-      </div>
-      <div class="p-6 border border-rule bg-canvas">
-        <span class="text-cta text-[18px] font-bold">[02]</span>
-        <h3 class="mt-3 text-[17px] font-bold text-ink">Audio Asli Seketika</h3>
-        <p class="mt-2 text-[14px] text-steel leading-[1.6]">
-          Cukup klik pada salah satu kotak huruf untuk mendengarkan lafal suara aksara aslinya melalui Web Speech API browser Anda.
-        </p>
-      </div>
-      <div class="p-6 border border-rule bg-canvas">
-        <span class="text-cta text-[18px] font-bold">[03]</span>
-        <h3 class="mt-3 text-[17px] font-bold text-ink">Tambah Bahasa Dinamis</h3>
-        <p class="mt-2 text-[14px] text-steel leading-[1.6]">
-          Ingin belajar bahasa baru? Cukup klik "+ Buat Tabel Sendiri", ketik huruf-hurufnya, dan tabel baru langsung aktif di browser.
-        </p>
-      </div>
-    </div>
-  </Section>
-
   <!-- Client-side Interactive Application Script -->
   <script is:inline>
     (function () {
-      const appEl = document.getElementById('language-app');
+      const appEl = document.getElementById('main-app');
       if (!appEl) return;
 
       const defaultTables = JSON.parse(appEl.dataset.defaults || '[]');
-      const STORAGE_KEY = 'belajar_bahasa_custom_tables_v1';
+      const allCountries = JSON.parse(appEl.dataset.countries || '[]');
+
+      const STORAGE_CUSTOM_TABLES = 'belajar_bahasa_custom_tables_v1';
+      const STORAGE_TARGET_COUNTRIES = 'belajar_bahasa_target_countries_v1';
+
       let customTables = [];
+      let targetCountryIds = [];
 
       try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          customTables = JSON.parse(stored);
+        const storedTables = localStorage.getItem(STORAGE_CUSTOM_TABLES);
+        if (storedTables) customTables = JSON.parse(storedTables);
+
+        const storedTargets = localStorage.getItem(STORAGE_TARGET_COUNTRIES);
+        if (storedTargets) {
+          targetCountryIds = JSON.parse(storedTargets);
+        } else {
+          // Default initial targets
+          targetCountryIds = ['jepang', 'jerman', 'korea-selatan'];
+          localStorage.setItem(STORAGE_TARGET_COUNTRIES, JSON.stringify(targetCountryIds));
         }
       } catch (e) {
-        console.error('Gagal membaca data tabel kustom', e);
+        console.error(e);
       }
 
       function getAllTables() {
         return [...defaultTables, ...customTables];
       }
 
+      let activeView = 'tables'; // 'tables' or 'countries'
       let currentTableId = defaultTables[0]?.id || '';
       let isAudioEnabled = true;
-      let searchQuery = '';
+      let tableSearchQuery = '';
+      let countryFilter = 'targets'; // 'targets', 'all', 'Asia', 'Eropa', etc.
+      let countrySearchQuery = '';
 
-      // Elements
+      // DOM Elements
+      const btnViewTables = document.getElementById('btn-view-tables');
+      const btnViewCountries = document.getElementById('btn-view-countries');
+      const sectionTables = document.getElementById('section-tables');
+      const sectionCountries = document.getElementById('section-countries');
+      const targetCountBadge = document.getElementById('target-count-badge');
+      const filterTargetCount = document.getElementById('filter-target-count');
+      const totalCountryCount = document.getElementById('total-country-count');
+
+      // Table DOM
       const tabBar = document.getElementById('tab-bar');
       const tableTitle = document.getElementById('table-title');
       const tableBadge = document.getElementById('table-badge');
@@ -289,6 +383,15 @@ import { defaultLanguageTables } from '../data/languages';
       const loadSampleBtn = document.getElementById('load-sample-btn');
       const customActions = document.getElementById('custom-table-actions');
       const deleteTableBtn = document.getElementById('delete-table-btn');
+
+      // Country DOM
+      const countriesGrid = document.getElementById('countries-grid');
+      const countrySearchInput = document.getElementById('country-search-input');
+      const countryFilterButtons = document.querySelectorAll('#country-region-filters button');
+      const btnExportBackup = document.getElementById('btn-export-backup');
+      const inputImportFile = document.getElementById('input-import-file');
+
+      // Toast
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toast-message');
       const toastClose = document.getElementById('toast-close');
@@ -297,16 +400,37 @@ import { defaultLanguageTables } from '../data/languages';
         if (!toast || !toastMessage) return;
         toastMessage.textContent = msg;
         toast.classList.remove('hidden');
-        setTimeout(() => {
-          toast.classList.add('hidden');
-        }, 3500);
+        setTimeout(() => toast.classList.add('hidden'), 3500);
+      }
+      if (toastClose) toastClose.addEventListener('click', () => toast.classList.add('hidden'));
+
+      function updateBadges() {
+        if (targetCountBadge) targetCountBadge.textContent = targetCountryIds.length;
+        if (filterTargetCount) filterTargetCount.textContent = targetCountryIds.length;
+        if (totalCountryCount) totalCountryCount.textContent = allCountries.length;
       }
 
-      if (toastClose) {
-        toastClose.addEventListener('click', () => toast.classList.add('hidden'));
+      // Switch View
+      function switchView(view) {
+        activeView = view;
+        if (view === 'tables') {
+          sectionTables.classList.remove('hidden');
+          sectionCountries.classList.add('hidden');
+          btnViewTables.className = 'px-5 py-2.5 text-[14px] font-mono border-2 border-ink bg-ink text-canvas font-bold flex items-center gap-2 cursor-pointer transition-colors';
+          btnViewCountries.className = 'px-5 py-2.5 text-[14px] font-mono border-2 border-rule bg-canvas text-steel hover:text-ink hover:border-ink flex items-center gap-2 cursor-pointer transition-colors';
+        } else {
+          sectionTables.classList.add('hidden');
+          sectionCountries.classList.remove('hidden');
+          btnViewTables.className = 'px-5 py-2.5 text-[14px] font-mono border-2 border-rule bg-canvas text-steel hover:text-ink hover:border-ink flex items-center gap-2 cursor-pointer transition-colors';
+          btnViewCountries.className = 'px-5 py-2.5 text-[14px] font-mono border-2 border-ink bg-ink text-canvas font-bold flex items-center gap-2 cursor-pointer transition-colors';
+          renderCountries();
+        }
       }
 
-      // Voice synthesizer
+      if (btnViewTables) btnViewTables.addEventListener('click', () => switchView('tables'));
+      if (btnViewCountries) btnViewCountries.addEventListener('click', () => switchView('countries'));
+
+      // Speech Synthesizer
       function speakText(text, lang) {
         if (!isAudioEnabled) return;
         if (!('speechSynthesis' in window)) return;
@@ -317,22 +441,13 @@ import { defaultLanguageTables } from '../data/languages';
         window.speechSynthesis.speak(utter);
       }
 
-      // Parse free text into grid
+      // Parse text into table grid
       function parseTextToGrid(text) {
         const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
         const grid = [];
-        
         for (const line of lines) {
-          let parts = [];
-          if (line.includes('|')) {
-            parts = line.split('|').map(p => p.trim());
-          } else if (line.includes(';')) {
-            parts = line.split(';').map(p => p.trim());
-          } else if (line.includes(',')) {
-            parts = line.split(',').map(p => p.trim());
-          } else {
-            parts = [line];
-          }
+          let parts = line.includes('|') ? line.split('|') : line.includes(';') ? line.split(';') : line.includes(',') ? line.split(',') : [line];
+          parts = parts.map(p => p.trim());
 
           const row = [];
           for (const part of parts) {
@@ -350,14 +465,12 @@ import { defaultLanguageTables } from '../data/languages';
               row.push({ romaji: '', char: part });
             }
           }
-          if (row.length > 0) {
-            grid.push(row);
-          }
+          if (row.length > 0) grid.push(row);
         }
         return grid;
       }
 
-      // Render Tabs
+      // Render Language Tabs
       function renderTabs() {
         if (!tabBar) return;
         tabBar.innerHTML = '';
@@ -376,7 +489,7 @@ import { defaultLanguageTables } from '../data/languages';
           btn.innerHTML = `${t.name} ${isCustom ? '<span class="text-[10px] opacity-75 font-sans">[Custom]</span>' : ''}`;
           btn.addEventListener('click', () => {
             currentTableId = t.id;
-            searchQuery = '';
+            tableSearchQuery = '';
             if (searchInput) searchInput.value = '';
             renderTabs();
             renderCurrentTable();
@@ -385,7 +498,7 @@ import { defaultLanguageTables } from '../data/languages';
         });
       }
 
-      // Render Current Table
+      // Render Table Grid
       function renderCurrentTable() {
         const allTables = getAllTables();
         const currentTable = allTables.find(t => t.id === currentTableId) || allTables[0];
@@ -406,11 +519,10 @@ import { defaultLanguageTables } from '../data/languages';
         if (tableBadge) tableBadge.textContent = currentTable.badge || currentTable.name;
         if (tableDescription) tableDescription.textContent = currentTable.description || '';
 
-        // Build HTML table that exactly replicates the clean grid in user's image
         let html = '<table class="w-full border-collapse border border-ink text-center bg-canvas select-text font-mono">';
         html += '<tbody>';
 
-        const filter = searchQuery.trim().toLowerCase();
+        const filter = tableSearchQuery.trim().toLowerCase();
 
         currentTable.grid.forEach((row) => {
           html += '<tr>';
@@ -449,7 +561,6 @@ import { defaultLanguageTables } from '../data/languages';
         html += '</tbody></table>';
         if (gridWrapper) gridWrapper.innerHTML = html;
 
-        // Attach click to cell for audio & copy
         const cells = gridWrapper.querySelectorAll('td[data-char]');
         cells.forEach(td => {
           td.addEventListener('click', () => {
@@ -460,6 +571,225 @@ import { defaultLanguageTables } from '../data/languages';
             navigator.clipboard?.writeText(char);
             showToast(`Karakter "${char}" (${romaji}) disalin ke clipboard! 🔊`);
           });
+        });
+      }
+
+      // Render Countries
+      function renderCountries() {
+        if (!countriesGrid) return;
+        updateBadges();
+
+        const query = countrySearchQuery.trim().toLowerCase();
+
+        let filtered = allCountries.filter(c => {
+          if (countryFilter === 'targets') {
+            return targetCountryIds.includes(c.id);
+          }
+          if (countryFilter === 'all') return true;
+          if (countryFilter === 'Lainnya') {
+            return c.region === 'Amerika' || c.region === 'Afrika';
+          }
+          return c.region === countryFilter;
+        });
+
+        if (query) {
+          filtered = filtered.filter(c => 
+            c.name.toLowerCase().includes(query) || 
+            c.nativeName.toLowerCase().includes(query) || 
+            c.language.toLowerCase().includes(query) ||
+            c.script.toLowerCase().includes(query)
+          );
+        }
+
+        if (filtered.length === 0) {
+          countriesGrid.innerHTML = `
+            <div class="col-span-full p-8 text-center border border-rule bg-canvas text-smoke font-mono text-[14px]">
+              Tidak ada negara yang cocok dengan filter "${countryFilter}".
+              ${countryFilter === 'targets' ? '<br><span class="text-[12px] text-steel">Pilih tab "Semua Negara" lalu klik tanda bintang ⭐ untuk menambah target belajar Anda!</span>' : ''}
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        filtered.forEach(c => {
+          const isTarget = targetCountryIds.includes(c.id);
+          const hasTable = Boolean(c.tableId && getAllTables().some(t => t.id === c.tableId));
+
+          html += `
+            <div class="border ${isTarget ? 'border-ink bg-canvas' : 'border-rule bg-canvas'} p-4 flex flex-col justify-between transition-all">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-[26px] leading-none select-none">${c.flag}</span>
+                    <div>
+                      <h3 class="text-[16px] font-bold text-ink leading-tight">${c.name}</h3>
+                      <p class="text-[11px] text-smoke">${c.nativeName}</p>
+                    </div>
+                  </div>
+                  <button 
+                    type="button" 
+                    data-toggle-target="${c.id}"
+                    class="size-8 flex items-center justify-center border ${isTarget ? 'border-cta bg-cta text-cta-ink' : 'border-rule hover:border-ink text-smoke'} font-bold cursor-pointer"
+                    title="${isTarget ? 'Hapus dari target belajar' : 'Simpan ke target belajar'}"
+                  >
+                    ⭐
+                  </button>
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-rule space-y-1.5 text-[12px] font-mono">
+                  <div class="flex items-center justify-between">
+                    <span class="text-smoke">Benua:</span>
+                    <span class="text-steel font-medium">${c.region}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-smoke">Bahasa:</span>
+                    <span class="text-ink font-bold truncate max-w-[150px]">${c.language}</span>
+                  </div>
+                  <div class="flex items-start justify-between gap-2">
+                    <span class="text-smoke shrink-0">Aksara:</span>
+                    <span class="text-steel text-right">${c.script}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-rule flex items-center gap-2">
+                ${hasTable ? `
+                  <button 
+                    type="button" 
+                    data-open-table="${c.tableId}"
+                    class="btn btn-primary btn-s text-[12px] w-full"
+                  >
+                    📖 Buka Tabel Aksara
+                  </button>
+                ` : `
+                  <button 
+                    type="button" 
+                    data-create-for="${c.name}"
+                    data-voice="${c.voiceLang || 'id-ID'}"
+                    class="btn btn-secondary btn-s text-[12px] w-full"
+                  >
+                    + Buat Tabel Aksara
+                  </button>
+                `}
+              </div>
+            </div>
+          `;
+        });
+
+        countriesGrid.innerHTML = html;
+
+        // Attach events
+        countriesGrid.querySelectorAll('[data-toggle-target]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-toggle-target');
+            if (targetCountryIds.includes(id)) {
+              targetCountryIds = targetCountryIds.filter(x => x !== id);
+              showToast('Dihapus dari daftar target belajar.');
+            } else {
+              targetCountryIds.push(id);
+              showToast('⭐ Disimpan ke daftar target belajar!');
+            }
+            try {
+              localStorage.setItem(STORAGE_TARGET_COUNTRIES, JSON.stringify(targetCountryIds));
+            } catch (e) {}
+            renderCountries();
+          });
+        });
+
+        countriesGrid.querySelectorAll('[data-open-table]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const tableId = btn.getAttribute('data-open-table');
+            currentTableId = tableId;
+            switchView('tables');
+            renderTabs();
+            renderCurrentTable();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        });
+
+        countriesGrid.querySelectorAll('[data-create-for]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const countryName = btn.getAttribute('data-create-for');
+            const voice = btn.getAttribute('data-voice');
+            switchView('tables');
+            openCreator();
+            document.getElementById('form-name').value = countryName;
+            document.getElementById('form-title').value = 'Tabel Aksara / Kosakata ' + countryName;
+            if (document.getElementById('form-voice')) {
+              document.getElementById('form-voice').value = voice;
+            }
+          });
+        });
+      }
+
+      // Country Filter Pill Buttons
+      countryFilterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          countryFilter = btn.getAttribute('data-filter');
+          countryFilterButtons.forEach(b => {
+            if (b === btn) {
+              b.className = 'px-3 py-1 font-mono border border-ink bg-ink text-canvas font-bold';
+            } else {
+              b.className = 'px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink';
+            }
+          });
+          renderCountries();
+        });
+      });
+
+      if (countrySearchInput) {
+        countrySearchInput.addEventListener('input', (e) => {
+          countrySearchQuery = e.target.value;
+          renderCountries();
+        });
+      }
+
+      // Backup JSON Download
+      if (btnExportBackup) {
+        btnExportBackup.addEventListener('click', () => {
+          const exportData = {
+            appName: 'Belajar Bahasa',
+            exportedAt: new Date().toISOString(),
+            targetCountryIds: targetCountryIds,
+            customTables: customTables
+          };
+          const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportData, null, 2));
+          const dlAnchor = document.createElement('a');
+          dlAnchor.setAttribute('href', dataStr);
+          dlAnchor.setAttribute('download', `backup_belajar_bahasa_${new Date().toISOString().slice(0, 10)}.json`);
+          dlAnchor.click();
+          showToast('Data berhasil dicadangkan ke file JSON!');
+        });
+      }
+
+      // Restore JSON Import
+      if (inputImportFile) {
+        inputImportFile.addEventListener('change', (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            try {
+              const imported = JSON.parse(event.target.result);
+              if (imported.targetCountryIds && Array.isArray(imported.targetCountryIds)) {
+                targetCountryIds = imported.targetCountryIds;
+                localStorage.setItem(STORAGE_TARGET_COUNTRIES, JSON.stringify(targetCountryIds));
+              }
+              if (imported.customTables && Array.isArray(imported.customTables)) {
+                customTables = imported.customTables;
+                localStorage.setItem(STORAGE_CUSTOM_TABLES, JSON.stringify(customTables));
+              }
+              updateBadges();
+              renderTabs();
+              renderCurrentTable();
+              renderCountries();
+              showToast('Data cadangan berhasil dipulihkan!');
+            } catch (err) {
+              alert('Gagal membaca file JSON. Pastikan format valid.');
+            }
+          };
+          reader.readAsText(file);
         });
       }
 
@@ -496,10 +826,10 @@ import { defaultLanguageTables } from '../data/languages';
         });
       }
 
-      // Search Filter
+      // Search Filter for Table
       if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-          searchQuery = e.target.value;
+          tableSearchQuery = e.target.value;
           renderCurrentTable();
         });
       }
@@ -510,7 +840,7 @@ import { defaultLanguageTables } from '../data/languages';
           if (!confirm('Apakah Anda yakin ingin menghapus tabel kustom ini?')) return;
           customTables = customTables.filter(c => c.id !== currentTableId);
           try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(customTables));
+            localStorage.setItem(STORAGE_CUSTOM_TABLES, JSON.stringify(customTables));
           } catch (e) {}
           currentTableId = defaultTables[0]?.id || '';
           renderTabs();
@@ -528,38 +858,28 @@ import { defaultLanguageTables } from '../data/languages';
 
       if (openCreatorBtn) openCreatorBtn.addEventListener('click', openCreator);
 
-      // Handle hash change or direct link to #buat-tabel
       if (window.location.hash === '#buat-tabel') {
         openCreator();
       }
       window.addEventListener('hashchange', () => {
-        if (window.location.hash === '#buat-tabel') {
-          openCreator();
-        }
+        if (window.location.hash === '#buat-tabel') openCreator();
+        if (window.location.hash === '#katalog-section') switchView('countries');
+        if (window.location.hash === '#tabel-section') switchView('tables');
       });
 
-      if (closeCreatorBtn) {
-        closeCreatorBtn.addEventListener('click', () => {
-          creatorModal.classList.add('hidden');
-        });
-      }
+      if (closeCreatorBtn) closeCreatorBtn.addEventListener('click', () => creatorModal.classList.add('hidden'));
+      if (cancelCreatorBtn) cancelCreatorBtn.addEventListener('click', () => creatorModal.classList.add('hidden'));
 
-      if (cancelCreatorBtn) {
-        cancelCreatorBtn.addEventListener('click', () => {
-          creatorModal.classList.add('hidden');
-        });
-      }
-
-      // Load Sample Text inside creator
+      // Sample Text in Creator
       if (loadSampleBtn && formText) {
         loadSampleBtn.addEventListener('click', () => {
-          document.getElementById('form-name').value = 'Mandarin (Hanzi Angka)';
-          document.getElementById('form-title').value = 'Tabel Angka Mandarin 1 - 10';
-          document.getElementById('form-desc').value = 'Karakter angka dasar dalam bahasa Mandarin beserta Pinyin.';
-          document.getElementById('form-voice').value = 'zh-CN';
+          document.getElementById('form-name').value = 'Jerman (Umlaut & Sapaan)';
+          document.getElementById('form-title').value = 'Tabel Huruf Khusus Bahasa Jerman';
+          document.getElementById('form-desc').value = 'Aksara Ä, Ö, Ü, ß dan contoh kata dasar.';
+          document.getElementById('form-voice').value = 'de-DE';
           formText.value = 
-`Yi = 一 | Er = 二 | San = 三 | Si = 四 | Wu = 五
-Liu = 六 | Qi = 七 | Ba = 八 | Jiu = 九 | Shi = 十`;
+`Ä = ä | Ö = ö | Ü = ü | Eszett = ß | Ai = ei
+Oi = eu | Ie = ie | Kh = ch | Sy = sch | Ts = z`;
           updateLivePreview();
         });
       }
@@ -591,9 +911,7 @@ Liu = 六 | Qi = 七 | Ba = 八 | Jiu = 九 | Shi = 十`;
         creatorPreview.innerHTML = html;
       }
 
-      if (formText) {
-        formText.addEventListener('input', updateLivePreview);
-      }
+      if (formText) formText.addEventListener('input', updateLivePreview);
 
       // Submit new table
       if (creatorForm) {
@@ -623,7 +941,7 @@ Liu = 六 | Qi = 七 | Ba = 八 | Jiu = 九 | Shi = 十`;
 
           customTables.push(newTable);
           try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(customTables));
+            localStorage.setItem(STORAGE_CUSTOM_TABLES, JSON.stringify(customTables));
           } catch (err) {
             console.error(err);
           }
@@ -642,9 +960,11 @@ Liu = 六 | Qi = 七 | Ba = 八 | Jiu = 九 | Shi = 十`;
         });
       }
 
-      // Init
+      // Initial Renders
+      updateBadges();
       renderTabs();
       renderCurrentTable();
+      renderCountries();
     })();
   </script>
 </Base>

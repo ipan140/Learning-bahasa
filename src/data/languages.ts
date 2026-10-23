@@ -9,7 +9,7 @@ export interface LanguageTable {
   badge: string;
   title: string;
   description: string;
-  voiceLang?: string; // for SpeechSynthesis e.g. ja-JP, ko-KR
+  voiceLang?: string; // for SpeechSynthesis e.g. ja-JP, de-DE, ko-KR
   headers?: string[];
   grid: (TableCell | null)[][];
 }
@@ -176,10 +176,48 @@ export const defaultLanguageTables: LanguageTable[] = [
     ]
   },
   {
+    id: 'jerman-dasar',
+    name: 'Jerman (Deutsch)',
+    badge: 'Umlaut & Fonetik Jerman',
+    title: 'C. Tabel Huruf Khusus & Fonetik Bahasa Jerman',
+    description: 'Huruf khusus bahasa Jerman meliputi Umlaut (Ä, Ö, Ü), Eszett (ß), dan kombinasi bunyi vokal/konsonan penting.',
+    voiceLang: 'de-DE',
+    grid: [
+      [
+        { romaji: 'A-Umlaut', char: 'Ä ä' },
+        { romaji: 'O-Umlaut', char: 'Ö ö' },
+        { romaji: 'U-Umlaut', char: 'Ü ü' },
+        { romaji: 'Eszett (ss)', char: 'ß' },
+        { romaji: 'Bunyi [ai]', char: 'ei' }
+      ],
+      [
+        { romaji: 'Bunyi [oi]', char: 'eu' },
+        { romaji: 'Bunyi [oi]', char: 'äu' },
+        { romaji: 'Bunyi [i:]', char: 'ie' },
+        { romaji: 'Bunyi [kh/sy]', char: 'ch' },
+        { romaji: 'Bunyi [sy]', char: 'sch' }
+      ],
+      [
+        { romaji: 'Bunyi [syp]', char: 'sp' },
+        { romaji: 'Bunyi [syt]', char: 'st' },
+        { romaji: 'Bunyi [f]', char: 'v' },
+        { romaji: 'Bunyi [v]', char: 'w' },
+        { romaji: 'Bunyi [ts]', char: 'z' }
+      ],
+      [
+        { romaji: 'Halo', char: 'Hallo' },
+        { romaji: 'Terima Kasih', char: 'Danke' },
+        { romaji: 'Tolong / Sama2', char: 'Bitte' },
+        { romaji: 'Selamat Pagi', char: 'Guten Morgen' },
+        { romaji: 'Sampai Jumpa', char: 'Tschüss' }
+      ]
+    ]
+  },
+  {
     id: 'korea-hangul',
     name: 'Korea (Hangul)',
     badge: 'Hangul Dasar',
-    title: 'C. Tabel Huruf Hangul Korea Dasar',
+    title: 'D. Tabel Huruf Hangul Korea Dasar',
     description: 'Aksara alfabetis Korea ciptaan Raja Sejong yang terdiri dari vokal dan konsonan dasar.',
     voiceLang: 'ko-KR',
     grid: [
@@ -224,7 +262,7 @@ export const defaultLanguageTables: LanguageTable[] = [
     id: 'arab-hijaiyah',
     name: 'Arab (Hijaiyah)',
     badge: 'Huruf Hijaiyah',
-    title: 'D. Tabel Huruf Hijaiyah Dasar',
+    title: 'E. Tabel Huruf Hijaiyah Dasar',
     description: '28 huruf abjad bahasa Arab dari Alif sampai Ya.',
     voiceLang: 'ar-SA',
     grid: [
@@ -273,10 +311,41 @@ export const defaultLanguageTables: LanguageTable[] = [
     ]
   },
   {
+    id: 'mandarin-dasar',
+    name: 'Mandarin (Tiongkok)',
+    badge: 'Pinyin & Hanzi Angka',
+    title: 'F. Tabel Angka & Sapaan Dasar Bahasa Mandarin',
+    description: 'Karakter Hanzi dasar dan sistem pelafalan Pinyin dalam bahasa Mandarin Tiongkok.',
+    voiceLang: 'zh-CN',
+    grid: [
+      [
+        { romaji: 'Yī (1)', char: '一' },
+        { romaji: 'Èr (2)', char: '二' },
+        { romaji: 'Sān (3)', char: '三' },
+        { romaji: 'Sì (4)', char: '四' },
+        { romaji: 'Wǔ (5)', char: '五' }
+      ],
+      [
+        { romaji: 'Liù (6)', char: '六' },
+        { romaji: 'Qī (7)', char: '七' },
+        { romaji: 'Bā (8)', char: '八' },
+        { romaji: 'Jiǔ (9)', char: '九' },
+        { romaji: 'Shí (10)', char: '十' }
+      ],
+      [
+        { romaji: 'Nǐ hǎo (Halo)', char: '你好' },
+        { romaji: 'Xièxiè (Trims)', char: '谢谢' },
+        { romaji: 'Zàijiàn (Dadah)', char: '再见' },
+        { romaji: 'Duìbuqǐ (Maaf)', char: '对不起' },
+        { romaji: 'Méiguānxi (Gpp)', char: '没关系' }
+      ]
+    ]
+  },
+  {
     id: 'rusia-cyrillic',
     name: 'Rusia (Sirilik)',
     badge: 'Sirilik Dasar',
-    title: 'E. Tabel Huruf Sirilik Rusia Dasar',
+    title: 'G. Tabel Huruf Sirilik Rusia Dasar',
     description: 'Aksara Sirilik Rusia yang digunakan di kawasan Eropa Timur dan Asia Utara.',
     voiceLang: 'ru-RU',
     grid: [
@@ -335,7 +404,7 @@ export const defaultLanguageTables: LanguageTable[] = [
     id: 'yunani-greek',
     name: 'Yunani (Greek)',
     badge: 'Yunani Kuno & Modern',
-    title: 'F. Tabel Alfabet Yunani Dasar',
+    title: 'H. Tabel Alfabet Yunani Dasar',
     description: 'Aksara Yunani dasar yang digunakan dalam bahasa Yunani serta simbol ilmiah matematika & sains.',
     voiceLang: 'el-GR',
     grid: [
