@@ -1,19 +1,19 @@
 {
   "hero": {
-    "label": "agent runtime",
-    "title": "Agents that ship work, not demos.",
-    "lede": "Runlog is the runtime for production AI agents. Plan, call tools, verify the result, and replay every step when something looks off."
+    "label": "tabel aksara dinamis",
+    "title": "Belajar aksara dunia dengan tabel teks.",
+    "lede": "Platform tabel aksara teks interaktif untuk bahasa Jepang, Korea, Arab, Rusia, dan Yunani. Dilengkapi pelafalan suara serta fitur untuk membuat tabel dan materi sendiri secara dinamis."
   },
-  "logos": ["northwind", "Halcyon", "kestrel/ai", "AMPERE", "fieldnote", "Quarry"],
+  "logos": ["Hiragana", "Katakana", "Hangul", "Hijaiyah", "Cyrillic", "Greek"],
   "stats": [
-    { "value": "41M", "label": "tool calls a month", "delta": "+18% MoM" },
-    { "value": "99.95%", "label": "uptime, backed by SLA", "delta": "90 days" },
-    { "value": "38ms", "label": "median overhead", "delta": "-22% QoQ" },
-    { "value": "0", "label": "unapproved writes", "delta": "since launch" }
+    { "value": "6+", "label": "bahasa bawaan", "delta": "+custom" },
+    { "value": "100%", "label": "tabel teks rapi", "delta": "grid style" },
+    { "value": "🔊", "label": "audio terintegrasi", "delta": "speech api" },
+    { "value": "0", "label": "koding tambahan", "delta": "instant" }
   ],
   "testimonial": {
-    "quote": "We moved four agents from a notebook to production in two weeks. The replay view alone saved us a hire.",
-    "name": "Mara Okafor",
-    "role": "Head of Platform, Northwind"
+    "quote": "Tabel teks yang rapi dan seragam mempermudah menghafal huruf asing seperti Hiragana dan Hangul secara cepat.",
+    "name": "Belajar Bahasa",
+    "role": "Sistem Pembelajaran Mandiri"
   }
 }

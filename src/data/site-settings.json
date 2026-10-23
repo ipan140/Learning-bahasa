@@ -1,13 +1,13 @@
 {
-  "name": "Runlog",
-  "description": "The runtime for production AI agents. Plan, call tools, verify, and replay every step.",
-  "install": "npm i @runlog/sdk",
+  "name": "Belajar Bahasa",
+  "description": "Aplikasi tabel belajar aksara bahasa: Jepang (Hiragana & Katakana), Korea (Hangul), Arab (Hijaiyah), dan bahasa lainnya.",
+  "install": "https://learning-bahasa-nine.vercel.app",
   "announcement": {
-    "text": "Runlog Lite is free. Pricing, docs, changelog and CMS are in Runlog Pro",
-    "href": "https://runlog-astro.pages.dev"
+    "text": "✨ Tabel Belajar Aksara & Huruf Bahasa Dinamis - Klik kotak untuk dengar suara",
+    "href": "/"
   },
   "cta": {
-    "label": "Get Runlog Pro",
-    "href": "https://contra.com/products/QETiOjxd-runlog-pro-ai-agent-and-dev-tool-saa-s-astro-theme"
+    "label": "+ Buat Tabel",
+    "href": "#buat-tabel"
   }
 }
