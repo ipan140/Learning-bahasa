@@ -1210,13 +1210,15 @@ Oi = eu | Ie = ie | Kh = ch | Sy = sch | Ts = z`;
       const btnCloudSyncTrigger = document.getElementById('btn-cloud-sync-trigger');
       if (btnCloudSyncTrigger) {
         btnCloudSyncTrigger.addEventListener('click', () => {
-          const authModal = document.getElementById('auth-modal') as HTMLDialogElement | null;
-          authModal?.showModal();
+          const authModal = document.getElementById('auth-modal');
+          if (authModal && typeof authModal.showModal === 'function') {
+            authModal.showModal();
+          }
         });
       }
 
       // Listen data loaded dari Supabase (sinkronisasi antar laptop / HP)
-      window.addEventListener('supabase-data-loaded', (e: any) => {
+      window.addEventListener('supabase-data-loaded', (e) => {
         const { targets, tables } = e.detail || {};
         let needRerender = false;
 
@@ -1237,7 +1239,7 @@ Oi = eu | Ie = ie | Kh = ch | Sy = sch | Ts = z`;
           const existingIds = new Set(customTables.map(t => t.id));
           let tableAdded = false;
 
-          tables.forEach((t: any) => {
+          tables.forEach((t) => {
             if (!existingIds.has(t.id)) {
               customTables.push({
                 id: t.id,
