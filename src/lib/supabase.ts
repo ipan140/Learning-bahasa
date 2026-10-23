@@ -4,18 +4,20 @@ import { createClient, type SupabaseClient, type User } from '@supabase/supabase
 let supabaseInstance: SupabaseClient | null = null;
 
 export function getSupabaseConfig(): { url: string; anonKey: string } | null {
+  const defaultUrl = 'https://qqitquxjqupclhlunjq.supabase.co';
+
   // 1. Coba dari environment variable Astro
-  const envUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const envUrl = import.meta.env.PUBLIC_SUPABASE_URL || defaultUrl;
   const envKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  if (envUrl && envKey && !envUrl.includes('your-project-id')) {
+  if (envKey && !envKey.includes('your-anon-key')) {
     return { url: envUrl, anonKey: envKey };
   }
 
   // 2. Coba dari localStorage (pengaturan runtime di browser)
   if (typeof window !== 'undefined') {
-    const localUrl = localStorage.getItem('sb_custom_url');
+    const localUrl = localStorage.getItem('sb_custom_url') || defaultUrl;
     const localKey = localStorage.getItem('sb_custom_key');
-    if (localUrl && localKey) {
+    if (localKey && !localKey.includes('your-anon-key')) {
       return { url: localUrl, anonKey: localKey };
     }
   }
