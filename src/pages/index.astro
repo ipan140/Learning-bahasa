@@ -221,80 +221,53 @@ import { worldCountries } from '../data/countries';
     <!-- Country Catalog Content (Always Visible) -->
     <div id="section-countries" class="mt-8 space-y-6">
         
-        <!-- Controls & Filters for Countries -->
-        <div class="p-5 border border-rule bg-canvas space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div class="flex items-center gap-2.5">
-                <h3 class="text-[20px] font-bold text-ink flex items-center gap-2">
-                  <span>🌍</span> Database 250 Negara Dunia
-                </h3>
-                <span class="px-2 py-0.5 text-[11px] font-mono border border-ok text-ok bg-canvas">REST Countries API Dataset</span>
-              </div>
-              <p class="text-[13px] text-steel mt-1">
-                Tandai bintang ⭐ pada negara yang ingin Anda pelajari. Daftar tersimpan otomatis di browser tanpa perlu login.
-              </p>
-            </div>
-            <div class="flex items-center gap-2">
-              <button type="button" id="btn-cloud-sync-trigger" class="btn btn-secondary btn-s text-[12px]" title="Masuk untuk sinkronisasi materi ke smartphone & laptop lain">
-                ☁️ Sinkron Akun
-              </button>
-              <button type="button" id="btn-export-backup" class="btn btn-secondary btn-s text-[12px]" title="Simpan file cadangan target belajar & tabel kustom">
-                📥 Backup JSON
-              </button>
-              <label class="btn btn-secondary btn-s text-[12px] cursor-pointer" title="Pulihkan cadangan dari file JSON">
-                📤 Import JSON
-                <input type="file" id="input-import-file" accept=".json" class="hidden" />
-              </label>
-            </div>
+      <!-- Filter Pills & Search -->
+      <div class="p-5 border border-rule bg-canvas space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-1.5 text-[13px]" id="country-region-filters">
+            <button type="button" data-filter="all" class="px-3 py-1 font-mono border border-ink bg-ink text-canvas font-bold">
+              Semua (<span id="total-country-count">250</span>)
+            </button>
+            <button type="button" data-filter="targets" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">
+              ⭐ Target Saya (<span id="filter-target-count">0</span>)
+            </button>
+            <button type="button" data-filter="Asia" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Asia</button>
+            <button type="button" data-filter="Eropa" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Eropa</button>
+            <button type="button" data-filter="Timur Tengah" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Timur Tengah</button>
+            <button type="button" data-filter="Amerika" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Amerika</button>
+            <button type="button" data-filter="Afrika" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Afrika</button>
+            <button type="button" data-filter="Oseania" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Oseania</button>
           </div>
 
-          <!-- Filter Pills & Search -->
-          <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-rule">
-            <div class="flex flex-wrap items-center gap-1.5 text-[13px]" id="country-region-filters">
-              <button type="button" data-filter="targets" class="px-3 py-1 font-mono border border-ink bg-ink text-canvas font-bold">
-                ⭐ Target Saya (<span id="filter-target-count">0</span>)
-              </button>
-              <button type="button" data-filter="all" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">
-                Semua (<span id="total-country-count">250</span>)
-              </button>
-              <button type="button" data-filter="Asia" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Asia</button>
-              <button type="button" data-filter="Eropa" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Eropa</button>
-              <button type="button" data-filter="Timur Tengah" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Timur Tengah</button>
-              <button type="button" data-filter="Amerika" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Amerika</button>
-              <button type="button" data-filter="Afrika" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Afrika</button>
-              <button type="button" data-filter="Oseania" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Oseania</button>
-            </div>
-
-            <div class="w-full sm:w-72">
-              <input 
-                type="text" 
-                id="country-search-input" 
-                placeholder="Cari negara / bahasa / ibukota..." 
-                class="w-full px-3 py-1.5 text-[13px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
-              />
-            </div>
+          <div class="w-full sm:w-72">
+            <input 
+              type="text" 
+              id="country-search-input" 
+              placeholder="Cari negara / bahasa / ibukota..." 
+              class="w-full px-3 py-1.5 text-[13px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+            />
           </div>
         </div>
 
         <!-- Showing count status -->
-        <div class="flex items-center justify-between text-[12px] text-smoke px-1">
+        <div class="flex items-center justify-between text-[12px] text-smoke pt-1 border-t border-rule">
           <span id="country-results-info">Menampilkan negara...</span>
         </div>
-
-        <!-- Country Cards Grid -->
-        <div id="countries-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Rendered dynamically by client script -->
-        </div>
-
-        <!-- Load More Button -->
-        <div id="load-more-wrapper" class="hidden text-center pt-4">
-          <button type="button" id="btn-load-more" class="btn btn-secondary px-8 py-2 text-[13px]">
-            Tampilkan Lebih Banyak Negara (+36) ↓
-          </button>
-        </div>
-
       </div>
+
+      <!-- Country Cards Grid -->
+      <div id="countries-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rendered dynamically by client script -->
+      </div>
+
+      <!-- Load More Button -->
+      <div id="load-more-wrapper" class="hidden text-center pt-4">
+        <button type="button" id="btn-load-more" class="btn btn-secondary px-8 py-2 text-[13px]">
+          Tampilkan Lebih Banyak Negara (+36) ↓
+        </button>
+      </div>
+
+    </div>
   </Section>
 
   <!-- ========================================== -->
@@ -456,7 +429,7 @@ import { worldCountries } from '../data/countries';
       let currentTableId = defaultTables[0]?.id || '';
       let isAudioEnabled = true;
       let tableSearchQuery = '';
-      let countryFilter = 'targets'; // 'targets', 'all', 'Asia', 'Eropa', etc.
+      let countryFilter = 'all'; // 'targets', 'all', 'Asia', 'Eropa', etc.
       let countrySearchQuery = '';
       let countryDisplayLimit = 36;
 

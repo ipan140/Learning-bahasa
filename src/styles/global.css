@@ -26,8 +26,8 @@
   --rule: #dcdcdc;
   --tint: #f1f1f1;
   --link: #0b6ec5;
-  --cta: #f35815;
-  --cta-ink: #000000;
+  --cta: #4C2365;
+  --cta-ink: #ffffff;
   --ok: #1a8a44;
   --badge: #f2b600;
   color-scheme: light;
@@ -43,7 +43,9 @@
   --stone: #4a4a4a;
   --rule: #262626;
   --tint: #161616;
-  --link: #4aa3f0;
+  --link: #a36bd6;
+  --cta: #632882;
+  --cta-ink: #ffffff;
   --ok: #3cc46f;
   color-scheme: dark;
 }
@@ -58,19 +60,21 @@
   --rule: #dcdcdc;
   --tint: #f1f1f1;
   --link: #0b6ec5;
+  --cta: #4C2365;
+  --cta-ink: #ffffff;
   --ok: #1a8a44;
   color-scheme: light;
 }
 
 .band-warm {
-  --canvas: #fde4d6;
+  --canvas: #f6edf9;
   --ink: #000000;
   --steel: #3d3d3d;
-  --smoke: #7a5a48;
-  --stone: #e3b496;
-  --rule: #f1c4a8;
-  --tint: #fbd5c0;
-  --link: #0b6ec5;
+  --smoke: #665070;
+  --stone: #d4c2dc;
+  --rule: #e5d8ec;
+  --tint: #ece0f3;
+  --link: #4C2365;
   --ok: #1a8a44;
   color-scheme: light;
 }
