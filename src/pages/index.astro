@@ -64,34 +64,22 @@ import { worldCountries } from '../data/countries';
     </div>
   </Section>
 
-  <!-- [01] MAIN APP: Area Belajar Aksara & Katalog Negara -->
+  <!-- [01] MAIN APP: Area Belajar Aksara -->
   <Section id="area-belajar" top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
     <div class="max-w-4xl">
-      <p class="label"><b>[01]</b> area belajar interaktif</p>
-      <h2 class="mt-4 text-[clamp(28px,3.8vw,44px)] leading-[1.1] font-bold tracking-[-0.035em]">
-        Pilih Aksara atau Telusuri Negara
-      </h2>
-      <p class="mt-3 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
-        Gunakan tombol di bawah untuk berganti antara tabel huruf teks atau katalog 250 negara di dunia.
-      </p>
-
-      <!-- View Switcher Tabs (Tabel vs Katalog Negara) -->
-      <div class="mt-7 flex flex-wrap items-center gap-3 border-b border-rule pb-4">
-        <button 
-          type="button" 
-          id="btn-view-tables" 
-          class="px-5 py-2.5 text-[14px] font-mono border-2 border-ink bg-ink text-canvas font-bold flex items-center gap-2 cursor-pointer transition-colors"
-        >
-          <span>📖</span> Tabel Aksara & Huruf
-        </button>
-        <button 
-          type="button" 
-          id="btn-view-countries" 
-          class="px-5 py-2.5 text-[14px] font-mono border-2 border-rule bg-canvas text-steel hover:text-ink hover:border-ink flex items-center gap-2 cursor-pointer transition-colors"
-        >
-          <span>🌍</span> Katalog 250 Negara & Target Belajar 
-          <span id="target-count-badge" class="px-2 py-0.2 text-[11px] bg-cta text-cta-ink font-bold">0</span>
-        </button>
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <p class="label"><b>[01]</b> area belajar interaktif</p>
+          <h2 class="mt-4 text-[clamp(28px,3.8vw,44px)] leading-[1.1] font-bold tracking-[-0.035em]">
+            Tabel Huruf & Aksara Bahasa
+          </h2>
+          <p class="mt-3 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
+            Pilih aksara bahasa di bawah ini. Klik tiap kotak karakter untuk mendengarkan lafal audio aslinya.
+          </p>
+        </div>
+        <a href="#katalog-section" class="btn btn-secondary btn-s shrink-0 font-mono text-[13px]">
+          🌍 Jelajahi 250 Negara ↓
+        </a>
       </div>
     </div>
 
@@ -110,7 +98,7 @@ import { worldCountries } from '../data/countries';
       </div>
 
       <!-- ========================================== -->
-      <!-- VIEW 1: TABEL AKSARA & HURUF -->
+      <!-- SECTION TABEL AKSARA & HURUF -->
       <!-- ========================================== -->
       <div id="section-tables" class="space-y-8">
         
@@ -197,11 +185,41 @@ import { worldCountries } from '../data/countries';
         </div>
 
       </div>
+    </div>
+  </Section>
 
-      <!-- ========================================== -->
-      <!-- VIEW 2: KATALOG 250 NEGARA & TARGET BELAJAR -->
-      <!-- ========================================== -->
-      <div id="section-countries" class="hidden space-y-6">
+  <!-- ======================================================== -->
+  <!-- [02] KATALOG 250 NEGARA & TARGET BELAJAR (SELALU AKTIF)  -->
+  <!-- ======================================================== -->
+  <Section id="katalog-section" top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
+    <div class="max-w-4xl">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <p class="label"><b>[02]</b> database 250 negara & target belajar</p>
+          <h2 class="mt-4 text-[clamp(28px,3.8vw,44px)] leading-[1.1] font-bold tracking-[-0.035em]">
+            Katalog 250 Negara di Dunia
+          </h2>
+          <p class="mt-3 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
+            Tandai bintang ⭐ pada negara yang ingin Anda pelajari atau klik "Buka Tabel Aksara" untuk belajar langsung.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btn-cloud-sync-trigger" class="btn btn-secondary btn-s text-[12px]" title="Masuk untuk sinkronisasi materi ke smartphone & laptop lain">
+            ☁️ Sinkron Akun
+          </button>
+          <button type="button" id="btn-export-backup" class="btn btn-secondary btn-s text-[12px]" title="Simpan file cadangan target belajar & tabel kustom">
+            📥 Backup JSON
+          </button>
+          <label class="btn btn-secondary btn-s text-[12px] cursor-pointer" title="Pulihkan cadangan dari file JSON">
+            📤 Import JSON
+            <input type="file" id="input-import-file" accept=".json" class="hidden" />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Country Catalog Content (Always Visible) -->
+    <div id="section-countries" class="mt-8 space-y-6">
         
         <!-- Controls & Filters for Countries -->
         <div class="p-5 border border-rule bg-canvas space-y-4">
@@ -277,12 +295,13 @@ import { worldCountries } from '../data/countries';
         </div>
 
       </div>
+  </Section>
 
-      <!-- ========================================== -->
-      <!-- CUSTOM TABLE CREATOR MODAL (DENGAN DUKUNGAN EXCEL & CSV) -->
-      <!-- ========================================== -->
-      <div id="buat-tabel" class="pt-8">
-        <div id="creator-modal" class="hidden p-6 border-2 border-ink bg-canvas">
+  <!-- ========================================== -->
+  <!-- CUSTOM TABLE CREATOR MODAL (DENGAN DUKUNGAN EXCEL & CSV) -->
+  <!-- ========================================== -->
+  <div id="buat-tabel" class="frame px-6 max-md:px-5">
+    <div id="creator-modal" class="hidden my-8 p-6 border-2 border-ink bg-canvas shadow-2xl">
           <div class="flex items-center justify-between border-b border-rule pb-4 mb-6">
             <div>
               <h3 class="text-[20px] font-bold text-ink">Buat Tabel / Halaman Bahasa Sendiri</h3>
@@ -398,9 +417,6 @@ import { worldCountries } from '../data/countries';
         </div>
       </div>
 
-    </div>
-  </Section>
-
   <!-- Client-side Interactive Application Script -->
   <script is:inline>
     (function () {
@@ -505,28 +521,11 @@ import { worldCountries } from '../data/countries';
         if (totalCountryCount) totalCountryCount.textContent = allCountries.length;
       }
 
-      // Switch View
-      function switchView(view) {
-        activeView = view;
-        if (view === 'tables') {
-          sectionTables.classList.remove('hidden');
-          sectionCountries.classList.add('hidden');
-          btnViewTables.className = 'px-5 py-2.5 text-[14px] font-mono border-2 border-ink bg-ink text-canvas font-bold flex items-center gap-2 cursor-pointer transition-colors';
-          btnViewCountries.className = 'px-5 py-2.5 text-[14px] font-mono border-2 border-rule bg-canvas text-steel hover:text-ink hover:border-ink flex items-center gap-2 cursor-pointer transition-colors';
-        } else {
-          sectionTables.classList.add('hidden');
-          sectionCountries.classList.remove('hidden');
-          btnViewTables.className = 'px-5 py-2.5 text-[14px] font-mono border-2 border-rule bg-canvas text-steel hover:text-ink hover:border-ink flex items-center gap-2 cursor-pointer transition-colors';
-          btnViewCountries.className = 'px-5 py-2.5 text-[14px] font-mono border-2 border-ink bg-ink text-canvas font-bold flex items-center gap-2 cursor-pointer transition-colors';
-          renderCountries();
-        }
-      }
-
-      if (btnViewTables) btnViewTables.addEventListener('click', () => switchView('tables'));
-      if (btnViewCountries) btnViewCountries.addEventListener('click', () => switchView('countries'));
       if (heroGotoCountries) {
         heroGotoCountries.addEventListener('click', (e) => {
-          switchView('countries');
+          e.preventDefault();
+          const target = document.getElementById('katalog-section');
+          target?.scrollIntoView({ behavior: 'smooth' });
         });
       }
 
@@ -928,7 +927,6 @@ import { worldCountries } from '../data/countries';
           btn.addEventListener('click', () => {
             const tableId = btn.getAttribute('data-open-table');
             currentTableId = tableId;
-            switchView('tables');
             renderTabs();
             renderCurrentTable();
             const area = document.getElementById('area-belajar');
@@ -940,7 +938,6 @@ import { worldCountries } from '../data/countries';
           btn.addEventListener('click', () => {
             const countryName = btn.getAttribute('data-create-for');
             const voice = btn.getAttribute('data-voice');
-            switchView('tables');
             openCreator();
             document.getElementById('form-name').value = countryName;
             document.getElementById('form-title').value = 'Tabel Aksara / Kosakata ' + countryName;
@@ -1108,8 +1105,6 @@ import { worldCountries } from '../data/countries';
       }
       window.addEventListener('hashchange', () => {
         if (window.location.hash === '#buat-tabel') openCreator();
-        if (window.location.hash === '#katalog-section') switchView('countries');
-        if (window.location.hash === '#area-belajar') switchView('tables');
       });
 
       if (closeCreatorBtn) closeCreatorBtn.addEventListener('click', () => creatorModal.classList.add('hidden'));
