@@ -1,0 +1,51 @@
+---
+// Interactive Guide Console modeled after RunLog with exact layout and aesthetic
+const guideSteps = [
+  { step: '01', action: 'pilih', text: 'Pilih aksara bahasa (Hiragana, Katakana, Jerman, Korea, dll.)', tag: 'instan', ok: true },
+  { step: '02', action: 'dengar', text: 'Klik kotak karakter untuk mendengar audio pelafalan asli', tag: 'audio 🔊', ok: true },
+  { step: '03', action: 'target', text: 'Tandai bintang ⭐ pada 250 negara yang ingin dipelajari', tag: 'bookmark', ok: true },
+  { step: '04', action: 'buat', text: 'Buat tabel aksara/kosakata baru dengan format teks bebas', tag: 'kustom', ok: true },
+  { step: '05', action: 'simpan', text: 'Tersimpan otomatis di browser tanpa repot registrasi/login', tag: 'otomatis', ok: true },
+  { step: '06', action: 'backup', text: 'Download / cadangkan data sewaktu-waktu via Backup JSON', tag: 'cadangan', ok: true },
+];
+---
+
+<div class="relative bg-canvas text-[13px] leading-none font-mono" aria-label="Panduan Cara Menggunakan Website">
+  <!-- Window Header Bar -->
+  <div class="flex items-center gap-3 px-4 h-11 border-b border-ink bg-tint/60">
+    <span class="text-ink font-bold">panduan_belajar</span>
+    <span class="text-smoke hidden sm:inline">sistem: mandiri</span>
+    <span class="ml-auto pill border border-rule text-steel">
+      <span class="size-1.5 rounded-full bg-ok" aria-hidden="true"></span>
+      <span class="font-medium">siap digunakan</span>
+    </span>
+  </div>
+
+  <!-- Step-by-step Guide List -->
+  <ol class="py-2.5 divide-y divide-rule/40">
+    {guideSteps.map((s) => (
+      <li class="grid grid-cols-[2.5ch_1fr_auto] sm:grid-cols-[2.5ch_6.5ch_1fr_auto] items-center gap-3 px-4 py-2 hover:bg-tint/30 transition-colors">
+        <span class="text-smoke font-bold">{s.step}</span>
+        <span class="text-smoke hidden sm:block font-medium">[{s.action}]</span>
+        <span class="text-ink truncate text-[12.5px] sm:text-[13px]">{s.text}</span>
+        <span class="text-ok font-bold text-right" aria-hidden="true">✓</span>
+      </li>
+    ))}
+  </ol>
+
+  <!-- Bottom Stat Bar (Like tokens / cost / steps) -->
+  <div class="grid grid-cols-3 border-t border-ink text-[12px] bg-tint/30">
+    <div class="px-4 py-3 border-r border-rule">
+      <span class="label block mb-1 text-[10px]">Aksara Bawaan</span>
+      <span class="text-ink font-bold tabular-nums">8+ Tabel</span>
+    </div>
+    <div class="px-4 py-3 border-r border-rule">
+      <span class="label block mb-1 text-[10px]">Database Negara</span>
+      <span class="text-ink font-bold tabular-nums">250 Dunia</span>
+    </div>
+    <div class="px-4 py-3">
+      <span class="label block mb-1 text-[10px]">Status Akun</span>
+      <span class="text-ok font-bold">Tanpa Login ✓</span>
+    </div>
+  </div>
+</div>

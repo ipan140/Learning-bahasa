@@ -1,25 +1,82 @@
 ---
 import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
+import MediaWindow from '../components/MediaWindow.astro';
+import GuideWindow from '../components/GuideWindow.astro';
 import { defaultLanguageTables } from '../data/languages';
 import { worldCountries } from '../data/countries';
 ---
 
-<Base title="Tabel Belajar Bahasa & 250 Negara Dunia" description="Aplikasi tabel belajar aksara bahasa dan database lengkap 250 negara dunia: Jepang, Jerman, Korea, Arab, Tiongkok, Rusia, dan pembuat tabel dinamis.">
+<Base title="Belajar Bahasa - Tabel Aksara & Katalog 250 Negara" description="Aplikasi tabel belajar aksara bahasa dan database 250 negara dunia dengan panduan cara belajar interaktif.">
   
-  <!-- [01] Hero & Main Navigation Section -->
-  <Section top={false} inner="px-6 pt-12 pb-14 lg:pt-16 lg:pb-18 max-md:px-5">
+  <!-- [00] HERO: Pengenalan & Panduan Menggunakan Website (Menggunakan MediaWindow seperti Gambar 2) -->
+  <Section id="panduan" top={false} inner="px-6 pt-14 pb-18 lg:pt-20 lg:pb-24 max-md:px-5 overflow-hidden" label="Pengenalan Website">
+    <div class="grid-bg" style="--gx:74%;--gy:50%" aria-hidden="true"></div>
+    
+    <!-- Retro-Tech Graphic Blueprint Background -->
+    <svg class="absolute left-0 top-0 max-lg:hidden pointer-events-none" width="1280" height="653" viewBox="0 0 1280 653" fill="none" aria-hidden="true">
+      <circle cx="1150" cy="146" r="150" stroke="var(--stone)" />
+      <circle cx="1150" cy="146" r="96" stroke="var(--rule)" stroke-dasharray="3 4" />
+      <circle cx="612" cy="567" r="58" stroke="var(--stone)" stroke-dasharray="3 4" />
+      <polyline points="520,593 612,567 740,589 880,555 1010,581 1130,547" stroke="var(--ink)" stroke-dasharray="4 4" />
+      <polyline points="700,122 820,90 960,112 1080,76" stroke="var(--ink)" stroke-dasharray="4 4" />
+      {[[520, 593], [612, 567], [740, 589], [880, 555, 1], [1010, 581], [1130, 547], [700, 122], [820, 90, 1], [960, 112], [1080, 76]].map(([x, y, o]) => (
+        <rect x={x - 4} y={y - 4} width="8" height="8" fill={o ? 'var(--cta)' : 'var(--canvas)'} stroke="var(--ink)" />
+      ))}
+      <g fill="var(--smoke)" font-size="11" font-family="inherit">
+        <text x="534" y="615">tabel_aksara</text><text x="892" y="535">audio_speech</text><text x="1020" y="606">250_negara</text><text x="832" y="70">tanpa_login</text>
+      </g>
+      <g stroke="var(--ink)"><path d="M580.5 96h11M586 90.5v11M1230.5 537h11M1236 531.5v11M34.5 613h11M40 607.5v11" /></g>
+    </svg>
+
+    <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_520px] gap-12 lg:gap-14 items-center">
+      <!-- Left: Introduction Text & CTA -->
+      <div>
+        <p class="label"><b>[00]</b> pengenalan & cara menggunakan</p>
+        <h1 class="mt-5 text-[clamp(36px,5vw,62px)] leading-[1.04] font-bold tracking-[-0.04em]">
+          Belajar Aksara Bahasa & Catat Target Negaramu.
+        </h1>
+        <p class="mt-6 max-w-[50ch] text-[16px] leading-[1.6] text-steel max-md:text-[15px]">
+          Selamat datang di platform belajar bahasa mandiri. Anda bisa mempelajari tabel aksara teks (Jepang, Jerman, Korea, Arab, dll.) dengan audio lafal asli, serta menandai target negara yang ingin dipelajari tanpa harus mendaftar akun.
+        </p>
+
+        <div class="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
+          <a href="#area-belajar" class="btn btn-primary max-md:w-full">
+            Mulai Belajar Aksara ↓
+          </a>
+          <a href="#area-belajar" id="hero-goto-countries" class="link text-[15px]">
+            Jelajahi 250 Negara -&gt;
+          </a>
+        </div>
+
+        <div class="mt-7 flex items-center w-fit max-w-full border border-rule bg-canvas text-[13px] font-mono">
+          <code class="px-4 py-2.5 text-ink truncate"><span class="text-smoke select-none">fitur: </span>audio otomatis · 250 negara · tanpa login</code>
+          <span class="px-3 py-2.5 border-l border-rule text-ok font-bold">100% GRATIS</span>
+        </div>
+      </div>
+
+      <!-- Right: MediaWindow with Guide Steps (Matches Image 2) -->
+      <div>
+        <MediaWindow title="app.belajar-bahasa.com/panduan" shadow>
+          <GuideWindow />
+        </MediaWindow>
+      </div>
+    </div>
+  </Section>
+
+  <!-- [01] MAIN APP: Area Belajar Aksara & Katalog Negara -->
+  <Section id="area-belajar" top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
     <div class="max-w-4xl">
-      <p class="label"><b>[01]</b> Belajar Aksara & 250 Negara Dunia</p>
-      <h1 class="mt-4 text-[clamp(32px,4.5vw,56px)] leading-[1.08] font-bold tracking-[-0.04em]">
-        Tabel Belajar Bahasa & Aksara Dunia
-      </h1>
-      <p class="mt-4 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
-        Pilih bahasa untuk membuka tabel aksara teks interaktif dengan audio lafal asli, atau jelajahi katalog 250 negara dunia untuk menyimpan daftar negara yang ingin Anda pelajari.
+      <p class="label"><b>[01]</b> area belajar interaktif</p>
+      <h2 class="mt-4 text-[clamp(28px,3.8vw,44px)] leading-[1.1] font-bold tracking-[-0.035em]">
+        Pilih Aksara atau Telusuri Negara
+      </h2>
+      <p class="mt-3 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
+        Gunakan tombol di bawah untuk berganti antara tabel huruf teks atau katalog 250 negara di dunia.
       </p>
 
       <!-- View Switcher Tabs (Tabel vs Katalog Negara) -->
-      <div class="mt-8 flex flex-wrap items-center gap-3 border-b border-rule pb-4">
+      <div class="mt-7 flex flex-wrap items-center gap-3 border-b border-rule pb-4">
         <button 
           type="button" 
           id="btn-view-tables" 
@@ -151,9 +208,9 @@ import { worldCountries } from '../data/countries';
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div class="flex items-center gap-2.5">
-                <h2 class="text-[20px] font-bold text-ink flex items-center gap-2">
+                <h3 class="text-[20px] font-bold text-ink flex items-center gap-2">
                   <span>🌍</span> Database 250 Negara Dunia
-                </h2>
+                </h3>
                 <span class="px-2 py-0.5 text-[11px] font-mono border border-ok text-ok bg-canvas">REST Countries API Dataset</span>
               </div>
               <p class="text-[13px] text-steel mt-1">
@@ -212,7 +269,7 @@ import { worldCountries } from '../data/countries';
         <!-- Load More Button -->
         <div id="load-more-wrapper" class="hidden text-center pt-4">
           <button type="button" id="btn-load-more" class="btn btn-secondary px-8 py-2 text-[13px]">
-            Tampilkan Lebih Banyak Negara (+30) ↓
+            Tampilkan Lebih Banyak Negara (+36) ↓
           </button>
         </div>
 
@@ -377,6 +434,7 @@ import { worldCountries } from '../data/countries';
       // DOM Elements
       const btnViewTables = document.getElementById('btn-view-tables');
       const btnViewCountries = document.getElementById('btn-view-countries');
+      const heroGotoCountries = document.getElementById('hero-goto-countries');
       const sectionTables = document.getElementById('section-tables');
       const sectionCountries = document.getElementById('section-countries');
       const targetCountBadge = document.getElementById('target-count-badge');
@@ -452,6 +510,11 @@ import { worldCountries } from '../data/countries';
 
       if (btnViewTables) btnViewTables.addEventListener('click', () => switchView('tables'));
       if (btnViewCountries) btnViewCountries.addEventListener('click', () => switchView('countries'));
+      if (heroGotoCountries) {
+        heroGotoCountries.addEventListener('click', (e) => {
+          switchView('countries');
+        });
+      }
 
       // Speech Synthesizer
       function speakText(text, lang) {
@@ -741,7 +804,8 @@ import { worldCountries } from '../data/countries';
             switchView('tables');
             renderTabs();
             renderCurrentTable();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const area = document.getElementById('area-belajar');
+            if (area) area.scrollIntoView({ behavior: 'smooth' });
           });
         });
 
@@ -911,7 +975,7 @@ import { worldCountries } from '../data/countries';
       window.addEventListener('hashchange', () => {
         if (window.location.hash === '#buat-tabel') openCreator();
         if (window.location.hash === '#katalog-section') switchView('countries');
-        if (window.location.hash === '#tabel-section') switchView('tables');
+        if (window.location.hash === '#area-belajar') switchView('tables');
       });
 
       if (closeCreatorBtn) closeCreatorBtn.addEventListener('click', () => creatorModal.classList.add('hidden'));
@@ -1003,7 +1067,8 @@ Oi = eu | Ie = ie | Kh = ch | Sy = sch | Ts = z`;
           renderTabs();
           renderCurrentTable();
           showToast(`Tabel baru "${title}" berhasil dibuat dan disimpan!`);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          const area = document.getElementById('area-belajar');
+          if (area) area.scrollIntoView({ behavior: 'smooth' });
         });
       }
 
