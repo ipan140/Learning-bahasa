@@ -1,0 +1,461 @@
+---
+// AuthModal.astro - Modal Login & Registrasi Pengguna
+---
+
+<dialog id="auth-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[420px] shadow-2xl">
+  <div class="p-6 max-sm:p-5 flex flex-col gap-5">
+    
+    <!-- Header Modal -->
+    <div class="flex items-start justify-between pb-3 border-b border-rule">
+      <div>
+        <h2 id="auth-modal-title" class="text-[18px] font-bold tracking-tight text-ink">Masuk ke Akun</h2>
+        <p class="text-[12px] text-steel mt-0.5" id="auth-modal-subtitle">
+          Simpan target belajar dan sinkronkan antar-laptop & smartphone Anda.
+        </p>
+      </div>
+      <button 
+        type="button" 
+        id="auth-modal-close" 
+        class="text-xs font-mono px-2 py-1 border border-rule hover:bg-smoke/10 text-smoke hover:text-ink transition-colors shrink-0 ml-3" 
+        aria-label="Tutup Modal"
+      >
+        [x]
+      </button>
+    </div>
+
+    <!-- Alert / Notifikasi Box -->
+    <div id="auth-alert" class="hidden text-xs p-3 border font-mono"></div>
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: PROFIL SAAT USER SUDAH LOGIN           -->
+    <!-- ============================================== -->
+    <div id="auth-view-logged-in" class="hidden flex flex-col gap-4">
+      <div class="p-4 bg-smoke/5 border border-rule flex items-center gap-3.5">
+        <div class="size-11 shrink-0 rounded-full bg-ink text-canvas font-bold text-base flex items-center justify-center uppercase select-none" id="auth-avatar-letter">
+          U
+        </div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-ok animate-pulse"></span>
+            <span class="text-[11px] font-mono text-ok font-semibold uppercase">Akun Aktif</span>
+          </div>
+          <p class="text-[14px] font-bold text-ink truncate mt-0.5" id="auth-user-email">user@email.com</p>
+        </div>
+      </div>
+
+      <!-- Ringkasan Materi Tersimpan -->
+      <div class="p-4 border border-rule flex flex-col gap-3">
+        <span class="text-[11px] font-mono text-smoke uppercase tracking-wider">Materi Tersimpan di Cloud</span>
+        <div class="grid grid-cols-2 gap-3 text-center">
+          <div class="p-3 bg-smoke/5 border border-rule">
+            <div class="text-[22px] font-bold font-mono text-ink" id="sync-target-count">0</div>
+            <div class="text-[12px] text-steel mt-0.5">Target Negara</div>
+          </div>
+          <div class="p-3 bg-smoke/5 border border-rule">
+            <div class="text-[22px] font-bold font-mono text-ink" id="sync-table-count">0</div>
+            <div class="text-[12px] text-steel mt-0.5">Tabel Aksara</div>
+          </div>
+        </div>
+
+        <button type="button" id="btn-force-sync" class="btn btn-secondary btn-s w-full justify-center text-[12px]">
+          ⚡ Sinkronkan Ulang Sekarang
+        </button>
+      </div>
+
+      <div class="pt-2 border-t border-rule flex justify-end">
+        <button type="button" id="btn-logout" class="btn btn-primary btn-s w-full justify-center">
+          Keluar dari Akun (Logout)
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: FORMULIR LOGIN & DAFTAR (BELUM LOGIN)  -->
+    <!-- ============================================== -->
+    <div id="auth-view-logged-out" class="flex flex-col gap-4">
+      
+      <!-- Tab Pilihan: Masuk / Daftar -->
+      <div class="flex border-b border-rule">
+        <button 
+          type="button" 
+          id="tab-login" 
+          class="flex-1 pb-2.5 text-[13px] font-semibold text-center border-b-2 border-cta text-ink transition-colors"
+        >
+          Masuk
+        </button>
+        <button 
+          type="button" 
+          id="tab-register" 
+          class="flex-1 pb-2.5 text-[13px] font-semibold text-center border-b-2 border-transparent text-smoke hover:text-ink transition-colors"
+        >
+          Daftar Akun
+        </button>
+      </div>
+
+      <!-- Form Otentikasi -->
+      <form id="auth-form" class="flex flex-col gap-3.5">
+        <div>
+          <label for="auth-email" class="block text-[11px] font-mono text-smoke mb-1 uppercase tracking-wider">
+            Email
+          </label>
+          <input 
+            type="email" 
+            id="auth-email" 
+            required 
+            autocomplete="email"
+            placeholder="nama@email.com" 
+            class="w-full text-[13px] px-3.5 py-2.5 bg-canvas border border-rule focus:border-ink focus:outline-none text-ink placeholder:text-smoke/60"
+          />
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="auth-password" class="block text-[11px] font-mono text-smoke uppercase tracking-wider">
+              Kata Sandi
+            </label>
+            <span id="password-hint" class="text-[11px] text-smoke hidden">Minimal 6 karakter</span>
+          </div>
+          <input 
+            type="password" 
+            id="auth-password" 
+            required 
+            minlength="6"
+            autocomplete="current-password"
+            placeholder="Masukkan kata sandi..." 
+            class="w-full text-[13px] px-3.5 py-2.5 bg-canvas border border-rule focus:border-ink focus:outline-none text-ink placeholder:text-smoke/60"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          id="auth-submit-btn" 
+          class="btn btn-primary w-full justify-center py-2.5 mt-1 font-semibold text-[13px]"
+        >
+          Masuk ke Akun
+        </button>
+      </form>
+
+      <!-- Footer Info -->
+      <p class="text-[12px] text-steel text-center leading-relaxed pt-2 border-t border-rule" id="auth-footer-text">
+        Belum memiliki akun? 
+        <button type="button" id="link-to-register" class="text-link hover:underline font-semibold ml-1">
+          Daftar sekarang
+        </button>
+      </p>
+    </div>
+
+  </div>
+</dialog>
+
+<script>
+  import {
+    getSupabase,
+    isSupabaseConfigured,
+    getCurrentUser,
+    signUpWithEmail,
+    signInWithEmail,
+    signOutUser,
+    fetchUserTargetsFromCloud,
+    addTargetToCloud,
+    removeTargetFromCloud,
+    batchSyncTargetsToCloud,
+    fetchUserCustomTablesFromCloud,
+    saveCustomTableToCloud,
+    deleteCustomTableFromCloud
+  } from '../lib/supabase';
+
+  let currentAuthMode: 'login' | 'register' = 'login';
+  let activeUser: any = null;
+
+  const modal = document.getElementById('auth-modal') as HTMLDialogElement | null;
+  const modalTitle = document.getElementById('auth-modal-title');
+  const modalSubtitle = document.getElementById('auth-modal-subtitle');
+  const alertBox = document.getElementById('auth-alert');
+  const viewLoggedIn = document.getElementById('auth-view-logged-in');
+  const viewLoggedOut = document.getElementById('auth-view-logged-out');
+
+  const tabLogin = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
+  const authForm = document.getElementById('auth-form') as HTMLFormElement | null;
+  const authSubmitBtn = document.getElementById('auth-submit-btn');
+  const passwordHint = document.getElementById('password-hint');
+  const footerText = document.getElementById('auth-footer-text');
+  const linkToRegister = document.getElementById('link-to-register');
+
+  const userEmailDisplay = document.getElementById('auth-user-email');
+  const avatarLetter = document.getElementById('auth-avatar-letter');
+  const syncTargetCount = document.getElementById('sync-target-count');
+  const syncTableCount = document.getElementById('sync-table-count');
+
+  function showAlert(msg: string, type: 'error' | 'success' | 'info' = 'info') {
+    if (!alertBox) return;
+    alertBox.textContent = msg;
+    alertBox.className = 'text-xs p-3 border font-mono block';
+    if (type === 'error') {
+      alertBox.classList.add('bg-red-500/10', 'border-red-500/40', 'text-red-500');
+    } else if (type === 'success') {
+      alertBox.classList.add('bg-ok/10', 'border-ok/40', 'text-ok');
+    } else {
+      alertBox.classList.add('bg-cta/10', 'border-cta/40', 'text-ink');
+    }
+  }
+
+  function hideAlert() {
+    if (!alertBox) return;
+    alertBox.className = 'hidden';
+  }
+
+  function switchAuthTab(mode: 'login' | 'register') {
+    currentAuthMode = mode;
+    hideAlert();
+    if (mode === 'login') {
+      if (modalTitle) modalTitle.textContent = 'Masuk ke Akun';
+      if (modalSubtitle) modalSubtitle.textContent = 'Simpan target belajar dan sinkronkan antar-laptop & smartphone Anda.';
+      tabLogin?.classList.add('border-cta', 'text-ink');
+      tabLogin?.classList.remove('border-transparent', 'text-smoke');
+      tabRegister?.classList.remove('border-cta', 'text-ink');
+      tabRegister?.classList.add('border-transparent', 'text-smoke');
+      if (authSubmitBtn) authSubmitBtn.textContent = 'Masuk ke Akun';
+      passwordHint?.classList.add('hidden');
+      if (footerText) {
+        footerText.innerHTML = `Belum memiliki akun? <button type="button" id="link-to-register" class="text-link hover:underline font-semibold ml-1">Daftar sekarang</button>`;
+        document.getElementById('link-to-register')?.addEventListener('click', () => switchAuthTab('register'));
+      }
+    } else {
+      if (modalTitle) modalTitle.textContent = 'Daftar Akun Baru';
+      if (modalSubtitle) modalSubtitle.textContent = 'Buat akun gratis untuk menyimpan progres belajar Anda selamanya.';
+      tabRegister?.classList.add('border-cta', 'text-ink');
+      tabRegister?.classList.remove('border-transparent', 'text-smoke');
+      tabLogin?.classList.remove('border-cta', 'text-ink');
+      tabLogin?.classList.add('border-transparent', 'text-smoke');
+      if (authSubmitBtn) authSubmitBtn.textContent = 'Buat Akun Saya';
+      passwordHint?.classList.remove('hidden');
+      if (footerText) {
+        footerText.innerHTML = `Sudah punya akun? <button type="button" id="link-to-login" class="text-link hover:underline font-semibold ml-1">Masuk di sini</button>`;
+        document.getElementById('link-to-login')?.addEventListener('click', () => switchAuthTab('login'));
+      }
+    }
+  }
+
+  // Update visual tombol status user di header web
+  function updateHeaderAuthButton(user: any) {
+    const dot = document.getElementById('auth-status-dot');
+    const label = document.getElementById('auth-trigger-label');
+    const mobileBtn = document.getElementById('auth-trigger-btn-mobile');
+
+    if (user) {
+      if (dot) dot.className = 'inline-block w-2 h-2 rounded-full bg-ok';
+      const emailName = user.email ? user.email.split('@')[0] : 'Akun';
+      if (label) label.textContent = emailName;
+      if (mobileBtn) mobileBtn.textContent = `🟢 Akun: ${emailName}`;
+    } else {
+      if (dot) dot.className = 'inline-block w-2 h-2 rounded-full bg-smoke';
+      if (label) label.textContent = 'Masuk';
+      if (mobileBtn) mobileBtn.textContent = 'Masuk ke Akun';
+    }
+  }
+
+  // Pengecekan status login user
+  async function checkAuthState() {
+    try {
+      const user = await getCurrentUser();
+      activeUser = user;
+      updateHeaderAuthButton(user);
+
+      if (user) {
+        viewLoggedIn?.classList.remove('hidden');
+        viewLoggedOut?.classList.add('hidden');
+        if (modalTitle) modalTitle.textContent = 'Profil Pengguna';
+        if (modalSubtitle) modalSubtitle.textContent = 'Kelola status sinkronisasi akun belajar Anda.';
+        if (userEmailDisplay) userEmailDisplay.textContent = user.email || '-';
+        if (avatarLetter) {
+          const initial = (user.email || 'U').charAt(0).toUpperCase();
+          avatarLetter.textContent = initial;
+        }
+        updateSyncStats(user.id);
+      } else {
+        viewLoggedIn?.classList.add('hidden');
+        viewLoggedOut?.classList.remove('hidden');
+        switchAuthTab(currentAuthMode);
+      }
+    } catch (err) {
+      console.warn('Auth check failed:', err);
+    }
+  }
+
+  async function updateSyncStats(userId: string) {
+    try {
+      const cloudTargets = await fetchUserTargetsFromCloud(userId);
+      const cloudTables = await fetchUserCustomTablesFromCloud(userId);
+
+      if (syncTargetCount) syncTargetCount.textContent = String(cloudTargets.length);
+      if (syncTableCount) syncTableCount.textContent = String(cloudTables.length);
+
+      window.dispatchEvent(new CustomEvent('supabase-data-loaded', {
+        detail: { targets: cloudTargets, tables: cloudTables }
+      }));
+    } catch (err) {
+      console.error('Update sync stats failed:', err);
+    }
+  }
+
+  // Sinkronisasi penuh lokal -> cloud
+  async function performFullSync() {
+    if (!activeUser) return;
+    showAlert('Menyinkronkan data belajar Anda...', 'info');
+
+    try {
+      // 1. Sinkronkan target negara
+      const localTargets: string[] = JSON.parse(localStorage.getItem('target_countries') || '[]');
+      if (localTargets.length > 0) {
+        await batchSyncTargetsToCloud(activeUser.id, localTargets);
+      }
+
+      // 2. Sinkronkan tabel custom
+      const localTables: any[] = JSON.parse(localStorage.getItem('custom_character_tables') || '[]');
+      for (const t of localTables) {
+        await saveCustomTableToCloud(activeUser.id, t);
+      }
+
+      showAlert('✓ Seluruh data berhasil tersinkron!', 'success');
+      await updateSyncStats(activeUser.id);
+    } catch (err: any) {
+      showAlert('Gagal sinkronisasi: ' + (err.message || 'Terjadi kesalahan'), 'error');
+    }
+  }
+
+  // Event Listeners Tab
+  tabLogin?.addEventListener('click', () => switchAuthTab('login'));
+  tabRegister?.addEventListener('click', () => switchAuthTab('register'));
+  linkToRegister?.addEventListener('click', () => switchAuthTab('register'));
+
+  // Trigger buka modal dari header desktop & mobile
+  document.getElementById('auth-trigger-btn')?.addEventListener('click', () => {
+    hideAlert();
+    checkAuthState();
+    modal?.showModal();
+  });
+  document.getElementById('auth-trigger-btn-mobile')?.addEventListener('click', () => {
+    const mobileMenu = document.querySelector<HTMLDialogElement>('dialog.mobile-menu');
+    mobileMenu?.close();
+    hideAlert();
+    checkAuthState();
+    modal?.showModal();
+  });
+
+  document.getElementById('auth-modal-close')?.addEventListener('click', () => modal?.close());
+
+  // Submit Login / Register
+  authForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAlert();
+
+    if (!isSupabaseConfigured()) {
+      showAlert('Layanan akun sedang dipersiapkan. Mohon isi PUBLIC_SUPABASE_URL & ANON_KEY di file .env terlebih dahulu.', 'error');
+      return;
+    }
+
+    const email = (document.getElementById('auth-email') as HTMLInputElement)?.value.trim();
+    const password = (document.getElementById('auth-password') as HTMLInputElement)?.value;
+
+    if (!email || !password) return;
+
+    if (authSubmitBtn) {
+      authSubmitBtn.setAttribute('disabled', 'true');
+      authSubmitBtn.textContent = 'Memproses...';
+    }
+
+    try {
+      if (currentAuthMode === 'login') {
+        const { error } = await signInWithEmail(email, password);
+        if (error) throw error;
+        showAlert('✓ Berhasil masuk! Menghubungkan materi belajar...', 'success');
+        await checkAuthState();
+        await performFullSync();
+        setTimeout(() => modal?.close(), 900);
+      } else {
+        const { error } = await signUpWithEmail(email, password);
+        if (error) throw error;
+        showAlert('✓ Pendaftaran berhasil! Silakan periksa email Anda jika konfirmasi aktif, atau langsung masuk.', 'success');
+        switchAuthTab('login');
+      }
+    } catch (err: any) {
+      showAlert(err.message || 'Gagal masuk. Periksa kembali email dan kata sandi Anda.', 'error');
+    } finally {
+      if (authSubmitBtn) {
+        authSubmitBtn.removeAttribute('disabled');
+        authSubmitBtn.textContent = currentAuthMode === 'login' ? 'Masuk ke Akun' : 'Buat Akun Saya';
+      }
+    }
+  });
+
+  // Tombol Logout
+  document.getElementById('btn-logout')?.addEventListener('click', async () => {
+    await signOutUser();
+    activeUser = null;
+    showAlert('Anda telah keluar dari akun.', 'info');
+    await checkAuthState();
+    setTimeout(() => modal?.close(), 600);
+  });
+
+  // Tombol Force Sync
+  document.getElementById('btn-force-sync')?.addEventListener('click', performFullSync);
+
+  // Sync event: toggle target negara
+  window.addEventListener('user-target-toggled', async (e: any) => {
+    if (!activeUser) return;
+    const { countryId, isAdded } = e.detail || {};
+    if (!countryId) return;
+
+    try {
+      if (isAdded) {
+        await addTargetToCloud(activeUser.id, countryId);
+      } else {
+        await removeTargetFromCloud(activeUser.id, countryId);
+      }
+      updateSyncStats(activeUser.id);
+    } catch (err) {
+      console.warn('Gagal sinkronkan target:', err);
+    }
+  });
+
+  // Sync event: simpan tabel kustom
+  window.addEventListener('custom-table-saved', async (e: any) => {
+    if (!activeUser) return;
+    const table = e.detail?.table;
+    if (!table) return;
+
+    try {
+      await saveCustomTableToCloud(activeUser.id, table);
+      updateSyncStats(activeUser.id);
+    } catch (err) {
+      console.warn('Gagal sinkronkan tabel kustom:', err);
+    }
+  });
+
+  // Sync event: hapus tabel kustom
+  window.addEventListener('custom-table-deleted', async (e: any) => {
+    if (!activeUser) return;
+    const tableId = e.detail?.tableId;
+    if (!tableId) return;
+
+    try {
+      await deleteCustomTableFromCloud(activeUser.id, tableId);
+      updateSyncStats(activeUser.id);
+    } catch (err) {
+      console.warn('Gagal hapus tabel kustom:', err);
+    }
+  });
+
+  // Listen auth state change dari Supabase
+  const sb = getSupabase();
+  if (sb) {
+    sb.auth.onAuthStateChange((_event, session) => {
+      activeUser = session?.user || null;
+      updateHeaderAuthButton(activeUser);
+    });
+  }
+
+  // Inisialisasi saat halaman pertama kali dibuka
+  checkAuthState();
+</script>

@@ -55,7 +55,7 @@ import { worldCountries } from '../data/countries';
         </div>
       </div>
 
-      <!-- Right: MediaWindow with Guide Steps (Matches Image 2) -->
+      <!-- Right: MediaWindow with Animated Guide Steps (Matches Image 2) -->
       <div>
         <MediaWindow title="app.belajar-bahasa.com/panduan" shadow>
           <GuideWindow />
@@ -218,6 +218,9 @@ import { worldCountries } from '../data/countries';
               </p>
             </div>
             <div class="flex items-center gap-2">
+              <button type="button" id="btn-cloud-sync-trigger" class="btn btn-secondary btn-s text-[12px]" title="Masuk untuk sinkronisasi materi ke smartphone & laptop lain">
+                ☁️ Sinkron Akun
+              </button>
               <button type="button" id="btn-export-backup" class="btn btn-secondary btn-s text-[12px]" title="Simpan file cadangan target belajar & tabel kustom">
                 📥 Backup JSON
               </button>
@@ -276,7 +279,7 @@ import { worldCountries } from '../data/countries';
       </div>
 
       <!-- ========================================== -->
-      <!-- CUSTOM TABLE CREATOR MODAL -->
+      <!-- CUSTOM TABLE CREATOR MODAL (DENGAN DUKUNGAN EXCEL & CSV) -->
       <!-- ========================================== -->
       <div id="buat-tabel" class="pt-8">
         <div id="creator-modal" class="hidden p-6 border-2 border-ink bg-canvas">
@@ -284,7 +287,7 @@ import { worldCountries } from '../data/countries';
             <div>
               <h3 class="text-[20px] font-bold text-ink">Buat Tabel / Halaman Bahasa Sendiri</h3>
               <p class="text-[13px] text-steel mt-1">
-                Tambahkan materi atau bahasa apa saja dengan format teks bebas. Data langsung disimpan di browser Anda.
+                Tambahkan materi atau bahasa apa saja dengan format teks bebas, atau <strong>impor langsung dari file Excel/Spreadsheet</strong> Anda.
               </p>
             </div>
             <button type="button" id="close-creator-btn" class="btn btn-secondary btn-s">✕ Tutup</button>
@@ -331,6 +334,7 @@ import { worldCountries } from '../data/countries';
                   <option value="de-DE">Jerman (de-DE)</option>
                   <option value="ko-KR">Korea (ko-KR)</option>
                   <option value="zh-CN">Mandarin (zh-CN)</option>
+                  <option value="th-TH">Thailand (th-TH)</option>
                   <option value="ar-SA">Arab (ar-SA)</option>
                   <option value="ru-RU">Rusia (ru-RU)</option>
                   <option value="fr-FR">Prancis (fr-FR)</option>
@@ -344,32 +348,41 @@ import { worldCountries } from '../data/countries';
               </div>
             </div>
 
+            <!-- Content Area with Excel Import Toolbar -->
             <div>
-              <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
                 <label for="form-text" class="block text-[13px] font-mono text-steel">
-                  Isi Teks Tabel * (Pisahkan antar kolom dengan koma atau pipa '|')
+                  Isi Tabel * (Bisa copy-paste langsung dari Excel atau upload file)
                 </label>
-                <button type="button" id="load-sample-btn" class="text-[12px] text-link hover:underline">
-                  Contoh Data
-                </button>
+                <div class="flex items-center gap-3">
+                  <!-- Excel Upload Button -->
+                  <label class="btn btn-secondary btn-s text-[12px] cursor-pointer flex items-center gap-1.5 font-bold hover:border-ink">
+                    <span>📊 Import Excel / CSV</span>
+                    <input type="file" id="form-excel-input" accept=".xlsx, .xls, .csv, .tsv, .txt" class="hidden" />
+                  </label>
+                  <button type="button" id="load-sample-btn" class="text-[12px] text-smoke hover:text-ink">
+                    Contoh Data
+                  </button>
+                </div>
               </div>
               <textarea 
                 id="form-text" 
-                rows="7" 
+                rows="8" 
                 required
-                placeholder={"A = あ | I = い | U = う | E = え | O = お\nKa = か | Ki = き | Ku = く | Ke = け | Ko = こ\natau format koma: Satu = 一, Dua = 二, Tiga = 三"}
+                placeholder={"Bisa paste langsung dari Excel (Ctrl+V) atau ketik:\nA = あ | I = い | U = う | E = え | O = お\nKa = か | Ki = き | Ku = く | Ke = け | Ko = こ\natau format kolom: Romaji [TAB] Karakter"}
                 class="w-full px-3 py-2.5 text-[14px] font-mono bg-tint border border-rule text-ink outline-none focus:border-ink leading-relaxed"
               ></textarea>
-              <p class="mt-1.5 text-[12px] text-smoke">
-                Tips: Tulis setiap kolom dengan format <code>Latin = Karakter</code>. Anda bisa pisahkan antar kolom dengan tanda koma <code>,</code> atau tanda pipa <code>|</code>.
-              </p>
+              <div class="mt-2 text-[12px] text-smoke flex items-center justify-between flex-wrap gap-2">
+                <span>💡 <strong>Tips Excel:</strong> Cukup blok sel di Excel/Google Sheets, tekan <code>Ctrl+C</code>, lalu paste <code>Ctrl+V</code> di sini!</span>
+                <span class="text-ok font-bold">Mendukung .xlsx, .csv, &amp; Copy-Paste Excel ✓</span>
+              </div>
             </div>
 
             <!-- Realtime Preview inside Creator -->
             <div class="border-t border-rule pt-4">
               <span class="label">Live Preview Tabel:</span>
               <div id="creator-preview" class="mt-3 p-3 bg-tint border border-rule min-h-[80px] overflow-x-auto text-[13px]">
-                <span class="text-smoke italic">Ketik di kotak atas untuk melihat pratinjau tabel...</span>
+                <span class="text-smoke italic">Ketik atau paste dari Excel di kotak atas untuk melihat pratinjau tabel...</span>
               </div>
             </div>
 
@@ -457,6 +470,7 @@ import { worldCountries } from '../data/countries';
       const creatorModal = document.getElementById('creator-modal');
       const creatorForm = document.getElementById('creator-form');
       const formText = document.getElementById('form-text');
+      const formExcelInput = document.getElementById('form-excel-input');
       const creatorPreview = document.getElementById('creator-preview');
       const loadSampleBtn = document.getElementById('load-sample-btn');
       const customActions = document.getElementById('custom-table-actions');
@@ -527,13 +541,37 @@ import { worldCountries } from '../data/countries';
         window.speechSynthesis.speak(utter);
       }
 
-      // Parse text into table grid
+      // Parse text into table grid (Mendukung format pipa |, koma ,, dan TAB dari Excel)
       function parseTextToGrid(text) {
         const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
         const grid = [];
         for (const line of lines) {
-          let parts = line.includes('|') ? line.split('|') : line.includes(';') ? line.split(';') : line.includes(',') ? line.split(',') : [line];
-          parts = parts.map(p => p.trim());
+          let parts = [];
+          
+          if (line.includes('\t')) {
+            // Langsung dari copy-paste Excel (Tab Separated)
+            parts = line.split('\t').map(p => p.trim());
+            if (parts.length === 2 && !parts[0].includes('=') && !parts[1].includes('=')) {
+              grid.push([{ romaji: parts[0], char: parts[1] }]);
+              continue;
+            }
+            if (parts.length > 2 && parts.length % 2 === 0) {
+              const row = [];
+              for (let i = 0; i < parts.length; i += 2) {
+                row.push({ romaji: parts[i], char: parts[i+1] });
+              }
+              grid.push(row);
+              continue;
+            }
+          } else if (line.includes('|')) {
+            parts = line.split('|').map(p => p.trim());
+          } else if (line.includes(';')) {
+            parts = line.split(';').map(p => p.trim());
+          } else if (line.includes(',')) {
+            parts = line.split(',').map(p => p.trim());
+          } else {
+            parts = [line];
+          }
 
           const row = [];
           for (const part of parts) {
@@ -554,6 +592,87 @@ import { worldCountries } from '../data/countries';
           if (row.length > 0) grid.push(row);
         }
         return grid;
+      }
+
+      // Excel / CSV File Import Handler
+      if (formExcelInput && formText) {
+        formExcelInput.addEventListener('change', (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+
+          const fileName = file.name.toLowerCase();
+          const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+
+          if (isExcel) {
+            showToast(`Membaca file Excel "${file.name}"...`);
+            
+            function readWorkbook() {
+              const reader = new FileReader();
+              reader.onload = (evt) => {
+                try {
+                  const data = new Uint8Array(evt.target.result);
+                  const workbook = window.XLSX.read(data, { type: 'array' });
+                  const sheetName = workbook.SheetNames[0];
+                  const worksheet = workbook.Sheets[sheetName];
+                  const jsonRows = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                  const formattedLines = [];
+                  for (const row of jsonRows) {
+                    if (!row || row.length === 0) continue;
+                    if (row.length === 2) {
+                      formattedLines.push(`${row[0]} = ${row[1]}`);
+                    } else {
+                      const rowItems = [];
+                      for (let i = 0; i < row.length; i += 2) {
+                        if (row[i] !== undefined && row[i+1] !== undefined) {
+                          rowItems.push(`${row[i]} = ${row[i+1]}`);
+                        } else if (row[i] !== undefined) {
+                          rowItems.push(`${row[i]}`);
+                        }
+                      }
+                      if (rowItems.length > 0) formattedLines.push(rowItems.join(' | '));
+                    }
+                  }
+
+                  formText.value = formattedLines.join('\n');
+                  updateLivePreview();
+                  
+                  // Auto suggest title if blank
+                  const titleInput = document.getElementById('form-title');
+                  if (titleInput && !titleInput.value) {
+                    const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+                    titleInput.value = 'Tabel ' + cleanName;
+                  }
+
+                  showToast(`File Excel "${file.name}" berhasil diimpor (${formattedLines.length} baris)!`);
+                } catch (err) {
+                  console.error(err);
+                  alert('Gagal membaca file Excel. Pastikan format valid.');
+                }
+              };
+              reader.readAsArrayBuffer(file);
+            }
+
+            if (!window.XLSX) {
+              const s = document.createElement('script');
+              s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+              s.onload = readWorkbook;
+              document.head.appendChild(s);
+            } else {
+              readWorkbook();
+            }
+          } else {
+            // CSV / TSV / TXT
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+              const text = evt.target.result;
+              formText.value = text;
+              updateLivePreview();
+              showToast(`File "${file.name}" berhasil diimpor!`);
+            };
+            reader.readAsText(file);
+          }
+        });
       }
 
       // Render Language Tabs
@@ -783,16 +902,24 @@ import { worldCountries } from '../data/countries';
         countriesGrid.querySelectorAll('[data-toggle-target]').forEach(btn => {
           btn.addEventListener('click', () => {
             const id = btn.getAttribute('data-toggle-target');
-            if (targetCountryIds.includes(id)) {
-              targetCountryIds = targetCountryIds.filter(x => x !== id);
-              showToast('Dihapus dari daftar target belajar.');
-            } else {
+            if (!id) return;
+            const isAdded = !targetCountryIds.includes(id);
+            if (isAdded) {
               targetCountryIds.push(id);
               showToast('⭐ Disimpan ke daftar target belajar!');
+            } else {
+              targetCountryIds = targetCountryIds.filter(x => x !== id);
+              showToast('Dihapus dari daftar target belajar.');
             }
             try {
               localStorage.setItem(STORAGE_TARGET_COUNTRIES, JSON.stringify(targetCountryIds));
             } catch (e) {}
+
+            // Trigger sinkronisasi Supabase jika user sedang login
+            window.dispatchEvent(new CustomEvent('user-target-toggled', {
+              detail: { countryId: id, isAdded }
+            }));
+
             renderCountries();
           });
         });
@@ -949,10 +1076,17 @@ import { worldCountries } from '../data/countries';
       if (deleteTableBtn) {
         deleteTableBtn.addEventListener('click', () => {
           if (!confirm('Apakah Anda yakin ingin menghapus tabel kustom ini?')) return;
-          customTables = customTables.filter(c => c.id !== currentTableId);
+          const tableIdToDelete = currentTableId;
+          customTables = customTables.filter(c => c.id !== tableIdToDelete);
           try {
             localStorage.setItem(STORAGE_CUSTOM_TABLES, JSON.stringify(customTables));
           } catch (e) {}
+
+          // Trigger hapus di Supabase jika sedang login
+          window.dispatchEvent(new CustomEvent('custom-table-deleted', {
+            detail: { tableId: tableIdToDelete }
+          }));
+
           currentTableId = defaultTables[0]?.id || '';
           renderTabs();
           renderCurrentTable();
@@ -999,7 +1133,7 @@ Oi = eu | Ie = ie | Kh = ch | Sy = sch | Ts = z`;
         if (!creatorPreview || !formText) return;
         const grid = parseTextToGrid(formText.value);
         if (grid.length === 0) {
-          creatorPreview.innerHTML = '<span class="text-smoke italic">Ketik di kotak atas untuk melihat pratinjau tabel...</span>';
+          creatorPreview.innerHTML = '<span class="text-smoke italic">Ketik atau paste dari Excel di kotak atas untuk melihat pratinjau tabel...</span>';
           return;
         }
 
@@ -1057,6 +1191,11 @@ Oi = eu | Ie = ie | Kh = ch | Sy = sch | Ts = z`;
             console.error(err);
           }
 
+          // Trigger simpan ke Supabase jika sedang login
+          window.dispatchEvent(new CustomEvent('custom-table-saved', {
+            detail: { table: newTable }
+          }));
+
           creatorForm.reset();
           if (creatorPreview) {
             creatorPreview.innerHTML = '<span class="text-smoke italic">Ketik di kotak atas untuk melihat pratinjau tabel...</span>';
@@ -1071,6 +1210,68 @@ Oi = eu | Ie = ie | Kh = ch | Sy = sch | Ts = z`;
           if (area) area.scrollIntoView({ behavior: 'smooth' });
         });
       }
+
+      // Supabase Cloud Sync trigger button in Katalog
+      const btnCloudSyncTrigger = document.getElementById('btn-cloud-sync-trigger');
+      if (btnCloudSyncTrigger) {
+        btnCloudSyncTrigger.addEventListener('click', () => {
+          const authModal = document.getElementById('auth-modal') as HTMLDialogElement | null;
+          authModal?.showModal();
+        });
+      }
+
+      // Listen data loaded dari Supabase (sinkronisasi antar laptop / HP)
+      window.addEventListener('supabase-data-loaded', (e: any) => {
+        const { targets, tables } = e.detail || {};
+        let needRerender = false;
+
+        // 1. Sinkronkan target negara dari cloud
+        if (Array.isArray(targets) && targets.length > 0) {
+          const mergedTargets = Array.from(new Set([...targetCountryIds, ...targets]));
+          if (mergedTargets.length !== targetCountryIds.length) {
+            targetCountryIds = mergedTargets;
+            try {
+              localStorage.setItem(STORAGE_TARGET_COUNTRIES, JSON.stringify(targetCountryIds));
+            } catch (err) {}
+            needRerender = true;
+          }
+        }
+
+        // 2. Sinkronkan tabel kustom dari cloud
+        if (Array.isArray(tables) && tables.length > 0) {
+          const existingIds = new Set(customTables.map(t => t.id));
+          let tableAdded = false;
+
+          tables.forEach((t: any) => {
+            if (!existingIds.has(t.id)) {
+              customTables.push({
+                id: t.id,
+                name: t.name,
+                badge: 'Tabel Cloud',
+                title: t.name,
+                description: t.description || '',
+                voiceLang: t.voiceLang || 'en-US',
+                grid: t.rows || []
+              });
+              tableAdded = true;
+            }
+          });
+
+          if (tableAdded) {
+            try {
+              localStorage.setItem(STORAGE_CUSTOM_TABLES, JSON.stringify(customTables));
+            } catch (err) {}
+            needRerender = true;
+          }
+        }
+
+        if (needRerender) {
+          updateBadges();
+          renderTabs();
+          renderCurrentTable();
+          renderCountries();
+        }
+      });
 
       // Initial Renders
       updateBadges();

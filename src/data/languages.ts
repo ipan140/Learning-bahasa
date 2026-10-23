@@ -342,10 +342,148 @@ export const defaultLanguageTables: LanguageTable[] = [
     ]
   },
   {
+    id: 'thailand-dasar',
+    name: 'Thailand (Aksara Thai)',
+    badge: 'Konsonan & Vokal Thai',
+    title: 'G. Tabel Aksara Bahasa Thailand Dasar',
+    description: 'Aksara fonetik abugida Thailand untuk konsonan utama dan vokal umum.',
+    voiceLang: 'th-TH',
+    grid: [
+      [
+        { romaji: 'Ko Kai', char: 'ก' },
+        { romaji: 'Kho Khai', char: 'ข' },
+        { romaji: 'Kho Khwai', char: 'ค' },
+        { romaji: 'Kho Rakhang', char: 'ฆ' },
+        { romaji: 'Ngo Ngu', char: 'ง' }
+      ],
+      [
+        { romaji: 'Cho Chan', char: 'จ' },
+        { romaji: 'Cho Ching', char: 'ฉ' },
+        { romaji: 'Cho Chang', char: 'ช' },
+        { romaji: 'So So', char: 'ซ' },
+        { romaji: 'Yo Ying', char: 'ญ' }
+      ],
+      [
+        { romaji: 'Do Dek', char: 'ด' },
+        { romaji: 'To Tao', char: 'ต' },
+        { romaji: 'Tho Thung', char: 'ถ' },
+        { romaji: 'Tho Thahan', char: 'ท' },
+        { romaji: 'No Nu', char: 'น' }
+      ],
+      [
+        { romaji: 'Bo Baimai', char: 'บ' },
+        { romaji: 'Po Pla', char: 'ป' },
+        { romaji: 'Pho Phueng', char: 'ผ' },
+        { romaji: 'Fo Fa', char: 'ฝ' },
+        { romaji: 'Mo Ma', char: 'ม' }
+      ],
+      [
+        { romaji: 'Sawatdee (Halo)', char: 'สวัสดี' },
+        { romaji: 'Khop khun (Trims)', char: 'ขอบคุณ' },
+        { romaji: 'Chai (Ya)', char: 'ใช่' },
+        { romaji: 'Mai (Tidak)', char: 'ไม่' },
+        { romaji: 'Aroy (Enak)', char: 'อร่อย' }
+      ]
+    ]
+  },
+  {
+    id: 'spanyol-dasar',
+    name: 'Spanyol (Español)',
+    badge: 'Alfabet & Aksen Spanyol',
+    title: 'H. Tabel Huruf Khusus & Sapaan Bahasa Spanyol',
+    description: 'Huruf khusus bahasa Spanyol seperti Eñe (Ñ), vokal beraksen tilde, dan tanda baca pembuka khusus.',
+    voiceLang: 'es-ES',
+    grid: [
+      [
+        { romaji: 'Eñe', char: 'Ñ ñ' },
+        { romaji: 'Doble L', char: 'LL ll' },
+        { romaji: 'Doble R', char: 'RR rr' },
+        { romaji: 'Tanya Balik', char: '¿' },
+        { romaji: 'Seru Balik', char: '¡' }
+      ],
+      [
+        { romaji: 'A-Aksen', char: 'Á á' },
+        { romaji: 'E-Aksen', char: 'É é' },
+        { romaji: 'I-Aksen', char: 'Í í' },
+        { romaji: 'O-Aksen', char: 'Ó ó' },
+        { romaji: 'U-Aksen', char: 'Ú ú' }
+      ],
+      [
+        { romaji: 'Halo', char: '¡Hola!' },
+        { romaji: 'Terima Kasih', char: 'Gracias' },
+        { romaji: 'Sama-sama', char: 'De nada' },
+        { romaji: 'Tolong', char: 'Por favor' },
+        { romaji: 'Sampai Jumpa', char: 'Adiós' }
+      ]
+    ]
+  },
+  {
+    id: 'prancis-dasar',
+    name: 'Prancis (Français)',
+    badge: 'Aksen & Huruf Prancis',
+    title: 'I. Tabel Aksen & Huruf Khusus Bahasa Prancis',
+    description: 'Tanda aksen fonetik vokal Prancis (Aigu, Grave, Circonflexe) dan ligatur khusus.',
+    voiceLang: 'fr-FR',
+    grid: [
+      [
+        { romaji: 'E-Aigu', char: 'É é' },
+        { romaji: 'E-Grave', char: 'È è' },
+        { romaji: 'A-Grave', char: 'À à' },
+        { romaji: 'U-Grave', char: 'Ù ù' },
+        { romaji: 'C-Cédille', char: 'Ç ç' }
+      ],
+      [
+        { romaji: 'Circonflexe', char: 'Â â' },
+        { romaji: 'E-Circonflexe', char: 'Ê ê' },
+        { romaji: 'I-Circonflexe', char: 'Î î' },
+        { romaji: 'O-Circonflexe', char: 'Ô ô' },
+        { romaji: 'Ligatur OE', char: 'Œ œ' }
+      ],
+      [
+        { romaji: 'Halo', char: 'Bonjour' },
+        { romaji: 'Terima Kasih', char: 'Merci' },
+        { romaji: 'Tolong', char: "S'il vous plaît" },
+        { romaji: 'Selamat Malam', char: 'Bonsoir' },
+        { romaji: 'Sampai Jumpa', char: 'Au revoir' }
+      ]
+    ]
+  },
+  {
+    id: 'italia-dasar',
+    name: 'Italia (Italiano)',
+    badge: 'Fonetik & Sapaan Italia',
+    title: 'J. Tabel Kombinasi Bunyi & Sapaan Bahasa Italia',
+    description: 'Pola bunyi fonetik konsonan ganda bahasa Italia serta kata sapaan umum.',
+    voiceLang: 'it-IT',
+    grid: [
+      [
+        { romaji: 'Bunyi [k]', char: 'ca, co, cu' },
+        { romaji: 'Bunyi [k]', char: 'che, chi' },
+        { romaji: 'Bunyi [c]', char: 'ce, ci' },
+        { romaji: 'Bunyi [c]', char: 'cia, cio, ciu' },
+        { romaji: 'Bunyi [ny]', char: 'gn' }
+      ],
+      [
+        { romaji: 'Bunyi [ly]', char: 'gli' },
+        { romaji: 'Bunyi [sy]', char: 'sci, sce' },
+        { romaji: 'Bunyi [sk]', char: 'sche, schi' },
+        { romaji: 'Vokal Beraksen', char: 'à, è, é, ì, ò, ù' },
+        null
+      ],
+      [
+        { romaji: 'Halo / Dadah', char: 'Ciao' },
+        { romaji: 'Terima Kasih', char: 'Grazie' },
+        { romaji: 'Sama-sama', char: 'Prego' },
+        { romaji: 'Selamat Pagi', char: 'Buongiorno' },
+        { romaji: 'Sampai Jumpa', char: 'Arrivederci' }
+      ]
+    ]
+  },
+  {
     id: 'rusia-cyrillic',
     name: 'Rusia (Sirilik)',
     badge: 'Sirilik Dasar',
-    title: 'G. Tabel Huruf Sirilik Rusia Dasar',
+    title: 'K. Tabel Huruf Sirilik Rusia Dasar',
     description: 'Aksara Sirilik Rusia yang digunakan di kawasan Eropa Timur dan Asia Utara.',
     voiceLang: 'ru-RU',
     grid: [
@@ -404,7 +542,7 @@ export const defaultLanguageTables: LanguageTable[] = [
     id: 'yunani-greek',
     name: 'Yunani (Greek)',
     badge: 'Yunani Kuno & Modern',
-    title: 'H. Tabel Alfabet Yunani Dasar',
+    title: 'L. Tabel Alfabet Yunani Dasar',
     description: 'Aksara Yunani dasar yang digunakan dalam bahasa Yunani serta simbol ilmiah matematika & sains.',
     voiceLang: 'el-GR',
     grid: [

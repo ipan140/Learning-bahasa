@@ -45,7 +45,8 @@
     "subregion": "Northern Africa",
     "language": "Arabic",
     "capital": "Algiers",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "as",
@@ -129,7 +130,8 @@
     "subregion": "South America",
     "language": "Guaraní, Spanish",
     "capital": "Buenos Aires",
-    "voiceLang": "en-US"
+    "voiceLang": "en-US",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "am",
@@ -177,7 +179,8 @@
     "subregion": "Central Europe",
     "language": "Austro-Bavarian German",
     "capital": "Vienna",
-    "voiceLang": "en-US"
+    "voiceLang": "en-US",
+    "tableId": "jerman-dasar"
   },
   {
     "id": "az",
@@ -213,7 +216,8 @@
     "subregion": "Western Asia",
     "language": "Arabic",
     "capital": "Manama",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "bd",
@@ -249,7 +253,8 @@
     "subregion": "Eastern Europe",
     "language": "Belarusian, Russian",
     "capital": "Minsk",
-    "voiceLang": "en-US"
+    "voiceLang": "en-US",
+    "tableId": "rusia-cyrillic"
   },
   {
     "id": "be",
@@ -285,7 +290,8 @@
     "subregion": "Western Africa",
     "language": "French",
     "capital": "Porto-Novo",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "bm",
@@ -321,7 +327,8 @@
     "subregion": "South America",
     "language": "Aymara, Guaraní, Quechua, Spanish",
     "capital": "Sucre",
-    "voiceLang": "en-US"
+    "voiceLang": "en-US",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "ba",
@@ -429,7 +436,8 @@
     "subregion": "Western Africa",
     "language": "French",
     "capital": "Ouagadougou",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "bi",
@@ -549,7 +557,8 @@
     "subregion": "South America",
     "language": "Spanish",
     "capital": "Santiago",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "cn",
@@ -598,7 +607,8 @@
     "subregion": "South America",
     "language": "Spanish",
     "capital": "Bogotá",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "km",
@@ -622,7 +632,8 @@
     "subregion": "Middle Africa",
     "language": "French, Kikongo, Lingala",
     "capital": "Brazzaville",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "ck",
@@ -646,7 +657,8 @@
     "subregion": "Central America",
     "language": "Spanish",
     "capital": "San José",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "hr",
@@ -670,7 +682,8 @@
     "subregion": "Caribbean",
     "language": "Spanish",
     "capital": "Havana",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "cw",
@@ -694,7 +707,8 @@
     "subregion": "Southern Europe",
     "language": "Greek, Turkish",
     "capital": "Nicosia",
-    "voiceLang": "el-GR"
+    "voiceLang": "el-GR",
+    "tableId": "yunani-greek"
   },
   {
     "id": "cz",
@@ -754,7 +768,8 @@
     "subregion": "Caribbean",
     "language": "Spanish",
     "capital": "Santo Domingo",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "cd",
@@ -766,7 +781,8 @@
     "subregion": "Middle Africa",
     "language": "French, Kikongo, Lingala, Tshiluba, Swahili",
     "capital": "Kinshasa",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "ec",
@@ -778,7 +794,8 @@
     "subregion": "South America",
     "language": "Spanish",
     "capital": "Quito",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "eg",
@@ -803,7 +820,8 @@
     "subregion": "Central America",
     "language": "Spanish",
     "capital": "San Salvador",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "gq",
@@ -923,7 +941,8 @@
     "subregion": "Western Europe",
     "language": "French",
     "capital": "Paris",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "gf",
@@ -971,7 +990,8 @@
     "subregion": "Middle Africa",
     "language": "French",
     "capital": "Libreville",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "gm",
@@ -1105,7 +1125,8 @@
     "subregion": "Central America",
     "language": "Spanish",
     "capital": "Guatemala City",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "gg",
@@ -1129,7 +1150,8 @@
     "subregion": "Western Africa",
     "language": "French",
     "capital": "Conakry",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "gw",
@@ -1189,7 +1211,8 @@
     "subregion": "Central America",
     "language": "Spanish",
     "capital": "Tegucigalpa",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "hk",
@@ -1201,7 +1224,8 @@
     "subregion": "Eastern Asia",
     "language": "English, Chinese",
     "capital": "City of Victoria",
-    "voiceLang": "en-US"
+    "voiceLang": "en-US",
+    "tableId": "mandarin-dasar"
   },
   {
     "id": "hu",
@@ -1273,7 +1297,8 @@
     "subregion": "Western Asia",
     "language": "Arabic, Aramaic, Sorani",
     "capital": "Baghdad",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "ie",
@@ -1321,7 +1346,8 @@
     "subregion": "Southern Europe",
     "language": "Italian",
     "capital": "Rome",
-    "voiceLang": "it-IT"
+    "voiceLang": "it-IT",
+    "tableId": "italia-dasar"
   },
   {
     "id": "ci",
@@ -1333,7 +1359,8 @@
     "subregion": "Western Africa",
     "language": "French",
     "capital": "Yamoussoukro",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "jm",
@@ -1382,7 +1409,8 @@
     "subregion": "Western Asia",
     "language": "Arabic",
     "capital": "Amman",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "kz",
@@ -1394,7 +1422,8 @@
     "subregion": "Central Asia",
     "language": "Kazakh, Russian",
     "capital": "Astana",
-    "voiceLang": "en-US"
+    "voiceLang": "en-US",
+    "tableId": "rusia-cyrillic"
   },
   {
     "id": "ke",
@@ -1442,7 +1471,8 @@
     "subregion": "Western Asia",
     "language": "Arabic",
     "capital": "Kuwait City",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "kg",
@@ -1490,7 +1520,8 @@
     "subregion": "Western Asia",
     "language": "Arabic, French",
     "capital": "Beirut",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "ls",
@@ -1526,7 +1557,8 @@
     "subregion": "Northern Africa",
     "language": "Arabic",
     "capital": "Tripoli",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "li",
@@ -1538,7 +1570,8 @@
     "subregion": "Western Europe",
     "language": "German",
     "capital": "Vaduz",
-    "voiceLang": "de-DE"
+    "voiceLang": "de-DE",
+    "tableId": "jerman-dasar"
   },
   {
     "id": "lt",
@@ -1574,7 +1607,8 @@
     "subregion": "Eastern Asia",
     "language": "Portuguese, Chinese",
     "capital": "",
-    "voiceLang": "pt-PT"
+    "voiceLang": "pt-PT",
+    "tableId": "mandarin-dasar"
   },
   {
     "id": "mg",
@@ -1586,7 +1620,8 @@
     "subregion": "Eastern Africa",
     "language": "French, Malagasy",
     "capital": "Antananarivo",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "mw",
@@ -1634,7 +1669,8 @@
     "subregion": "Western Africa",
     "language": "French",
     "capital": "Bamako",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "mt",
@@ -1718,7 +1754,8 @@
     "subregion": "North America",
     "language": "Spanish",
     "capital": "Mexico City",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "fm",
@@ -1754,7 +1791,8 @@
     "subregion": "Western Europe",
     "language": "French",
     "capital": "Monaco",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "mn",
@@ -1802,7 +1840,8 @@
     "subregion": "Northern Africa",
     "language": "Arabic, Berber",
     "capital": "Rabat",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "mz",
@@ -1910,7 +1949,8 @@
     "subregion": "Central America",
     "language": "Spanish",
     "capital": "Managua",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "ne",
@@ -1922,7 +1962,8 @@
     "subregion": "Western Africa",
     "language": "French",
     "capital": "Niamey",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "ng",
@@ -1970,7 +2011,8 @@
     "subregion": "Eastern Asia",
     "language": "Korean",
     "capital": "Pyongyang",
-    "voiceLang": "ko-KR"
+    "voiceLang": "ko-KR",
+    "tableId": "korea-hangul"
   },
   {
     "id": "mk",
@@ -2018,7 +2060,8 @@
     "subregion": "Western Asia",
     "language": "Arabic",
     "capital": "Muscat",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "pk",
@@ -2054,7 +2097,8 @@
     "subregion": "Western Asia",
     "language": "Arabic",
     "capital": "Ramallah",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "pa",
@@ -2066,7 +2110,8 @@
     "subregion": "Central America",
     "language": "Spanish",
     "capital": "Panama City",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "pg",
@@ -2090,7 +2135,8 @@
     "subregion": "South America",
     "language": "Guaraní, Spanish",
     "capital": "Asunción",
-    "voiceLang": "en-US"
+    "voiceLang": "en-US",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "pe",
@@ -2102,7 +2148,8 @@
     "subregion": "South America",
     "language": "Aymara, Quechua, Spanish",
     "capital": "Lima",
-    "voiceLang": "en-US"
+    "voiceLang": "en-US",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "ph",
@@ -2332,7 +2379,8 @@
     "subregion": "Southern Europe",
     "language": "Italian",
     "capital": "City of San Marino",
-    "voiceLang": "it-IT"
+    "voiceLang": "it-IT",
+    "tableId": "italia-dasar"
   },
   {
     "id": "st",
@@ -2369,7 +2417,8 @@
     "subregion": "Western Africa",
     "language": "French",
     "capital": "Dakar",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "rs",
@@ -2538,7 +2587,8 @@
     "subregion": "Southern Europe",
     "language": "Spanish",
     "capital": "Madrid",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "lk",
@@ -2562,7 +2612,8 @@
     "subregion": "Northern Africa",
     "language": "Arabic, English",
     "capital": "Khartoum",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "sr",
@@ -2622,7 +2673,8 @@
     "subregion": "Western Asia",
     "language": "Arabic",
     "capital": "Damascus",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "tw",
@@ -2671,7 +2723,8 @@
     "subregion": "South-Eastern Asia",
     "language": "Thai",
     "capital": "Bangkok",
-    "voiceLang": "th-TH"
+    "voiceLang": "th-TH",
+    "tableId": "thailand-dasar"
   },
   {
     "id": "tl",
@@ -2695,7 +2748,8 @@
     "subregion": "Western Africa",
     "language": "French",
     "capital": "Lomé",
-    "voiceLang": "fr-FR"
+    "voiceLang": "fr-FR",
+    "tableId": "prancis-dasar"
   },
   {
     "id": "tk",
@@ -2743,7 +2797,8 @@
     "subregion": "Northern Africa",
     "language": "Arabic",
     "capital": "Tunis",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "tr",
@@ -2888,7 +2943,8 @@
     "subregion": "South America",
     "language": "Spanish",
     "capital": "Montevideo",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "uz",
@@ -2924,7 +2980,8 @@
     "subregion": "Southern Europe",
     "language": "Italian, Latin",
     "capital": "Vatican City",
-    "voiceLang": "it-IT"
+    "voiceLang": "it-IT",
+    "tableId": "italia-dasar"
   },
   {
     "id": "ve",
@@ -2936,7 +2993,8 @@
     "subregion": "South America",
     "language": "Spanish",
     "capital": "Caracas",
-    "voiceLang": "es-ES"
+    "voiceLang": "es-ES",
+    "tableId": "spanyol-dasar"
   },
   {
     "id": "vn",
@@ -2984,7 +3042,8 @@
     "subregion": "Western Asia",
     "language": "Arabic",
     "capital": "Sana'a",
-    "voiceLang": "ar-SA"
+    "voiceLang": "ar-SA",
+    "tableId": "arab-hijaiyah"
   },
   {
     "id": "zm",

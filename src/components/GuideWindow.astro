@@ -1,51 +1,161 @@
 ---
-// Interactive Guide Console modeled after RunLog with exact layout and aesthetic
+// Interactive Guide Console with live step-by-step appearing animation
 const guideSteps = [
-  { step: '01', action: 'pilih', text: 'Pilih aksara bahasa (Hiragana, Katakana, Jerman, Korea, dll.)', tag: 'instan', ok: true },
-  { step: '02', action: 'dengar', text: 'Klik kotak karakter untuk mendengar audio pelafalan asli', tag: 'audio 🔊', ok: true },
-  { step: '03', action: 'target', text: 'Tandai bintang ⭐ pada 250 negara yang ingin dipelajari', tag: 'bookmark', ok: true },
-  { step: '04', action: 'buat', text: 'Buat tabel aksara/kosakata baru dengan format teks bebas', tag: 'kustom', ok: true },
-  { step: '05', action: 'simpan', text: 'Tersimpan otomatis di browser tanpa repot registrasi/login', tag: 'otomatis', ok: true },
-  { step: '06', action: 'backup', text: 'Download / cadangkan data sewaktu-waktu via Backup JSON', tag: 'cadangan', ok: true },
+  { step: '01', action: 'pilih', text: 'Pilih aksara bahasa (Hiragana, Katakana, Jerman, Korea, dll.)', ms: 550 },
+  { step: '02', action: 'dengar', text: 'Klik kotak karakter untuk mendengar audio pelafalan asli', ms: 600 },
+  { step: '03', action: 'target', text: 'Tandai bintang ⭐ pada 250 negara yang ingin dipelajari', ms: 500 },
+  { step: '04', action: 'buat', text: 'Buat tabel aksara/kosakata baru dengan format teks bebas', ms: 650 },
+  { step: '05', action: 'simpan', text: 'Tersimpan otomatis di browser tanpa repot registrasi/login', ms: 550 },
+  { step: '06', action: 'backup', text: 'Download / cadangkan data sewaktu-waktu via Backup JSON', ms: 500 },
 ];
 ---
 
-<div class="relative bg-canvas text-[13px] leading-none font-mono" aria-label="Panduan Cara Menggunakan Website">
+<div class="guidewindow runlog relative bg-canvas text-[13px] leading-none font-mono select-none" aria-label="Panduan Cara Menggunakan Website">
   <!-- Window Header Bar -->
   <div class="flex items-center gap-3 px-4 h-11 border-b border-ink bg-tint/60">
     <span class="text-ink font-bold">panduan_belajar</span>
     <span class="text-smoke hidden sm:inline">sistem: mandiri</span>
-    <span class="ml-auto pill border border-rule text-steel">
-      <span class="size-1.5 rounded-full bg-ok" aria-hidden="true"></span>
-      <span class="font-medium">siap digunakan</span>
+    <span class="ml-auto pill border border-rule text-steel" data-status-pill>
+      <span class="size-1.5 rounded-full bg-ok" data-status-dot aria-hidden="true"></span>
+      <span data-status-text class="font-medium text-[11.5px]">siap digunakan</span>
     </span>
   </div>
 
-  <!-- Step-by-step Guide List -->
-  <ol class="py-2.5 divide-y divide-rule/40">
-    {guideSteps.map((s) => (
-      <li class="grid grid-cols-[2.5ch_1fr_auto] sm:grid-cols-[2.5ch_6.5ch_1fr_auto] items-center gap-3 px-4 py-2 hover:bg-tint/30 transition-colors">
+  <!-- Step-by-step Guide List with Live Appearing Animation -->
+  <ol class="py-2.5 divide-y divide-rule/40" id="guide-list">
+    {guideSteps.map((s, i) => (
+      <li 
+        class="step grid grid-cols-[2.5ch_1fr_auto] sm:grid-cols-[2.5ch_6.5ch_1fr_auto] items-center gap-3 px-4 py-2 hover:bg-tint/40 transition-all duration-200" 
+        data-ms={s.ms}
+        data-index={i}
+      >
         <span class="text-smoke font-bold">{s.step}</span>
         <span class="text-smoke hidden sm:block font-medium">[{s.action}]</span>
         <span class="text-ink truncate text-[12.5px] sm:text-[13px]">{s.text}</span>
-        <span class="text-ok font-bold text-right" aria-hidden="true">✓</span>
+        <span class="text-ok font-bold text-right min-w-[20px]" data-mark aria-hidden="true">✓</span>
       </li>
     ))}
   </ol>
 
-  <!-- Bottom Stat Bar (Like tokens / cost / steps) -->
+  <!-- Bottom Stat Bar with Animated Counters -->
   <div class="grid grid-cols-3 border-t border-ink text-[12px] bg-tint/30">
     <div class="px-4 py-3 border-r border-rule">
       <span class="label block mb-1 text-[10px]">Aksara Bawaan</span>
-      <span class="text-ink font-bold tabular-nums">8+ Tabel</span>
+      <span class="text-ink font-bold tabular-nums" data-stat-tables>12 Tabel</span>
     </div>
     <div class="px-4 py-3 border-r border-rule">
       <span class="label block mb-1 text-[10px]">Database Negara</span>
-      <span class="text-ink font-bold tabular-nums">250 Dunia</span>
+      <span class="text-ink font-bold tabular-nums" data-stat-countries>250 Dunia</span>
     </div>
     <div class="px-4 py-3">
       <span class="label block mb-1 text-[10px]">Status Akun</span>
-      <span class="text-ok font-bold">Tanpa Login ✓</span>
+      <span class="text-ok font-bold" data-stat-auth>Tanpa Login ✓</span>
     </div>
   </div>
 </div>
+
+<style>
+  .step { 
+    transition: opacity 250ms cubic-bezier(0.16, 1, 0.3, 1), transform 250ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease-out; 
+  }
+  .guidewindow.playing .step.pending { 
+    opacity: 0.15; 
+    transform: translateY(2px);
+  }
+  .guidewindow.playing .step.active { 
+    background: var(--tint); 
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .spin { 
+    display: inline-block; 
+    animation: spin 0.8s steps(8) infinite; 
+  }
+  @keyframes spin { 
+    to { transform: rotate(360deg); } 
+  }
+</style>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('.guidewindow').forEach((root) => {
+    if (reduce) return; // Keep static if user prefers reduced motion
+
+    const rows = [...root.querySelectorAll<HTMLElement>('.step')];
+    const statusText = root.querySelector('[data-status-text]')!;
+    const statusDot = root.querySelector('[data-status-dot]')!;
+    const statTables = root.querySelector('[data-stat-tables]')!;
+    const statCountries = root.querySelector('[data-stat-countries]')!;
+    let runId = 0;
+
+    const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+    async function play(id: number) {
+      root.classList.add('playing');
+      
+      // Reset all steps to pending
+      rows.forEach((r) => {
+        r.classList.add('pending');
+        r.classList.remove('active');
+        const mark = r.querySelector('[data-mark]');
+        if (mark) mark.textContent = '';
+      });
+
+      statusText.textContent = 'memuat...';
+      if (statusDot) {
+        statusDot.className = 'size-1.5 rounded-full bg-badge';
+      }
+      if (statTables) statTables.textContent = '0 Tabel';
+      if (statCountries) statCountries.textContent = '0 Dunia';
+
+      // Animate steps one by one
+      for (const [i, row] of rows.entries()) {
+        const ms = Number(row.dataset.ms) || 500;
+        const mark = row.querySelector('[data-mark]');
+        
+        row.classList.remove('pending');
+        row.classList.add('active');
+        if (mark) mark.innerHTML = '<span class="spin text-smoke">/</span>';
+
+        // Count up stats dynamically as steps progress
+        if (statTables) {
+          const currentCount = Math.round(((i + 1) / rows.length) * 12);
+          statTables.textContent = `${currentCount} Tabel`;
+        }
+        if (statCountries) {
+          const currentCountries = Math.round(((i + 1) / rows.length) * 250);
+          statCountries.textContent = `${currentCountries} Dunia`;
+        }
+
+        await wait(ms);
+        if (id !== runId) return;
+
+        if (mark) mark.textContent = '✓';
+        row.classList.remove('active');
+      }
+
+      // Final state
+      statusText.textContent = 'siap digunakan';
+      if (statusDot) {
+        statusDot.className = 'size-1.5 rounded-full bg-ok';
+      }
+      if (statTables) statTables.textContent = '12 Tabel';
+      if (statCountries) statCountries.textContent = '250 Dunia';
+
+      // Wait 5 seconds before looping animation again
+      await wait(5000);
+      if (id === runId) play(id);
+    }
+
+    // Trigger animation when window comes into view
+    const observer = new IntersectionObserver(([entry]) => {
+      runId++;
+      if (entry.isIntersecting) {
+        play(runId);
+      }
+    });
+
+    observer.observe(root);
+  });
+</script>

@@ -2,6 +2,7 @@
 import { site } from '../data/site';
 import ThemeSwitcher from './ThemeSwitcher.astro';
 import Logo from './Logo.astro';
+import AuthModal from './AuthModal.astro';
 const path = Astro.url.pathname;
 ---
 
@@ -11,15 +12,26 @@ const path = Astro.url.pathname;
 
 <!-- Fixed header: sticky once the announcement bar scrolls away; data-scrolled toggles the blurred state -->
 <header class="site-header sticky top-0 z-50 border-b border-rule bg-canvas">
-  <nav class="frame flex items-center gap-8 h-16 px-6 max-md:h-14 max-md:px-5" aria-label="Main">
+  <nav class="frame flex items-center gap-6 h-16 px-6 max-md:h-14 max-md:px-4" aria-label="Main">
     <Logo />
     <ul class="hidden md:flex gap-7 text-[14px]">
       {site.nav.map((l) => (
         <li><a href={l.href} class:list={['hover:text-ink', path.startsWith(l.href) && l.href !== '/' ? 'text-ink' : 'text-steel']}>{l.label}</a></li>
       ))}
     </ul>
-    <div class="ml-auto flex items-center gap-5">
+    <div class="ml-auto flex items-center gap-3">
       <div class="hidden md:block"><ThemeSwitcher /></div>
+
+      <!-- User Login Button -->
+      <button 
+        type="button" 
+        id="auth-trigger-btn" 
+        class="text-[12px] font-mono px-2.5 py-1.5 border border-rule hover:border-ink transition-colors flex items-center gap-1.5 bg-canvas"
+        aria-label="Akun Pengguna"
+      >
+        <span class="inline-block w-2 h-2 rounded-full bg-smoke" id="auth-status-dot"></span>
+        <span id="auth-trigger-label" class="hidden sm:inline">Masuk</span>
+      </button>
       
       <a href={site.cta.href} class="btn btn-primary btn-s">{site.cta.label}</a>
       <button type="button" class="md:hidden text-[13px] text-ink" data-menu-open aria-haspopup="dialog">[menu]</button>
@@ -46,12 +58,18 @@ const path = Astro.url.pathname;
       ))}
     </ul>
     <div class="mt-auto px-5 pt-5 pb-7 border-t border-rule flex flex-col gap-4">
+      <button type="button" id="auth-trigger-btn-mobile" class="btn btn-secondary w-full justify-center text-center">
+        Masuk ke Akun
+      </button>
       <div class="flex items-center"><span class="label">Theme</span><span class="ml-auto"><ThemeSwitcher /></span></div>
       <a href={site.cta.href} class="btn btn-primary w-full">{site.cta.label} -&gt;</a>
       <p class="text-[11px] text-smoke">All systems normal</p>
     </div>
   </div>
 </dialog>
+
+<!-- Modal Otentikasi Supabase -->
+<AuthModal />
 
 <style>
   .site-header { transition: background-color 150ms ease-out, border-color 150ms ease-out; }
