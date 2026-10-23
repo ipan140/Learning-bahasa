@@ -5,17 +5,17 @@ import { defaultLanguageTables } from '../data/languages';
 import { worldCountries } from '../data/countries';
 ---
 
-<Base title="Tabel Belajar Bahasa & Katalog Aksara Negara Dunia" description="Aplikasi tabel belajar aksara bahasa dan penyimpan target belajar negara: Jepang, Jerman, Korea, Arab, Tiongkok, Rusia, dan pembuat tabel dinamis.">
+<Base title="Tabel Belajar Bahasa & 250 Negara Dunia" description="Aplikasi tabel belajar aksara bahasa dan database lengkap 250 negara dunia: Jepang, Jerman, Korea, Arab, Tiongkok, Rusia, dan pembuat tabel dinamis.">
   
   <!-- [01] Hero & Main Navigation Section -->
   <Section top={false} inner="px-6 pt-12 pb-14 lg:pt-16 lg:pb-18 max-md:px-5">
     <div class="max-w-4xl">
-      <p class="label"><b>[01]</b> Belajar Aksara & Target Negara</p>
+      <p class="label"><b>[01]</b> Belajar Aksara & 250 Negara Dunia</p>
       <h1 class="mt-4 text-[clamp(32px,4.5vw,56px)] leading-[1.08] font-bold tracking-[-0.04em]">
         Tabel Belajar Bahasa & Aksara Dunia
       </h1>
       <p class="mt-4 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
-        Pilih bahasa untuk membuka tabel aksara teks interaktif dengan audio lafal asli, atau jelajahi katalog negara untuk menyimpan daftar negara yang ingin Anda pelajari.
+        Pilih bahasa untuk membuka tabel aksara teks interaktif dengan audio lafal asli, atau jelajahi katalog 250 negara dunia untuk menyimpan daftar negara yang ingin Anda pelajari.
       </p>
 
       <!-- View Switcher Tabs (Tabel vs Katalog Negara) -->
@@ -32,7 +32,7 @@ import { worldCountries } from '../data/countries';
           id="btn-view-countries" 
           class="px-5 py-2.5 text-[14px] font-mono border-2 border-rule bg-canvas text-steel hover:text-ink hover:border-ink flex items-center gap-2 cursor-pointer transition-colors"
         >
-          <span>🌍</span> Katalog Negara & Target Belajar 
+          <span>🌍</span> Katalog 250 Negara & Target Belajar 
           <span id="target-count-badge" class="px-2 py-0.2 text-[11px] bg-cta text-cta-ink font-bold">0</span>
         </button>
       </div>
@@ -142,7 +142,7 @@ import { worldCountries } from '../data/countries';
       </div>
 
       <!-- ========================================== -->
-      <!-- VIEW 2: KATALOG NEGARA & TARGET BELAJAR -->
+      <!-- VIEW 2: KATALOG 250 NEGARA & TARGET BELAJAR -->
       <!-- ========================================== -->
       <div id="section-countries" class="hidden space-y-6">
         
@@ -150,10 +150,13 @@ import { worldCountries } from '../data/countries';
         <div class="p-5 border border-rule bg-canvas space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 class="text-[20px] font-bold text-ink flex items-center gap-2">
-                <span>🌍</span> Daftar Negara & Target Belajar Saya
-              </h2>
-              <p class="text-[13px] text-steel mt-0.5">
+              <div class="flex items-center gap-2.5">
+                <h2 class="text-[20px] font-bold text-ink flex items-center gap-2">
+                  <span>🌍</span> Database 250 Negara Dunia
+                </h2>
+                <span class="px-2 py-0.5 text-[11px] font-mono border border-ok text-ok bg-canvas">REST Countries API Dataset</span>
+              </div>
+              <p class="text-[13px] text-steel mt-1">
                 Tandai bintang ⭐ pada negara yang ingin Anda pelajari. Daftar tersimpan otomatis di browser tanpa perlu login.
               </p>
             </div>
@@ -170,33 +173,47 @@ import { worldCountries } from '../data/countries';
 
           <!-- Filter Pills & Search -->
           <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-rule">
-            <div class="flex flex-wrap items-center gap-2 text-[13px]" id="country-region-filters">
+            <div class="flex flex-wrap items-center gap-1.5 text-[13px]" id="country-region-filters">
               <button type="button" data-filter="targets" class="px-3 py-1 font-mono border border-ink bg-ink text-canvas font-bold">
                 ⭐ Target Saya (<span id="filter-target-count">0</span>)
               </button>
               <button type="button" data-filter="all" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">
-                Semua Negara (<span id="total-country-count">0</span>)
+                Semua (<span id="total-country-count">250</span>)
               </button>
               <button type="button" data-filter="Asia" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Asia</button>
               <button type="button" data-filter="Eropa" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Eropa</button>
               <button type="button" data-filter="Timur Tengah" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Timur Tengah</button>
-              <button type="button" data-filter="Lainnya" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Amerika & Afrika</button>
+              <button type="button" data-filter="Amerika" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Amerika</button>
+              <button type="button" data-filter="Afrika" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Afrika</button>
+              <button type="button" data-filter="Oseania" class="px-3 py-1 font-mono border border-rule bg-canvas text-steel hover:text-ink">Oseania</button>
             </div>
 
-            <div class="w-full sm:w-64">
+            <div class="w-full sm:w-72">
               <input 
                 type="text" 
                 id="country-search-input" 
-                placeholder="Cari negara / bahasa..." 
+                placeholder="Cari negara / bahasa / ibukota..." 
                 class="w-full px-3 py-1.5 text-[13px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
               />
             </div>
           </div>
         </div>
 
+        <!-- Showing count status -->
+        <div class="flex items-center justify-between text-[12px] text-smoke px-1">
+          <span id="country-results-info">Menampilkan negara...</span>
+        </div>
+
         <!-- Country Cards Grid -->
         <div id="countries-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Rendered dynamically by client script -->
+        </div>
+
+        <!-- Load More Button -->
+        <div id="load-more-wrapper" class="hidden text-center pt-4">
+          <button type="button" id="btn-load-more" class="btn btn-secondary px-8 py-2 text-[13px]">
+            Tampilkan Lebih Banyak Negara (+30) ↓
+          </button>
         </div>
 
       </div>
@@ -262,6 +279,8 @@ import { worldCountries } from '../data/countries';
                   <option value="fr-FR">Prancis (fr-FR)</option>
                   <option value="es-ES">Spanyol (es-ES)</option>
                   <option value="it-IT">Italia (it-IT)</option>
+                  <option value="pt-PT">Portugis (pt-PT)</option>
+                  <option value="nl-NL">Belanda (nl-NL)</option>
                   <option value="en-US">Inggris (en-US)</option>
                   <option value="id-ID">Indonesia (id-ID)</option>
                 </select>
@@ -335,8 +354,8 @@ import { worldCountries } from '../data/countries';
         if (storedTargets) {
           targetCountryIds = JSON.parse(storedTargets);
         } else {
-          // Default initial targets
-          targetCountryIds = ['jepang', 'jerman', 'korea-selatan'];
+          // Default initial targets (Japan, Germany, South Korea)
+          targetCountryIds = ['jp', 'de', 'kr'];
           localStorage.setItem(STORAGE_TARGET_COUNTRIES, JSON.stringify(targetCountryIds));
         }
       } catch (e) {
@@ -353,6 +372,7 @@ import { worldCountries } from '../data/countries';
       let tableSearchQuery = '';
       let countryFilter = 'targets'; // 'targets', 'all', 'Asia', 'Eropa', etc.
       let countrySearchQuery = '';
+      let countryDisplayLimit = 36;
 
       // DOM Elements
       const btnViewTables = document.getElementById('btn-view-tables');
@@ -388,6 +408,9 @@ import { worldCountries } from '../data/countries';
       const countriesGrid = document.getElementById('countries-grid');
       const countrySearchInput = document.getElementById('country-search-input');
       const countryFilterButtons = document.querySelectorAll('#country-region-filters button');
+      const countryResultsInfo = document.getElementById('country-results-info');
+      const loadMoreWrapper = document.getElementById('load-more-wrapper');
+      const btnLoadMore = document.getElementById('btn-load-more');
       const btnExportBackup = document.getElementById('btn-export-backup');
       const inputImportFile = document.getElementById('input-import-file');
 
@@ -586,33 +609,46 @@ import { worldCountries } from '../data/countries';
             return targetCountryIds.includes(c.id);
           }
           if (countryFilter === 'all') return true;
-          if (countryFilter === 'Lainnya') {
-            return c.region === 'Amerika' || c.region === 'Afrika';
-          }
           return c.region === countryFilter;
         });
 
         if (query) {
           filtered = filtered.filter(c => 
             c.name.toLowerCase().includes(query) || 
-            c.nativeName.toLowerCase().includes(query) || 
-            c.language.toLowerCase().includes(query) ||
-            c.script.toLowerCase().includes(query)
+            (c.nativeName && c.nativeName.toLowerCase().includes(query)) || 
+            (c.capital && c.capital.toLowerCase().includes(query)) || 
+            (c.language && c.language.toLowerCase().includes(query))
           );
+        }
+
+        const totalFiltered = filtered.length;
+        if (countryResultsInfo) {
+          countryResultsInfo.textContent = `Menampilkan ${Math.min(filtered.length, countryDisplayLimit)} dari ${totalFiltered} negara (${countryFilter === 'targets' ? 'Target Saya' : countryFilter})`;
         }
 
         if (filtered.length === 0) {
           countriesGrid.innerHTML = `
             <div class="col-span-full p-8 text-center border border-rule bg-canvas text-smoke font-mono text-[14px]">
-              Tidak ada negara yang cocok dengan filter "${countryFilter}".
-              ${countryFilter === 'targets' ? '<br><span class="text-[12px] text-steel">Pilih tab "Semua Negara" lalu klik tanda bintang ⭐ untuk menambah target belajar Anda!</span>' : ''}
+              Tidak ada negara yang cocok dengan kriteria pencarian.
+              ${countryFilter === 'targets' ? '<br><span class="text-[12px] text-steel">Pilih filter "Semua (250)" lalu klik tombol bintang ⭐ untuk menambah target belajar Anda!</span>' : ''}
             </div>
           `;
+          if (loadMoreWrapper) loadMoreWrapper.classList.add('hidden');
           return;
         }
 
+        const displayList = filtered.slice(0, countryDisplayLimit);
+
+        if (loadMoreWrapper) {
+          if (filtered.length > countryDisplayLimit) {
+            loadMoreWrapper.classList.remove('hidden');
+          } else {
+            loadMoreWrapper.classList.add('hidden');
+          }
+        }
+
         let html = '';
-        filtered.forEach(c => {
+        displayList.forEach(c => {
           const isTarget = targetCountryIds.includes(c.id);
           const hasTable = Boolean(c.tableId && getAllTables().some(t => t.id === c.tableId));
 
@@ -620,17 +656,17 @@ import { worldCountries } from '../data/countries';
             <div class="border ${isTarget ? 'border-ink bg-canvas' : 'border-rule bg-canvas'} p-4 flex flex-col justify-between transition-all">
               <div>
                 <div class="flex items-center justify-between gap-2 mb-2">
-                  <div class="flex items-center gap-2.5">
-                    <span class="text-[26px] leading-none select-none">${c.flag}</span>
-                    <div>
-                      <h3 class="text-[16px] font-bold text-ink leading-tight">${c.name}</h3>
-                      <p class="text-[11px] text-smoke">${c.nativeName}</p>
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="text-[26px] leading-none select-none shrink-0">${c.flag}</span>
+                    <div class="min-w-0">
+                      <h3 class="text-[15px] font-bold text-ink leading-tight truncate">${c.name}</h3>
+                      <p class="text-[11px] text-smoke truncate">${c.nativeName || c.capital || ''}</p>
                     </div>
                   </div>
                   <button 
                     type="button" 
                     data-toggle-target="${c.id}"
-                    class="size-8 flex items-center justify-center border ${isTarget ? 'border-cta bg-cta text-cta-ink' : 'border-rule hover:border-ink text-smoke'} font-bold cursor-pointer"
+                    class="size-8 shrink-0 flex items-center justify-center border ${isTarget ? 'border-cta bg-cta text-cta-ink' : 'border-rule hover:border-ink text-smoke'} font-bold cursor-pointer"
                     title="${isTarget ? 'Hapus dari target belajar' : 'Simpan ke target belajar'}"
                   >
                     ⭐
@@ -639,16 +675,17 @@ import { worldCountries } from '../data/countries';
 
                 <div class="mt-3 pt-3 border-t border-rule space-y-1.5 text-[12px] font-mono">
                   <div class="flex items-center justify-between">
-                    <span class="text-smoke">Benua:</span>
-                    <span class="text-steel font-medium">${c.region}</span>
+                    <span class="text-smoke">Kawasan:</span>
+                    <span class="text-steel font-medium truncate max-w-[150px]">${c.region} ${c.subregion ? '(' + c.subregion + ')' : ''}</span>
                   </div>
+                  ${c.capital ? `
                   <div class="flex items-center justify-between">
-                    <span class="text-smoke">Bahasa:</span>
-                    <span class="text-ink font-bold truncate max-w-[150px]">${c.language}</span>
-                  </div>
+                    <span class="text-smoke">Ibukota:</span>
+                    <span class="text-steel truncate max-w-[150px]">${c.capital}</span>
+                  </div>` : ''}
                   <div class="flex items-start justify-between gap-2">
-                    <span class="text-smoke shrink-0">Aksara:</span>
-                    <span class="text-steel text-right">${c.script}</span>
+                    <span class="text-smoke shrink-0">Bahasa:</span>
+                    <span class="text-ink font-bold text-right truncate max-w-[150px]">${c.language}</span>
                   </div>
                 </div>
               </div>
@@ -666,7 +703,7 @@ import { worldCountries } from '../data/countries';
                   <button 
                     type="button" 
                     data-create-for="${c.name}"
-                    data-voice="${c.voiceLang || 'id-ID'}"
+                    data-voice="${c.voiceLang || 'en-US'}"
                     class="btn btn-secondary btn-s text-[12px] w-full"
                   >
                     + Buat Tabel Aksara
@@ -723,10 +760,19 @@ import { worldCountries } from '../data/countries';
         });
       }
 
+      // Load More Button
+      if (btnLoadMore) {
+        btnLoadMore.addEventListener('click', () => {
+          countryDisplayLimit += 36;
+          renderCountries();
+        });
+      }
+
       // Country Filter Pill Buttons
       countryFilterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
           countryFilter = btn.getAttribute('data-filter');
+          countryDisplayLimit = 36;
           countryFilterButtons.forEach(b => {
             if (b === btn) {
               b.className = 'px-3 py-1 font-mono border border-ink bg-ink text-canvas font-bold';
@@ -741,6 +787,7 @@ import { worldCountries } from '../data/countries';
       if (countrySearchInput) {
         countrySearchInput.addEventListener('input', (e) => {
           countrySearchQuery = e.target.value;
+          countryDisplayLimit = 36;
           renderCountries();
         });
       }
