@@ -120,7 +120,19 @@ import { worldCountries } from '../data/countries';
 
     // Local Storage target countries
     let targetCountryIds: string[] = JSON.parse(localStorage.getItem('target_countries') || '["JP", "KR", "DE"]');
+    
+    // Baca parameter URL jika dibuka dari footer/link eksternal (misal: ?region=Asia atau ?filter=targets)
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialRegion = urlParams.get('region');
+    const initialFilter = urlParams.get('filter');
+
     let countryFilter = 'all';
+    if (initialFilter === 'targets') {
+      countryFilter = 'targets';
+    } else if (initialRegion) {
+      countryFilter = initialRegion;
+    }
+
     let countrySearchQuery = '';
     let countryDisplayLimit = 36;
     let currentUser: any = null;
@@ -405,6 +417,18 @@ import { worldCountries } from '../data/countries';
       } catch (err) {
         console.warn('Init user targets error:', err);
       }
+    }
+
+    // Sync button highlight with initial URL filter
+    if (countryFilter !== 'all') {
+      filterButtons.forEach(b => {
+        const f = b.getAttribute('data-filter');
+        if (f === countryFilter) {
+          b.className = 'px-3.5 py-1.5 font-mono border border-ink bg-ink text-canvas font-bold';
+        } else {
+          b.className = 'px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink';
+        }
+      });
     }
 
     // Initial render

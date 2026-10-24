@@ -22,26 +22,28 @@ export const site = {
     { 
       title: 'Aksara Pilihan', 
       links: [
-        ['Jepang (Hiragana)', '/belajar?lang=jepang-hiragana'], 
+        ['Jepang (Hiragana & Katakana)', '/belajar?lang=jepang-hiragana'], 
         ['Jerman (Umlaut)', '/belajar?lang=jerman-dasar'], 
         ['Korea (Hangul)', '/belajar?lang=korea-hangul'], 
         ['Arab (Hijaiyah)', '/belajar?lang=arab-hijaiyah']
       ] 
     },
     { 
-      title: 'Daftar Negara', 
+      title: 'Database 250 Negara', 
       links: [
-        ['Asia (Jepang, Korea, Tiongkok)', '/katalog'], 
-        ['Eropa (Jerman, Prancis, Spanyol)', '/katalog'], 
-        ['Timur Tengah (Arab Saudi, Mesir)', '/katalog']
+        ['Semua 250 Negara Terintegrasi', '/katalog'], 
+        ['Kawasan Asia & Oseania', '/katalog?region=Asia'], 
+        ['Kawasan Eropa', '/katalog?region=Eropa'], 
+        ['Kawasan Timur Tengah & Afrika', '/katalog?region=Timur+Tengah'],
+        ['Target Belajar Saya', '/katalog?filter=targets']
       ] 
     },
     { 
-      title: 'Fitur', 
+      title: 'Fitur Sistem', 
       links: [
         ['Studio Belajar Aksara', '/belajar'], 
-        ['Database 250 Negara', '/katalog'], 
-        ['Sinkronisasi Cloud', '/belajar']
+        ['Database 250 Negara Lengkap', '/katalog'], 
+        ['Integrasi Cloud Otomatis', '/#panduan']
       ] 
     },
   ],

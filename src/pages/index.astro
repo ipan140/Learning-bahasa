@@ -10,7 +10,7 @@ const sampleTable = defaultLanguageTables[0]; // Jepang Hiragana
 const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES', 'FR'].includes(c.code));
 ---
 
-<Base title="Belajar Bahasa - Tabel Aksara Interaktif & Database 250 Negara" description="Aplikasi tabel belajar aksara bahasa (Jepang, Jerman, Korea, Arab, dll.) dan katalog 250 negara dengan audio pengucapan asli dan sinkronisasi akun Supabase.">
+<Base title="Belajar Bahasa - Tabel Aksara Interaktif & Database 250 Negara" description="Aplikasi tabel belajar aksara bahasa (Jepang, Jerman, Korea, Arab, dll.) dan katalog 250 negara dengan audio pengucapan asli dan integrasi cloud multi-perangkat.">
   
   <!-- [00] HERO: Pengenalan & Panduan Menggunakan Website -->
   <Section id="panduan" top={false} inner="px-6 pt-14 pb-18 lg:pt-20 lg:pb-24 max-md:px-5 overflow-hidden" label="Pengenalan Website">
@@ -27,7 +27,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
         <rect x={x - 4} y={y - 4} width="8" height="8" fill={o ? 'var(--cta)' : 'var(--canvas)'} stroke="var(--ink)" />
       ))}
       <g fill="var(--smoke)" font-size="11" font-family="inherit">
-        <text x="534" y="615">tabel_aksara</text><text x="892" y="535">audio_speech</text><text x="1020" y="606">250_negara</text><text x="832" y="70">supabase_sync</text>
+        <text x="534" y="615">tabel_aksara</text><text x="892" y="535">audio_speech</text><text x="1020" y="606">250_negara</text><text x="832" y="70">integrasi_cloud</text>
       </g>
       <g stroke="var(--ink)"><path d="M580.5 96h11M586 90.5v11M1230.5 537h11M1236 531.5v11M34.5 613h11M40 607.5v11" /></g>
     </svg>
@@ -40,7 +40,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
           Belajar Aksara Bahasa &amp; Catat Target Negaramu.
         </h1>
         <p class="mt-6 max-w-[50ch] text-[16px] leading-[1.6] text-steel max-md:text-[15px]">
-          Selamat datang di platform belajar bahasa mandiri. Pelajari tabel aksara fonetik (Jepang, Jerman, Korea, Arab, dll.) dengan audio lafal asli, kelola database 250 negara, dan sinkronkan progres Anda dengan Supabase Cloud.
+          Selamat datang di platform belajar bahasa mandiri. Pelajari tabel aksara fonetik (Jepang, Jerman, Korea, Arab, dll.) dengan audio lafal asli, kelola database 250 negara, dan integrasikan progres Anda ke cloud secara aman.
         </p>
 
         <div class="mt-8 flex flex-wrap items-center gap-4">
@@ -53,7 +53,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
         </div>
 
         <div class="mt-7 flex items-center w-fit max-w-full border border-rule bg-canvas text-[13px] font-mono shadow-sm">
-          <code class="px-4 py-2.5 text-ink truncate"><span class="text-smoke select-none">fitur: </span>audio native · 250 negara · cloud supabase</code>
+          <code class="px-4 py-2.5 text-ink truncate"><span class="text-smoke select-none">fitur: </span>audio native · 250 negara · integrasi cloud</code>
           <span class="px-3.5 py-2.5 border-l border-rule text-ok font-bold">100% GRATIS</span>
         </div>
       </div>
@@ -191,7 +191,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
     </div>
   </Section>
 
-  <!-- [03] FITUR UTAMA & SINKRONISASI SUPABASE -->
+  <!-- [03] FITUR UTAMA & INTEGRASI CLOUD -->
   <Section top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
     <div class="max-w-5xl">
       <div class="pb-6 border-b border-rule">
@@ -223,9 +223,9 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
         <!-- Fitur 3 -->
         <div class="border border-rule bg-canvas p-6 space-y-3">
           <span class="text-[28px]">☁️</span>
-          <h3 class="text-[17px] font-bold text-ink">Sinkron Akun Supabase</h3>
+          <h3 class="text-[17px] font-bold text-ink">Integrasi Cloud Otomatis</h3>
           <p class="text-[13px] text-steel leading-relaxed">
-            Daftar akun gratis untuk menyimpan target negara dan materi tabel kustom Anda secara otomatis di Supabase Cloud.
+            Daftar akun gratis untuk menyimpan target negara dan materi tabel kustom Anda secara otomatis di penyimpanan cloud.
           </p>
         </div>
       </div>

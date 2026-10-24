@@ -2,25 +2,14 @@ import { createClient, type SupabaseClient, type User } from '@supabase/supabase
 
 // Cache client instance in memory
 let supabaseInstance: SupabaseClient | null = null;
-export const DEFAULT_SUPABASE_URL = 'https://qqitquxjqupclhlunjq.supabase.co';
 
 export function getSupabaseConfig(): { url: string; anonKey: string } | null {
-  const defaultUrl = DEFAULT_SUPABASE_URL;
-
-  // 1. Coba dari environment variable Astro (Build / Vercel Env)
-  const envUrl = import.meta.env.PUBLIC_SUPABASE_URL || defaultUrl;
+  // Hanya membaca dari environment variables (Vercel / .env lokal)
+  const envUrl = import.meta.env.PUBLIC_SUPABASE_URL;
   const envKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  if (envKey && !envKey.includes('your-anon-key') && envKey.trim().length > 10) {
-    return { url: envUrl.trim(), anonKey: envKey.trim() };
-  }
 
-  // 2. Coba dari localStorage (Pengaturan runtime di browser)
-  if (typeof window !== 'undefined') {
-    const localUrl = localStorage.getItem('sb_custom_url') || defaultUrl;
-    const localKey = localStorage.getItem('sb_custom_key');
-    if (localKey && !localKey.includes('your-anon-key') && localKey.trim().length > 10) {
-      return { url: localUrl.trim(), anonKey: localKey.trim() };
-    }
+  if (envUrl && envKey && !envKey.includes('your-anon-key') && envKey.trim().length > 10) {
+    return { url: envUrl.trim(), anonKey: envKey.trim() };
   }
 
   return null;
@@ -28,24 +17,6 @@ export function getSupabaseConfig(): { url: string; anonKey: string } | null {
 
 export function isSupabaseConfigured(): boolean {
   return getSupabaseConfig() !== null;
-}
-
-export function saveSupabaseConfig(url: string, anonKey: string) {
-  if (typeof window !== 'undefined') {
-    const cleanUrl = (url || DEFAULT_SUPABASE_URL).trim();
-    const cleanKey = anonKey.trim();
-    localStorage.setItem('sb_custom_url', cleanUrl);
-    localStorage.setItem('sb_custom_key', cleanKey);
-    supabaseInstance = null; // reset client instance agar terinisialisasi ulang
-  }
-}
-
-export function clearSupabaseConfig() {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('sb_custom_url');
-    localStorage.removeItem('sb_custom_key');
-    supabaseInstance = null;
-  }
 }
 
 export function getSupabase(): SupabaseClient | null {
@@ -84,7 +55,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
 export async function signUpWithEmail(email: string, password: string) {
   const sb = getSupabase();
-  if (!sb) throw new Error('Supabase belum terhubung. Harap masukkan Supabase anon key.');
+  if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
   return await sb.auth.signUp({
     email,
     password,
@@ -93,7 +64,7 @@ export async function signUpWithEmail(email: string, password: string) {
 
 export async function signInWithEmail(email: string, password: string) {
   const sb = getSupabase();
-  if (!sb) throw new Error('Supabase belum terhubung. Harap masukkan Supabase anon key.');
+  if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
   return await sb.auth.signInWithPassword({
     email,
     password,
@@ -108,10 +79,32 @@ export async function signOutUser() {
 
 export async function resetPasswordForEmail(email: string) {
   const sb = getSupabase();
-  if (!sb) throw new Error('Supabase belum terhubung.');
+  if (!sb) throw new Error('Layanan autentikasi belum terhubung.');
   return await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : undefined,
+    redirectTo: typeof window !== 'undefined' ? `${window.location.origin}` : undefined,
   });
+}
+
+export async function updateUserProfile(displayName: string, avatarUrl?: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const updateData: any = { display_name: displayName };
+    if (avatarUrl !== undefined) {
+      updateData.avatar_url = avatarUrl;
+    }
+    const { error } = await sb.auth.updateUser({
+      data: updateData
+    });
+    if (error) {
+      console.warn('Gagal updateUserProfile:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error updateUserProfile:', err);
+    return false;
+  }
 }
 
 // ================= DATA SYNC HELPERS =================

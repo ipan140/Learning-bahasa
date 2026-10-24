@@ -1,16 +1,16 @@
 ---
-// AuthModal.astro - Modal Login & Registrasi Pengguna
+// AuthModal.astro - Modal Login, Registrasi, & Edit Profil Pengguna
 ---
 
-<dialog id="auth-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[420px] shadow-2xl">
-  <div class="p-6 max-sm:p-5 flex flex-col gap-5">
+<dialog id="auth-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[440px] shadow-2xl">
+  <div class="p-5 sm:p-6 flex flex-col gap-4">
     
     <!-- Header Modal -->
     <div class="flex items-start justify-between pb-3 border-b border-rule">
       <div>
         <h2 id="auth-modal-title" class="text-[18px] font-bold tracking-tight text-ink">Masuk ke Akun</h2>
         <p class="text-[12px] text-steel mt-0.5" id="auth-modal-subtitle">
-          Simpan target belajar dan sinkronkan antar-laptop &amp; smartphone Anda.
+          Simpan target belajar dan integrasikan data antar-perangkat Anda.
         </p>
       </div>
       <button 
@@ -30,22 +30,73 @@
     <!-- VIEW 1: PROFIL SAAT USER SUDAH LOGIN           -->
     <!-- ============================================== -->
     <div id="auth-view-logged-in" class="hidden flex flex-col gap-4">
-      <div class="p-4 bg-smoke/5 border border-rule flex items-center gap-3.5">
-        <div class="size-11 shrink-0 rounded-full bg-ink text-canvas font-bold text-base flex items-center justify-center uppercase select-none" id="auth-avatar-letter">
-          U
-        </div>
-        <div class="min-w-0 flex-1">
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-2 h-2 rounded-full bg-ok animate-pulse"></span>
-            <span class="text-[11px] font-mono text-ok font-semibold uppercase">Akun Aktif</span>
+      
+      <!-- Card Identitas Pengguna -->
+      <div class="p-4 bg-tint/60 border border-rule flex flex-col gap-3">
+        <div class="flex items-center gap-3.5">
+          <!-- Avatar Container -->
+          <div class="relative size-14 shrink-0 rounded-full border border-rule overflow-hidden bg-ink text-canvas font-bold text-lg flex items-center justify-center select-none" id="auth-avatar-box">
+            <img id="auth-avatar-img" class="hidden size-full object-cover" alt="Foto Profil" />
+            <span id="auth-avatar-letter">U</span>
           </div>
-          <p class="text-[14px] font-bold text-ink truncate mt-0.5" id="auth-user-email">user@email.com</p>
+
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5">
+              <span class="inline-block w-2 h-2 rounded-full bg-ok animate-pulse"></span>
+              <span class="text-[11px] font-mono text-ok font-semibold uppercase">Akun Aktif</span>
+            </div>
+            <p class="text-[15px] font-bold text-ink truncate mt-0.5" id="auth-display-name-label">Nama Pengguna</p>
+            <p class="text-[12px] text-steel truncate" id="auth-user-email">user@email.com</p>
+          </div>
+        </div>
+
+        <!-- Form Edit Nama & Foto Profil -->
+        <div class="pt-3 border-t border-rule space-y-3">
+          <div>
+            <label for="auth-input-name" class="block text-[11px] font-mono text-smoke uppercase tracking-wider mb-1">
+              Ubah Nama Tampilan
+            </label>
+            <input 
+              type="text" 
+              id="auth-input-name" 
+              placeholder="Ketik nama Anda (misal: Ivano Rossi)..." 
+              class="w-full text-[13px] px-3 py-2 bg-canvas border border-rule focus:border-ink focus:outline-none text-ink font-mono"
+            />
+          </div>
+
+          <!-- Pilihan Avatar Preset / Upload Foto -->
+          <div>
+            <label class="block text-[11px] font-mono text-smoke uppercase tracking-wider mb-1.5">
+              Pilih Avatar / Unggah Foto
+            </label>
+            <div class="flex items-center gap-2 flex-wrap">
+              <!-- Preset Avatar Emojis -->
+              <div class="flex items-center gap-1" id="avatar-preset-chips">
+                <button type="button" data-avatar="🧑‍🎓" class="size-8 text-[15px] border border-rule bg-canvas hover:border-ink flex items-center justify-center transition-colors" title="Pilih avatar pelajar">🧑‍🎓</button>
+                <button type="button" data-avatar="🌍" class="size-8 text-[15px] border border-rule bg-canvas hover:border-ink flex items-center justify-center transition-colors" title="Pilih avatar globe">🌍</button>
+                <button type="button" data-avatar="⚡" class="size-8 text-[15px] border border-rule bg-canvas hover:border-ink flex items-center justify-center transition-colors" title="Pilih avatar kilat">⚡</button>
+                <button type="button" data-avatar="📖" class="size-8 text-[15px] border border-rule bg-canvas hover:border-ink flex items-center justify-center transition-colors" title="Pilih avatar buku">📖</button>
+                <button type="button" data-avatar="🌟" class="size-8 text-[15px] border border-rule bg-canvas hover:border-ink flex items-center justify-center transition-colors" title="Pilih avatar bintang">🌟</button>
+                <button type="button" data-avatar="🦊" class="size-8 text-[15px] border border-rule bg-canvas hover:border-ink flex items-center justify-center transition-colors" title="Pilih avatar rubah">🦊</button>
+              </div>
+
+              <!-- Upload Custom Image -->
+              <label class="px-2.5 py-1 text-[11px] font-mono border border-rule hover:border-ink text-steel hover:text-ink cursor-pointer bg-canvas inline-flex items-center gap-1 transition-colors">
+                📷 Upload Foto
+                <input type="file" id="auth-avatar-file-input" accept="image/*" class="hidden" />
+              </label>
+            </div>
+          </div>
+
+          <button type="button" id="btn-save-profile" class="btn btn-secondary btn-s w-full justify-center text-[12px] font-mono">
+            💾 Simpan Perubahan Profil
+          </button>
         </div>
       </div>
 
-      <!-- Ringkasan Materi Tersimpan -->
+      <!-- Ringkasan Materi Tersimpan di Cloud -->
       <div class="p-4 border border-rule flex flex-col gap-3">
-        <span class="text-[11px] font-mono text-smoke uppercase tracking-wider">Materi Tersimpan di Cloud</span>
+        <span class="text-[11px] font-mono text-smoke uppercase tracking-wider">Integrasi Data Tersimpan</span>
         <div class="grid grid-cols-2 gap-3 text-center">
           <div class="p-3 bg-smoke/5 border border-rule">
             <div class="text-[22px] font-bold font-mono text-ink" id="sync-target-count">0</div>
@@ -57,8 +108,8 @@
           </div>
         </div>
 
-        <button type="button" id="btn-force-sync" class="btn btn-secondary btn-s w-full justify-center text-[12px]">
-          ⚡ Sinkronkan Ulang Sekarang
+        <button type="button" id="btn-force-sync" class="btn btn-secondary btn-s w-full justify-center text-[12px] font-mono">
+          ⚡ Sinkronkan Data Sekarang
         </button>
       </div>
 
@@ -155,6 +206,7 @@
     signUpWithEmail,
     signInWithEmail,
     signOutUser,
+    updateUserProfile,
     fetchUserTargetsFromCloud,
     addTargetToCloud,
     removeTargetFromCloud,
@@ -166,6 +218,7 @@
 
   let currentAuthMode: 'login' | 'register' = 'login';
   let activeUser: any = null;
+  let currentAvatarUrl: string = '';
 
   const modal = document.getElementById('auth-modal') as HTMLDialogElement | null;
   const modalTitle = document.getElementById('auth-modal-title');
@@ -183,7 +236,14 @@
   const linkToRegister = document.getElementById('link-to-register');
 
   const userEmailDisplay = document.getElementById('auth-user-email');
+  const displayNameLabel = document.getElementById('auth-display-name-label');
+  const inputName = document.getElementById('auth-input-name') as HTMLInputElement | null;
   const avatarLetter = document.getElementById('auth-avatar-letter');
+  const avatarImg = document.getElementById('auth-avatar-img') as HTMLImageElement | null;
+  const avatarFileInput = document.getElementById('auth-avatar-file-input') as HTMLInputElement | null;
+  const btnSaveProfile = document.getElementById('btn-save-profile');
+  const presetChips = document.querySelectorAll('#avatar-preset-chips button');
+
   const syncTargetCount = document.getElementById('sync-target-count');
   const syncTableCount = document.getElementById('sync-table-count');
 
@@ -205,12 +265,30 @@
     alertBox.className = 'hidden';
   }
 
+  function setAvatarDisplay(avatar: string, fallbackInitial: string) {
+    if (!avatarLetter || !avatarImg) return;
+    if (avatar && (avatar.startsWith('data:image') || avatar.startsWith('http'))) {
+      avatarImg.src = avatar;
+      avatarImg.classList.remove('hidden');
+      avatarLetter.classList.add('hidden');
+    } else if (avatar && avatar.length <= 4) {
+      // Emoji avatar
+      avatarImg.classList.add('hidden');
+      avatarLetter.textContent = avatar;
+      avatarLetter.classList.remove('hidden');
+    } else {
+      avatarImg.classList.add('hidden');
+      avatarLetter.textContent = fallbackInitial;
+      avatarLetter.classList.remove('hidden');
+    }
+  }
+
   function switchAuthTab(mode: 'login' | 'register') {
     currentAuthMode = mode;
     hideAlert();
     if (mode === 'login') {
       if (modalTitle) modalTitle.textContent = 'Masuk ke Akun';
-      if (modalSubtitle) modalSubtitle.textContent = 'Simpan target belajar dan sinkronkan antar-laptop & smartphone Anda.';
+      if (modalSubtitle) modalSubtitle.textContent = 'Simpan target belajar dan integrasikan data antar-perangkat Anda.';
       tabLogin?.classList.add('border-cta', 'text-ink');
       tabLogin?.classList.remove('border-transparent', 'text-smoke');
       tabRegister?.classList.remove('border-cta', 'text-ink');
@@ -245,9 +323,10 @@
 
     if (user) {
       if (dot) dot.className = 'inline-block w-2 h-2 rounded-full bg-ok';
-      const emailName = user.email ? user.email.split('@')[0] : 'Akun';
-      if (label) label.textContent = emailName;
-      if (mobileBtn) mobileBtn.textContent = `🟢 Akun: ${emailName}`;
+      const customName = user.user_metadata?.display_name || localStorage.getItem('user_display_name');
+      const nameToShow = customName || (user.email ? user.email.split('@')[0] : 'Akun');
+      if (label) label.textContent = nameToShow;
+      if (mobileBtn) mobileBtn.textContent = `🟢 Akun: ${nameToShow}`;
     } else {
       if (dot) dot.className = 'inline-block w-2 h-2 rounded-full bg-smoke';
       if (label) label.textContent = 'Masuk';
@@ -266,12 +345,18 @@
         viewLoggedIn?.classList.remove('hidden');
         viewLoggedOut?.classList.add('hidden');
         if (modalTitle) modalTitle.textContent = 'Profil Pengguna';
-        if (modalSubtitle) modalSubtitle.textContent = 'Kelola status sinkronisasi akun belajar Anda.';
+        if (modalSubtitle) modalSubtitle.textContent = 'Kelola foto profil, nama tampilan, dan status integrasi cloud Anda.';
         if (userEmailDisplay) userEmailDisplay.textContent = user.email || '-';
-        if (avatarLetter) {
-          const initial = (user.email || 'U').charAt(0).toUpperCase();
-          avatarLetter.textContent = initial;
-        }
+
+        const customName = user.user_metadata?.display_name || localStorage.getItem('user_display_name') || '';
+        const savedAvatar = user.user_metadata?.avatar_url || localStorage.getItem('user_avatar_url') || '';
+        currentAvatarUrl = savedAvatar;
+
+        const initial = (user.email || 'U').charAt(0).toUpperCase();
+        if (displayNameLabel) displayNameLabel.textContent = customName || (user.email ? user.email.split('@')[0] : 'Pengguna');
+        if (inputName) inputName.value = customName;
+
+        setAvatarDisplay(savedAvatar, initial);
         updateSyncStats(user.id);
       } else {
         viewLoggedIn?.classList.add('hidden');
@@ -282,6 +367,63 @@
       console.warn('Auth check failed:', err);
     }
   }
+
+  // Preset Emoji Avatar selection
+  presetChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const emoji = chip.getAttribute('data-avatar');
+      if (!emoji) return;
+      currentAvatarUrl = emoji;
+      setAvatarDisplay(emoji, (activeUser?.email || 'U').charAt(0).toUpperCase());
+      showAlert(`Avatar dipilih: ${emoji}. Klik "Simpan Perubahan Profil" untuk menyimpan.`, 'info');
+    });
+  });
+
+  // Custom File Avatar Upload (Image File)
+  avatarFileInput?.addEventListener('change', (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      showAlert('Ukuran gambar maksimal 2MB.', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const base64 = evt.target?.result as string;
+      currentAvatarUrl = base64;
+      setAvatarDisplay(base64, (activeUser?.email || 'U').charAt(0).toUpperCase());
+      showAlert('Foto profil dimuat! Klik "Simpan Perubahan Profil" untuk menyimpan.', 'info');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Simpan Nama & Foto Profil
+  btnSaveProfile?.addEventListener('click', async () => {
+    if (!activeUser) return;
+    const name = inputName?.value.trim() || '';
+
+    showAlert('Menyimpan perubahan profil...', 'info');
+    try {
+      localStorage.setItem('user_display_name', name);
+      if (currentAvatarUrl) {
+        localStorage.setItem('user_avatar_url', currentAvatarUrl);
+      }
+
+      await updateUserProfile(name, currentAvatarUrl);
+
+      if (displayNameLabel) displayNameLabel.textContent = name || activeUser.email.split('@')[0];
+      updateHeaderAuthButton({
+        ...activeUser,
+        user_metadata: { ...activeUser.user_metadata, display_name: name, avatar_url: currentAvatarUrl }
+      });
+
+      showAlert('✓ Profil berhasil diperbarui!', 'success');
+    } catch (err: any) {
+      showAlert('Gagal menyimpan profil: ' + (err.message || 'Terjadi kesalahan'), 'error');
+    }
+  });
 
   async function updateSyncStats(userId: string) {
     try {
@@ -302,7 +444,7 @@
   // Sinkronisasi penuh lokal -> cloud
   async function performFullSync() {
     if (!activeUser) return;
-    showAlert('Menyinkronkan data belajar Anda...', 'info');
+    showAlert('Mengintegrasikan data belajar Anda...', 'info');
 
     try {
       // 1. Sinkronkan target negara
@@ -317,7 +459,7 @@
         await saveCustomTableToCloud(activeUser.id, t);
       }
 
-      showAlert('✓ Seluruh data berhasil tersinkron!', 'success');
+      showAlert('✓ Seluruh data berhasil terintegrasi!', 'success');
       await updateSyncStats(activeUser.id);
     } catch (err: any) {
       showAlert('Gagal sinkronisasi: ' + (err.message || 'Terjadi kesalahan'), 'error');
@@ -351,7 +493,7 @@
     hideAlert();
 
     if (!isSupabaseConfigured()) {
-      showAlert('Layanan server akun belum terhubung. Pastikan env telah diset dan di-redeploy di Vercel.', 'error');
+      showAlert('Layanan integrasi akun belum terhubung. Pastikan env telah diset dan di-redeploy di Vercel.', 'error');
       return;
     }
 
@@ -382,9 +524,9 @@
     } catch (err: any) {
       let msg = err.message || 'Terjadi kesalahan saat menghubungi server.';
       if (msg.includes('fetch') || msg.includes('Failed to fetch') || err.name === 'AuthRetryableFetchError') {
-        msg = 'Tidak dapat terhubung ke server Supabase. Pastikan PUBLIC_SUPABASE_URL di Vercel sudah benar dan tidak ada salah ketik.';
+        msg = 'Tidak dapat terhubung ke server autentikasi. Pastikan koneksi internet stabil atau coba beberapa saat lagi.';
       } else if (msg.includes('Email not confirmed')) {
-        msg = 'Email belum dikonfirmasi. Silakan buka email Anda untuk konfirmasi, atau nonaktifkan "Confirm email" di dashboard Supabase Auth.';
+        msg = 'Email belum dikonfirmasi. Silakan buka email Anda untuk konfirmasi aktivasi akun.';
       } else if (msg.includes('Invalid login credentials')) {
         msg = 'Email atau kata sandi salah. Silakan periksa kembali atau daftar akun baru.';
       } else if (msg.includes('User already registered')) {
@@ -457,7 +599,7 @@
     }
   });
 
-  // Listen auth state change dari Supabase
+  // Listen auth state change
   const sb = getSupabase();
   if (sb) {
     sb.auth.onAuthStateChange((_event, session) => {
