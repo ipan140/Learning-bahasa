@@ -5,7 +5,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://runlog-lite.pages.dev',
+  site: 'https://learning-bahasa-nine.vercel.app',
   integrations: [mdx(), sitemap()],
   vite: { plugins: [tailwindcss()] },
 });

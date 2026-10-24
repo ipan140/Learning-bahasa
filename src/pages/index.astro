@@ -69,7 +69,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
 
   <!-- [01] SHOWCASE: Pratinjau Interaktif Studio Belajar Aksara -->
   <Section top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
-    <div class="max-w-5xl">
+    <div class="w-full">
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-rule">
         <div>
           <p class="label"><b>[01]</b> pratinjau studio belajar</p>
@@ -77,7 +77,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
             Tabel Huruf &amp; Aksara Interaktif
           </h2>
           <p class="mt-2 text-[15px] text-steel max-w-[60ch]">
-            Klik kotak karakter di bawah untuk mendengar suara pengucapan audio aslinya. Tersedia lebih dari 12 aksara bahasa dunia.
+            Klik kotak karakter di bawah untuk mendengar suara pengucapan audio aslinya dengan suara Google Speech. Tersedia lebih dari 12 aksara bahasa dunia.
           </p>
         </div>
         <a href="/belajar" class="btn btn-primary btn-s shrink-0 font-mono text-[13px]">
@@ -92,7 +92,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
             <span class="text-lg">🇯🇵</span>
             <span class="font-bold text-ink text-[16px]">Pratinjau Aksara Hiragana (5 Baris Pertama)</span>
           </div>
-          <span class="text-smoke font-mono text-[12px]">💡 Klik sel untuk mendengar suara</span>
+          <span class="text-smoke font-mono text-[12px]">🔊 Suara Asli Google Speech · Klik sel untuk mendengarkan</span>
         </div>
 
         <div class="overflow-x-auto pb-2">
@@ -137,7 +137,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
 
   <!-- [02] SHOWCASE: Katalog 250 Negara di Dunia -->
   <Section top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
-    <div class="max-w-5xl">
+    <div class="w-full">
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-rule">
         <div>
           <p class="label"><b>[02]</b> database target belajar</p>
@@ -193,7 +193,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
 
   <!-- [03] FITUR UTAMA & INTEGRASI CLOUD -->
   <Section top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
-    <div class="max-w-5xl">
+    <div class="w-full">
       <div class="pb-6 border-b border-rule">
         <p class="label"><b>[03]</b> arsitektur &amp; keunggulan</p>
         <h2 class="mt-3 text-[clamp(26px,3.5vw,40px)] leading-[1.1] font-bold tracking-[-0.035em] text-ink">
@@ -205,9 +205,9 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
         <!-- Fitur 1 -->
         <div class="border border-rule bg-canvas p-6 space-y-3">
           <span class="text-[28px]">🔊</span>
-          <h3 class="text-[17px] font-bold text-ink">Pelafalan Audio Instan</h3>
+          <h3 class="text-[17px] font-bold text-ink">Pelafalan Audio Suara Google</h3>
           <p class="text-[13px] text-steel leading-relaxed">
-            Didukung Web Speech API native browser, audio lafal huruf diputar tanpa delay dan tanpa kuota audio berat.
+            Terintegrasi dengan mesin suara Google Speech &amp; Google Translate TTS untuk menghasilkan pengucapan fonetik aksara yang jernih dan akurat.
           </p>
         </div>
 
@@ -263,6 +263,69 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
     }
   });
 
+  // Google Speech Synthesizer engine dengan Fallback Audio Stream
+  let cachedVoices = [];
+  function loadVoices() {
+    if ('speechSynthesis' in window) {
+      cachedVoices = window.speechSynthesis.getVoices();
+    }
+  }
+  if ('speechSynthesis' in window) {
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  function playGoogleSpeech(text, lang) {
+    if (!text) return;
+    const langCode = lang ? lang.split('-')[0].toLowerCase() : 'ja';
+
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        if (lang) utter.lang = lang;
+        utter.rate = 0.85;
+
+        const voices = cachedVoices.length ? cachedVoices : window.speechSynthesis.getVoices();
+        
+        // Prioritaskan suara resmi Google untuk bahasa ini
+        const googleVoice = voices.find(v => 
+          (v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()) && 
+          v.name.toLowerCase().includes('google')
+        );
+
+        const naturalVoice = voices.find(v => 
+          (v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()) && 
+          (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online'))
+        );
+
+        const matchedVoice = voices.find(v => 
+          v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()
+        );
+
+        if (googleVoice) {
+          utter.voice = googleVoice;
+        } else if (naturalVoice) {
+          utter.voice = naturalVoice;
+        } else if (matchedVoice) {
+          utter.voice = matchedVoice;
+        }
+
+        window.speechSynthesis.speak(utter);
+        return;
+      } catch (e) {
+        console.warn('SpeechSynthesis error, falling back:', e);
+      }
+    }
+
+    // Fallback: Google Translate TTS audio stream
+    try {
+      const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(text)}`;
+      const audio = new Audio(audioUrl);
+      audio.play().catch(() => {});
+    } catch {}
+  }
+
   // Audio listener for hero sample table
   const heroTable = document.getElementById('hero-preview-table');
   if (heroTable) {
@@ -270,12 +333,8 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
       td.addEventListener('click', () => {
         const char = td.getAttribute('data-char');
         const lang = td.getAttribute('data-lang');
-        if (char && 'speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const utter = new SpeechSynthesisUtterance(char);
-          if (lang) utter.lang = lang;
-          utter.rate = 0.85;
-          window.speechSynthesis.speak(utter);
+        if (char) {
+          playGoogleSpeech(char, lang);
         }
       });
     });

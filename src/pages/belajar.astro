@@ -11,7 +11,7 @@ import { defaultLanguageTables } from '../data/languages';
   
   <!-- [01] MAIN APP: Area Belajar Aksara -->
   <Section id="area-belajar" top={false} inner="px-6 pt-12 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
-    <div class="max-w-5xl">
+    <div class="w-full">
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-rule">
         <div>
           <p class="label"><b>[01]</b> studio belajar interaktif</p>
@@ -56,17 +56,17 @@ import { defaultLanguageTables } from '../data/languages';
           <div class="flex items-center justify-between flex-wrap gap-2">
             <span class="label font-bold text-ink">PILIH AKSARA BAHASA:</span>
             <!-- Category Chips Filter -->
-            <div class="flex items-center gap-1.5 text-[12px] font-mono" id="category-filter-chips">
-              <button type="button" data-cat="all" class="px-2.5 py-1 border border-ink bg-ink text-canvas font-bold">Semua</button>
-              <button type="button" data-cat="Asia" class="px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink">Asia</button>
-              <button type="button" data-cat="Eropa" class="px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink">Eropa</button>
-              <button type="button" data-cat="Timur Tengah" class="px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink">Timur Tengah</button>
-              <button type="button" data-cat="custom" class="px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink">Kustom</button>
+            <div class="flex items-center gap-1.5 text-[12px] font-mono overflow-x-auto pb-1 scrollbar-none" id="category-filter-chips">
+              <button type="button" data-cat="all" class="px-3 py-1 border border-ink bg-ink text-canvas font-bold whitespace-nowrap">Semua</button>
+              <button type="button" data-cat="Asia" class="px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap">Asia</button>
+              <button type="button" data-cat="Eropa" class="px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap">Eropa</button>
+              <button type="button" data-cat="Timur Tengah" class="px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap">Timur Tengah</button>
+              <button type="button" data-cat="custom" class="px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap">Kustom</button>
             </div>
           </div>
 
-          <!-- Buttons Container (Clean, responsive, retro-tech styled) -->
-          <div class="flex flex-wrap items-center gap-2 pt-1" id="tab-bar">
+          <!-- Buttons Container (Responsive 2-column grid on mobile, multi-column on desktop) -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 pt-1" id="tab-bar">
             <!-- Rendered by client script -->
           </div>
         </div>
@@ -342,15 +342,70 @@ import { defaultLanguageTables } from '../data/languages';
       localStorage.setItem('custom_character_tables', JSON.stringify(customTables));
     }
 
-    // Speech Synthesizer
+    // Google Speech Synthesizer Engine dengan Fallback Audio Stream
+    let cachedVoices: SpeechSynthesisVoice[] = [];
+    function loadVoices() {
+      if ('speechSynthesis' in window) {
+        cachedVoices = window.speechSynthesis.getVoices();
+      }
+    }
+    if ('speechSynthesis' in window) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
     function speakText(text: string, lang?: string) {
-      if (!isAudioEnabled) return;
-      if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
-      if (lang) utter.lang = lang;
-      utter.rate = 0.85;
-      window.speechSynthesis.speak(utter);
+      if (!isAudioEnabled || !text) return;
+      const langCode = lang ? lang.split('-')[0].toLowerCase() : 'ja';
+
+      // 1. Prioritaskan suara resmi Google dari Web Speech API
+      if ('speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          if (lang) utter.lang = lang;
+          utter.rate = 0.85;
+
+          const voices = cachedVoices.length ? cachedVoices : window.speechSynthesis.getVoices();
+          
+          // Cari suara resmi Google untuk bahasa ini
+          const googleVoice = voices.find(v => 
+            (v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()) && 
+            v.name.toLowerCase().includes('google')
+          );
+
+          const naturalVoice = voices.find(v => 
+            (v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()) && 
+            (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online'))
+          );
+
+          const matchedVoice = voices.find(v => 
+            v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()
+          );
+
+          if (googleVoice) {
+            utter.voice = googleVoice;
+          } else if (naturalVoice) {
+            utter.voice = naturalVoice;
+          } else if (matchedVoice) {
+            utter.voice = matchedVoice;
+          }
+
+          window.speechSynthesis.speak(utter);
+          return;
+        } catch (e) {
+          console.warn('SpeechSynthesis error, falling back to Google Audio stream:', e);
+        }
+      }
+
+      // 2. Fallback: Google Translate TTS Audio Stream
+      try {
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(text)}`;
+        const audio = new Audio(audioUrl);
+        audio.play().catch(() => {});
+      } catch (err) {
+        console.warn('Audio play error:', err);
+      }
     }
 
     // Parse Text to Grid
@@ -512,16 +567,17 @@ import { defaultLanguageTables } from '../data/languages';
         const isActive = t.id === currentTableId;
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `px-3.5 py-2 text-[13px] font-mono border transition-all flex items-center gap-2 select-none ${
+        btn.className = `p-2 sm:px-3 sm:py-2 text-[12px] sm:text-[13px] font-mono border transition-all flex items-center justify-start gap-1.5 select-none w-full min-w-0 ${
           isActive 
             ? 'bg-ink text-canvas border-ink font-bold shadow-sm' 
             : 'bg-canvas text-steel border-rule hover:text-ink hover:border-ink hover:bg-tint/40'
         }`;
         
-        const flagSpan = t.flag ? `<span class="text-base leading-none">${t.flag}</span>` : '';
-        const customBadge = isCustom ? '<span class="text-[10px] uppercase font-sans tracking-wide opacity-80 px-1 border border-current">[Kustom]</span>' : '';
+        const flagSpan = t.flag ? `<span class="text-base leading-none shrink-0">${t.flag}</span>` : '';
+        const customBadge = isCustom ? '<span class="text-[9px] uppercase font-sans tracking-wide opacity-80 px-1 border border-current shrink-0">[K]</span>' : '';
         
-        btn.innerHTML = `${flagSpan}<span>${t.name}</span>${customBadge}`;
+        btn.innerHTML = `${flagSpan}<span class="truncate flex-1 text-left font-medium">${t.name}</span>${customBadge}`;
+        btn.title = t.name;
         
         btn.addEventListener('click', () => {
           currentTableId = t.id;
@@ -541,9 +597,9 @@ import { defaultLanguageTables } from '../data/languages';
         if (!cat) return;
         categoryFilter = cat;
         categoryChips.forEach(c => {
-          c.className = 'px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink';
+          c.className = 'px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap';
         });
-        chip.className = 'px-2.5 py-1 border border-ink bg-ink text-canvas font-bold';
+        chip.className = 'px-3 py-1 border border-ink bg-ink text-canvas font-bold whitespace-nowrap';
         renderTabs();
       });
     });
