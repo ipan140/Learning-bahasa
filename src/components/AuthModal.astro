@@ -380,7 +380,17 @@
         switchAuthTab('login');
       }
     } catch (err: any) {
-      showAlert(err.message || 'Gagal masuk. Periksa kembali email dan kata sandi Anda.', 'error');
+      let msg = err.message || 'Terjadi kesalahan saat menghubungi server.';
+      if (msg.includes('fetch') || msg.includes('Failed to fetch') || err.name === 'AuthRetryableFetchError') {
+        msg = 'Tidak dapat terhubung ke server Supabase. Pastikan PUBLIC_SUPABASE_URL di Vercel sudah benar dan tidak ada salah ketik.';
+      } else if (msg.includes('Email not confirmed')) {
+        msg = 'Email belum dikonfirmasi. Silakan buka email Anda untuk konfirmasi, atau nonaktifkan "Confirm email" di dashboard Supabase Auth.';
+      } else if (msg.includes('Invalid login credentials')) {
+        msg = 'Email atau kata sandi salah. Silakan periksa kembali atau daftar akun baru.';
+      } else if (msg.includes('User already registered')) {
+        msg = 'Email ini sudah terdaftar. Silakan pilih tab "Masuk" untuk masuk ke akun Anda.';
+      }
+      showAlert(msg, 'error');
     } finally {
       if (authSubmitBtn) {
         authSubmitBtn.removeAttribute('disabled');
