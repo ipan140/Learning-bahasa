@@ -5,7 +5,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://learning-bahasa-nine.vercel.app',
+  site: 'https://learning-bahasa-news.vercel.app',
   integrations: [mdx(), sitemap()],
   vite: { plugins: [tailwindcss()] },
 });

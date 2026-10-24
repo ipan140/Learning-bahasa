@@ -3,7 +3,7 @@ import settings from './site-settings.json';
 
 export const site = {
   ...settings,
-  url: 'https://learning-bahasa-nine.vercel.app',
+  url: 'https://learning-bahasa-news.vercel.app',
   secondary: { label: 'Katalog 250 Negara', href: '/katalog' },
   pro: '/belajar',
   nav: [

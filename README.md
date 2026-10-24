@@ -4,6 +4,8 @@ Aplikasi web modern, ringan, dan interaktif untuk mempelajari sistem penulisan d
 
 Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase**.
 
+**Live Demo**: [https://learning-bahasa-news.vercel.app](https://learning-bahasa-news.vercel.app)
+
 ---
 
 ## ✨ Fitur Utama

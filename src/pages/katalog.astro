@@ -272,10 +272,10 @@ import { worldCountries } from '../data/countries';
                 </a>
               ` : `
                 <a 
-                  href="/belajar?create=${encodeURIComponent(c.name)}&voice=${encodeURIComponent(c.voiceLang || 'en-US')}"
+                  href="/belajar?unadded=${encodeURIComponent(c.name)}&country=${encodeURIComponent(c.name)}&language=${encodeURIComponent(c.language)}&flag=${encodeURIComponent(c.flag || '')}&voice=${encodeURIComponent(c.voiceLang || 'en-US')}"
                   class="btn btn-secondary btn-s text-[12px] w-full justify-center text-center font-mono text-smoke hover:text-ink"
                 >
-                  + Buat Tabel Aksara
+                  ⚠️ Belum Ditambahkan (+ Buat)
                 </a>
               `}
             </div>

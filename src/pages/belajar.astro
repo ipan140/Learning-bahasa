@@ -289,14 +289,51 @@ import { defaultLanguageTables } from '../data/languages';
     let categoryFilter = 'all';
     let currentUser: any = null;
 
-    // Baca URL params misal: /belajar?lang=arab-hijaiyah atau /belajar?create=Jerman
+    let isUnaddedState = false;
+    let unaddedInfo = {
+      country: '',
+      language: '',
+      flag: '🏳️',
+      voice: 'en-US'
+    };
+
+
+    function getAllTables() {
+      return [...defaultTables, ...customTables];
+    }
+
+    // Baca URL params misal: /belajar?lang=arab-hijaiyah atau /belajar?unadded=Anguilla atau /belajar?create=Jerman
     const urlParams = new URLSearchParams(window.location.search);
     const initialLang = urlParams.get('lang');
+    const unaddedTarget = urlParams.get('unadded');
     const createTarget = urlParams.get('create');
-    const voiceTarget = urlParams.get('voice');
+    const countryParam = urlParams.get('country') || unaddedTarget || createTarget;
+    const languageParam = urlParams.get('language') || '';
+    const flagParam = urlParams.get('flag') || '🏳️';
+    const voiceTarget = urlParams.get('voice') || 'en-US';
 
-    if (initialLang) {
-      currentTableId = initialLang;
+    if (unaddedTarget || createTarget) {
+      isUnaddedState = true;
+      unaddedInfo = {
+        country: countryParam || 'Negara',
+        language: languageParam || '',
+        flag: flagParam,
+        voice: voiceTarget
+      };
+    } else if (initialLang) {
+      const found = getAllTables().find(t => t.id === initialLang);
+      if (found) {
+        currentTableId = initialLang;
+        isUnaddedState = false;
+      } else {
+        isUnaddedState = true;
+        unaddedInfo = {
+          country: countryParam || initialLang,
+          language: languageParam || '',
+          flag: flagParam,
+          voice: voiceTarget
+        };
+      }
     }
 
     const tabBar = document.getElementById('tab-bar');
@@ -334,9 +371,6 @@ import { defaultLanguageTables } from '../data/languages';
 
     toastClose?.addEventListener('click', () => toast?.classList.add('hidden'));
 
-    function getAllTables() {
-      return [...defaultTables, ...customTables];
-    }
 
     function saveCustomTablesToStorage() {
       localStorage.setItem('custom_character_tables', JSON.stringify(customTables));
@@ -551,20 +585,34 @@ import { defaultLanguageTables } from '../data/languages';
       tabBar.innerHTML = '';
       const allTables = getAllTables();
 
+      // Jika dalam status belum ditambahkan, tampilkan tab khusus aktif di posisi paling depan
+      if (isUnaddedState) {
+        const unaddedBtn = document.createElement('button');
+        unaddedBtn.type = 'button';
+        unaddedBtn.className = 'p-2 sm:px-3 sm:py-2 text-[12px] sm:text-[13px] font-mono border-2 border-badge bg-badge/15 text-ink font-bold shadow-sm flex items-center justify-start gap-1.5 select-none w-full min-w-0';
+        unaddedBtn.title = `${unaddedInfo.country} - Belum Ditambahkan`;
+        unaddedBtn.innerHTML = `
+          <span class="text-base leading-none shrink-0">${unaddedInfo.flag}</span>
+          <span class="truncate flex-1 text-left font-bold">${unaddedInfo.country}</span>
+          <span class="text-[9px] uppercase font-sans tracking-wide bg-badge text-canvas px-1 py-0.5 font-bold shrink-0">Belum Ada</span>
+        `;
+        tabBar.appendChild(unaddedBtn);
+      }
+
       const filteredTables = allTables.filter(t => {
         if (categoryFilter === 'all') return true;
         if (categoryFilter === 'custom') return customTables.some(c => c.id === t.id);
         return t.category === categoryFilter;
       });
 
-      if (filteredTables.length === 0) {
+      if (filteredTables.length === 0 && !isUnaddedState) {
         tabBar.innerHTML = '<span class="text-smoke text-[12px] font-mono italic">Tidak ada bahasa di kategori ini.</span>';
         return;
       }
 
       filteredTables.forEach(t => {
         const isCustom = customTables.some(c => c.id === t.id);
-        const isActive = t.id === currentTableId;
+        const isActive = !isUnaddedState && t.id === currentTableId;
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `p-2 sm:px-3 sm:py-2 text-[12px] sm:text-[13px] font-mono border transition-all flex items-center justify-start gap-1.5 select-none w-full min-w-0 ${
@@ -580,6 +628,7 @@ import { defaultLanguageTables } from '../data/languages';
         btn.title = t.name;
         
         btn.addEventListener('click', () => {
+          isUnaddedState = false;
           currentTableId = t.id;
           tableSearchQuery = '';
           if (searchInput) searchInput.value = '';
@@ -596,19 +645,110 @@ import { defaultLanguageTables } from '../data/languages';
         const cat = chip.getAttribute('data-cat');
         if (!cat) return;
         categoryFilter = cat;
+        if (isUnaddedState) {
+          isUnaddedState = false;
+          currentTableId = defaultTables[0]?.id || '';
+        }
         categoryChips.forEach(c => {
           c.className = 'px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap';
         });
         chip.className = 'px-3 py-1 border border-ink bg-ink text-canvas font-bold whitespace-nowrap';
         renderTabs();
+        renderCurrentTable();
       });
     });
 
     // Render Table Grid
     function renderCurrentTable() {
+      // JIKA DALAM STATUS BELUM DITAMBAHKAN, TAMPILKAN EMPTY STATE KHUSUS (JANGAN KE HIRAGANA / AKSARA LAIN)
+      if (isUnaddedState) {
+        if (customActions) {
+          customActions.classList.add('hidden');
+          customActions.classList.remove('flex');
+        }
+
+        if (tableBadge) {
+          tableBadge.textContent = `${unaddedInfo.flag} ${unaddedInfo.country} · BELUM TERSEDIA`;
+          tableBadge.className = 'px-2.5 py-1 text-[11px] font-mono border border-badge text-badge bg-badge/10 uppercase tracking-wider font-bold';
+        }
+        if (tableTitle) {
+          tableTitle.textContent = `Aksara ${unaddedInfo.country} Belum Ditambahkan`;
+        }
+        if (tableDescription) {
+          tableDescription.textContent = `Aksara atau materi kosakata untuk bahasa ${unaddedInfo.language ? unaddedInfo.language + ' (' + unaddedInfo.country + ')' : unaddedInfo.country} belum tersedia di database bawaan.`;
+        }
+
+        if (gridWrapper) {
+          gridWrapper.innerHTML = `
+            <div class="py-12 sm:py-16 px-4 sm:px-8 text-center border-2 border-dashed border-rule bg-canvas select-none font-mono">
+              <div class="text-[48px] sm:text-[60px] mb-3 leading-none">${unaddedInfo.flag}</div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-mono border border-badge text-badge bg-badge/10 uppercase tracking-wider mb-4 font-bold">
+                <span>⚠️</span>
+                <span>STATUS: AKSARA BELUM DITAMBAHKAN</span>
+              </div>
+              <h3 class="text-[20px] sm:text-[24px] font-bold text-ink mb-2">
+                Tabel Aksara "${unaddedInfo.country}" Belum Tersedia
+              </h3>
+              <p class="max-w-[56ch] mx-auto text-[13px] sm:text-[14px] text-steel mb-8 leading-relaxed font-sans">
+                Sistem saat ini belum memiliki tabel aksara resmi untuk negara <b>${unaddedInfo.country}</b>${unaddedInfo.language ? ` (Bahasa: <b>${unaddedInfo.language}</b>)` : ''}.
+                <br class="hidden sm:inline" />
+                Anda dapat langsung membuatnya sendiri ke dalam studio atau mengimpor dari file CSV/Excel!
+              </p>
+
+              <div class="flex items-center justify-center gap-3 flex-wrap">
+                <button 
+                  type="button" 
+                  id="btn-trigger-create-unadded" 
+                  class="btn btn-primary font-mono text-[13px] px-5 py-2.5 shadow-sm cursor-pointer"
+                >
+                  + Buat Tabel Aksara ${unaddedInfo.country} Sendiri
+                </button>
+                <a 
+                  href="/katalog" 
+                  class="btn btn-secondary font-mono text-[13px] px-4 py-2.5"
+                >
+                  ← Kembali ke Katalog Negara
+                </a>
+                <button 
+                  type="button" 
+                  id="btn-see-existing-languages" 
+                  class="btn btn-ghost font-mono text-[13px] px-4 py-2.5 text-steel hover:text-ink cursor-pointer"
+                >
+                  Lihat Aksara yang Sudah Tersedia (Jepang, Arab, dll.) →
+                </button>
+              </div>
+            </div>
+          `;
+
+          // Event listener untuk tombol buat tabel dari state unadded
+          document.getElementById('btn-trigger-create-unadded')?.addEventListener('click', () => {
+            openCreator();
+            const formName = document.getElementById('form-name') as HTMLInputElement | null;
+            const formTitle = document.getElementById('form-title') as HTMLInputElement | null;
+            const formVoice = document.getElementById('form-voice') as HTMLSelectElement | null;
+            if (formName) formName.value = unaddedInfo.country;
+            if (formTitle) formTitle.value = `Tabel Aksara / Kosakata ${unaddedInfo.country}`;
+            if (formVoice && unaddedInfo.voice) formVoice.value = unaddedInfo.voice;
+          });
+
+          // Pindah ke aksara pertama yang tersedia
+          document.getElementById('btn-see-existing-languages')?.addEventListener('click', () => {
+            isUnaddedState = false;
+            currentTableId = defaultTables[0]?.id || '';
+            renderTabs();
+            renderCurrentTable();
+          });
+        }
+        return;
+      }
+
       const allTables = getAllTables();
       const currentTable = allTables.find(t => t.id === currentTableId) || allTables[0];
       if (!currentTable) return;
+
+      if (tableBadge) {
+        tableBadge.className = 'px-2.5 py-1 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider bg-tint';
+      }
 
       const isCustom = customTables.some(c => c.id === currentTable.id);
       if (customActions) {
@@ -692,6 +832,10 @@ import { defaultLanguageTables } from '../data/languages';
 
     // Copy All Table Text
     copyAllBtn?.addEventListener('click', () => {
+      if (isUnaddedState) {
+        showToast('⚠️ Aksara ini belum ditambahkan, buat tabel terlebih dahulu.');
+        return;
+      }
       const allTables = getAllTables();
       const currentTable = allTables.find(t => t.id === currentTableId);
       if (!currentTable) return;
@@ -707,6 +851,11 @@ import { defaultLanguageTables } from '../data/languages';
     // Search input
     searchInput?.addEventListener('input', (e) => {
       tableSearchQuery = (e.target as HTMLInputElement).value;
+      if (isUnaddedState && tableSearchQuery) {
+        isUnaddedState = false;
+        currentTableId = defaultTables[0]?.id || '';
+        renderTabs();
+      }
       renderCurrentTable();
     });
 
@@ -727,7 +876,6 @@ import { defaultLanguageTables } from '../data/languages';
 
     // Pre-fill creator if URL has create params
     if (createTarget) {
-      openCreator();
       const formName = document.getElementById('form-name') as HTMLInputElement | null;
       const formTitle = document.getElementById('form-title') as HTMLInputElement | null;
       const formVoice = document.getElementById('form-voice') as HTMLSelectElement | null;
@@ -789,6 +937,7 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       }
 
       currentTableId = newId;
+      isUnaddedState = false;
       closeCreator();
       renderTabs();
       renderCurrentTable();

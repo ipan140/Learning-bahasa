@@ -1,7 +1,7 @@
 {
   "name": "Belajar Bahasa",
   "description": "Aplikasi tabel belajar aksara bahasa: Jepang (Hiragana & Katakana), Korea (Hangul), Arab (Hijaiyah), dan bahasa lainnya.",
-  "install": "https://learning-bahasa-nine.vercel.app",
+  "install": "https://learning-bahasa-news.vercel.app",
   "announcement": {
     "text": "✨ Studio Belajar Aksara & Huruf Bahasa - Klik kotak untuk dengar suara asli",
     "href": "/belajar"
