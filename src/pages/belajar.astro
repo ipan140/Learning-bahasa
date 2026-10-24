@@ -1,3 +1,810 @@
 ---
-return Astro.redirect('/');
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import { defaultLanguageTables } from '../data/languages';
 ---
+
+<Base 
+  title="Studio Belajar Aksara & Huruf Bahasa - Belajar Bahasa" 
+  description="Tabel interaktif aksara bahasa: Jepang (Hiragana & Katakana), Jerman, Korea (Hangul), Arab (Hijaiyah), Mandarin, Thai, dan lainnya dengan audio lafal asli."
+>
+  
+  <!-- [01] MAIN APP: Area Belajar Aksara -->
+  <Section id="area-belajar" top={false} inner="px-6 pt-12 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
+    <div class="max-w-5xl">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-rule">
+        <div>
+          <p class="label"><b>[01]</b> studio belajar interaktif</p>
+          <h1 class="mt-3 text-[clamp(28px,3.8vw,46px)] leading-[1.08] font-bold tracking-[-0.035em] text-ink">
+            Tabel Huruf &amp; Aksara Bahasa
+          </h1>
+          <p class="mt-3 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
+            Pilih aksara bahasa di bawah ini. Klik tiap kotak karakter untuk mendengarkan lafal audio aslinya atau menyalin karakter ke clipboard.
+          </p>
+        </div>
+        <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <a href="/katalog" class="btn btn-secondary btn-s font-mono text-[13px]">
+            🌍 Katalog 250 Negara →
+          </a>
+          <button type="button" id="open-creator-top-btn" class="btn btn-primary btn-s font-mono text-[13px]">
+            + Buat Tabel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- App Data Container -->
+    <div 
+      id="main-app" 
+      class="mt-8"
+      data-defaults={JSON.stringify(defaultLanguageTables)}
+    >
+
+      <!-- Notification Toast -->
+      <div id="toast" class="hidden mb-6 px-4 py-2.5 text-[13px] border border-ok text-ok bg-canvas flex items-center justify-between font-mono">
+        <span id="toast-message">Berhasil disimpan!</span>
+        <button type="button" id="toast-close" class="text-smoke hover:text-ink font-bold ml-4">✕</button>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SECTION TABEL AKSARA & HURUF               -->
+      <!-- ========================================== -->
+      <div id="section-tables" class="space-y-6">
+        
+        <!-- Language Switcher Bar (Perbaikan Image 1) -->
+        <div class="p-4 sm:p-5 border border-rule bg-canvas shadow-sm space-y-3.5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="label font-bold text-ink">PILIH AKSARA BAHASA:</span>
+            <!-- Category Chips Filter -->
+            <div class="flex items-center gap-1.5 text-[12px] font-mono" id="category-filter-chips">
+              <button type="button" data-cat="all" class="px-2.5 py-1 border border-ink bg-ink text-canvas font-bold">Semua</button>
+              <button type="button" data-cat="Asia" class="px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink">Asia</button>
+              <button type="button" data-cat="Eropa" class="px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink">Eropa</button>
+              <button type="button" data-cat="Timur Tengah" class="px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink">Timur Tengah</button>
+              <button type="button" data-cat="custom" class="px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink">Kustom</button>
+            </div>
+          </div>
+
+          <!-- Buttons Container (Clean, responsive, retro-tech styled) -->
+          <div class="flex flex-wrap items-center gap-2 pt-1" id="tab-bar">
+            <!-- Rendered by client script -->
+          </div>
+        </div>
+
+        <!-- Action & Search Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 p-4 border border-rule bg-canvas">
+          <div class="flex items-center gap-3 flex-1 min-w-[240px]">
+            <span class="text-smoke text-[13px] font-mono select-none">CARI:</span>
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Cari huruf atau romaji (misal: Ka, あ, Ä, ㄱ)..." 
+              class="w-full max-w-sm px-3.5 py-2 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+            />
+          </div>
+          <div class="flex items-center gap-2 flex-wrap text-[13px]">
+            <button 
+              type="button" 
+              id="toggle-audio-btn" 
+              class="btn btn-secondary btn-s"
+              title="Aktifkan/Nonaktifkan Suara Pengucapan saat kotak diklik"
+            >
+              🔊 Suara: <span id="audio-status-label" class="text-ok font-bold">AKTIF</span>
+            </button>
+            <button 
+              type="button" 
+              id="copy-all-btn" 
+              class="btn btn-secondary btn-s"
+              title="Salin seluruh isi tabel ke clipboard"
+            >
+              📋 Salin Teks
+            </button>
+            <button 
+              type="button" 
+              id="open-creator-btn" 
+              class="btn btn-primary btn-s"
+            >
+              + Buat Tabel Sendiri
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Viewer Table Card -->
+        <div id="viewer-container" class="border border-rule bg-canvas p-5 sm:p-6 shadow-sm">
+          <!-- Table Title & Description -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-rule pb-4 mb-6">
+            <div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <span id="table-badge" class="px-2.5 py-1 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider bg-tint">Hiragana Dasar</span>
+                <h2 id="table-title" class="text-[22px] sm:text-[26px] font-bold text-ink tracking-tight">
+                  A. Tabel Huruf Hiragana Dasar
+                </h2>
+              </div>
+              <p id="table-description" class="mt-1.5 text-[14px] text-steel">
+                Aksara fonetik utama dalam bahasa Jepang.
+              </p>
+            </div>
+            <div id="custom-table-actions" class="hidden items-center gap-2 shrink-0">
+              <button type="button" id="delete-table-btn" class="px-3 py-1.5 text-[12px] font-mono border border-rule text-smoke hover:text-red-500 hover:border-red-500 transition-colors">
+                ✕ Hapus Tabel Ini
+              </button>
+            </div>
+          </div>
+
+          <!-- The Text Grid / Table -->
+          <div class="w-full overflow-x-auto pb-4">
+            <div id="table-grid-wrapper" class="inline-block min-w-full align-middle">
+              <!-- Table will be rendered here -->
+            </div>
+          </div>
+
+          <!-- Instructions footer -->
+          <div class="mt-6 p-4 border border-dashed border-rule text-[13px] text-smoke flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-tint/30">
+            <span>💡 <strong>Tips:</strong> Klik kotak huruf untuk mendengarkan pengucapan audio aslinya.</span>
+            <span class="font-mono text-[12px]">Format: [Romaji/Cara Baca] = [Aksara]</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </Section>
+
+  <!-- ========================================== -->
+  <!-- CUSTOM TABLE CREATOR MODAL                 -->
+  <!-- ========================================== -->
+  <div id="buat-tabel" class="frame px-6 max-md:px-5">
+    <div id="creator-modal" class="hidden my-8 p-6 sm:p-8 border-2 border-ink bg-canvas shadow-2xl">
+      <div class="flex items-center justify-between border-b border-rule pb-4 mb-6">
+        <div>
+          <h3 class="text-[22px] font-bold text-ink">Buat Tabel / Materi Bahasa Baru</h3>
+          <p class="text-[13px] text-steel mt-1">
+            Tambahkan materi atau bahasa apa saja dengan format teks bebas, atau <strong>impor langsung dari file Excel/Spreadsheet</strong> Anda.
+          </p>
+        </div>
+        <button type="button" id="close-creator-btn" class="btn btn-secondary btn-s shrink-0">✕ Tutup</button>
+      </div>
+
+      <form id="creator-form" class="space-y-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="form-name" class="block text-[13px] font-mono text-steel mb-1.5">Nama Bahasa / Kategori *</label>
+            <input 
+              type="text" 
+              id="form-name" 
+              required 
+              placeholder="Misal: Mandarin (Hanzi), Jerman, dll." 
+              class="w-full px-3.5 py-2.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+            />
+          </div>
+          <div>
+            <label for="form-title" class="block text-[13px] font-mono text-steel mb-1.5">Judul Tabel *</label>
+            <input 
+              type="text" 
+              id="form-title" 
+              required 
+              placeholder="Misal: Tabel Angka 1-10, Tabel Aksara Khusus" 
+              class="w-full px-3.5 py-2.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="form-desc" class="block text-[13px] font-mono text-steel mb-1.5">Keterangan Singkat</label>
+            <input 
+              type="text" 
+              id="form-desc" 
+              placeholder="Keterangan singkat materi belajar ini..." 
+              class="w-full px-3.5 py-2.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+            />
+          </div>
+          <div>
+            <label for="form-voice" class="block text-[13px] font-mono text-steel mb-1.5">Kode Suara Audio (Opsional)</label>
+            <select id="form-voice" class="w-full px-3.5 py-2.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono">
+              <option value="ja-JP">Jepang (ja-JP)</option>
+              <option value="de-DE">Jerman (de-DE)</option>
+              <option value="ko-KR">Korea (ko-KR)</option>
+              <option value="zh-CN">Mandarin (zh-CN)</option>
+              <option value="th-TH">Thailand (th-TH)</option>
+              <option value="ar-SA">Arab (ar-SA)</option>
+              <option value="ru-RU">Rusia (ru-RU)</option>
+              <option value="fr-FR">Prancis (fr-FR)</option>
+              <option value="es-ES">Spanyol (es-ES)</option>
+              <option value="it-IT">Italia (it-IT)</option>
+              <option value="pt-PT">Portugis (pt-PT)</option>
+              <option value="nl-NL">Belanda (nl-NL)</option>
+              <option value="en-US">Inggris (en-US)</option>
+              <option value="id-ID">Indonesia (id-ID)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Content Area with Excel Import Toolbar -->
+        <div>
+          <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+            <label for="form-text" class="block text-[13px] font-mono text-steel">
+              Isi Tabel * (Bisa copy-paste langsung dari Excel atau upload file)
+            </label>
+            <div class="flex items-center gap-3">
+              <label class="btn btn-secondary btn-s text-[12px] cursor-pointer flex items-center gap-1.5 font-bold hover:border-ink font-mono">
+                <span>📊 Import Excel / CSV</span>
+                <input type="file" id="form-excel-input" accept=".xlsx, .xls, .csv, .tsv, .txt" class="hidden" />
+              </label>
+              <button type="button" id="load-sample-btn" class="text-[12px] text-smoke hover:text-ink font-mono">
+                Contoh Data
+              </button>
+            </div>
+          </div>
+          <textarea 
+            id="form-text" 
+            rows="8" 
+            required
+            placeholder={"Bisa paste langsung dari Excel (Ctrl+V) atau ketik:\nA = あ | I = い | U = う | E = え | O = お\nKa = か | Ki = き | Ku = く | Ke = け | Ko = こ\natau format kolom: Romaji [TAB] Karakter"}
+            class="w-full px-3.5 py-3 text-[14px] font-mono bg-tint border border-rule text-ink outline-none focus:border-ink leading-relaxed"
+          ></textarea>
+          <div class="mt-2 text-[12px] text-smoke flex items-center justify-between flex-wrap gap-2 font-mono">
+            <span>💡 <strong>Tips Excel:</strong> Cukup blok sel di Excel/Google Sheets, tekan <code>Ctrl+C</code>, lalu paste <code>Ctrl+V</code> di sini!</span>
+            <span class="text-ok font-bold">Mendukung .xlsx, .csv, &amp; Copy-Paste Excel ✓</span>
+          </div>
+        </div>
+
+        <!-- Realtime Preview inside Creator -->
+        <div class="border-t border-rule pt-4">
+          <span class="label">Live Preview Tabel:</span>
+          <div id="creator-preview" class="mt-3 p-3 bg-tint border border-rule min-h-[80px] overflow-x-auto text-[13px]">
+            <span class="text-smoke italic font-mono">Ketik atau paste dari Excel di kotak atas untuk melihat pratinjau tabel...</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-rule">
+          <button type="button" id="cancel-creator-btn" class="btn btn-secondary">Batal</button>
+          <button type="submit" id="save-table-btn" class="btn btn-primary">Simpan Tabel Aksara</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</Base>
+
+<!-- Load SheetJS for Excel Reading -->
+<script is:inline src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+  import {
+    getCurrentUser,
+    saveCustomTableToCloud,
+    deleteCustomTableFromCloud,
+    fetchUserCustomTablesFromCloud
+  } from '../lib/supabase';
+
+  const container = document.getElementById('main-app');
+  if (container) {
+    const rawDefaults = container.getAttribute('data-defaults');
+    const defaultTables: any[] = rawDefaults ? JSON.parse(rawDefaults) : [];
+
+    let customTables: any[] = JSON.parse(localStorage.getItem('custom_character_tables') || '[]');
+    let currentTableId = defaultTables[0]?.id || '';
+    let isAudioEnabled = true;
+    let tableSearchQuery = '';
+    let categoryFilter = 'all';
+    let currentUser: any = null;
+
+    // Baca URL params misal: /belajar?lang=arab-hijaiyah atau /belajar?create=Jerman
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialLang = urlParams.get('lang');
+    const createTarget = urlParams.get('create');
+    const voiceTarget = urlParams.get('voice');
+
+    if (initialLang) {
+      currentTableId = initialLang;
+    }
+
+    const tabBar = document.getElementById('tab-bar');
+    const categoryChips = document.querySelectorAll('#category-filter-chips button');
+    const tableTitle = document.getElementById('table-title');
+    const tableBadge = document.getElementById('table-badge');
+    const tableDescription = document.getElementById('table-description');
+    const gridWrapper = document.getElementById('table-grid-wrapper');
+    const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+    const toggleAudioBtn = document.getElementById('toggle-audio-btn');
+    const audioStatusLabel = document.getElementById('audio-status-label');
+    const copyAllBtn = document.getElementById('copy-all-btn');
+    const openCreatorBtn = document.getElementById('open-creator-btn');
+    const openCreatorTopBtn = document.getElementById('open-creator-top-btn');
+    const closeCreatorBtn = document.getElementById('close-creator-btn');
+    const cancelCreatorBtn = document.getElementById('cancel-creator-btn');
+    const creatorModal = document.getElementById('creator-modal');
+    const creatorForm = document.getElementById('creator-form');
+    const formText = document.getElementById('form-text') as HTMLTextAreaElement | null;
+    const formExcelInput = document.getElementById('form-excel-input') as HTMLInputElement | null;
+    const creatorPreview = document.getElementById('creator-preview');
+    const loadSampleBtn = document.getElementById('load-sample-btn');
+    const customActions = document.getElementById('custom-table-actions');
+    const deleteTableBtn = document.getElementById('delete-table-btn');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    const toastClose = document.getElementById('toast-close');
+
+    function showToast(msg: string) {
+      if (!toast || !toastMessage) return;
+      toastMessage.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 4000);
+    }
+
+    toastClose?.addEventListener('click', () => toast?.classList.add('hidden'));
+
+    function getAllTables() {
+      return [...defaultTables, ...customTables];
+    }
+
+    function saveCustomTablesToStorage() {
+      localStorage.setItem('custom_character_tables', JSON.stringify(customTables));
+    }
+
+    // Speech Synthesizer
+    function speakText(text: string, lang?: string) {
+      if (!isAudioEnabled) return;
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      if (lang) utter.lang = lang;
+      utter.rate = 0.85;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Parse Text to Grid
+    function parseTextToGrid(text: string) {
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const grid: any[] = [];
+      for (const line of lines) {
+        let parts: string[] = [];
+        
+        if (line.includes('\t')) {
+          parts = line.split('\t').map(p => p.trim());
+          if (parts.length === 2 && !parts[0].includes('=') && !parts[1].includes('=')) {
+            grid.push([{ romaji: parts[0], char: parts[1] }]);
+            continue;
+          }
+          if (parts.length > 2 && parts.length % 2 === 0) {
+            const row: any[] = [];
+            for (let i = 0; i < parts.length; i += 2) {
+              row.push({ romaji: parts[i], char: parts[i+1] });
+            }
+            grid.push(row);
+            continue;
+          }
+        } else if (line.includes('|')) {
+          parts = line.split('|').map(p => p.trim());
+        } else if (line.includes(';')) {
+          parts = line.split(';').map(p => p.trim());
+        } else if (line.includes(',')) {
+          parts = line.split(',').map(p => p.trim());
+        } else {
+          parts = [line];
+        }
+
+        const row: any[] = [];
+        for (const part of parts) {
+          if (!part || part === '-' || part.toLowerCase() === 'null') {
+            row.push(null);
+            continue;
+          }
+          if (part.includes('=')) {
+            const [romaji, char] = part.split('=').map(s => s.trim());
+            row.push({ romaji: romaji || '', char: char || '' });
+          } else if (part.includes(':')) {
+            const [romaji, char] = part.split(':').map(s => s.trim());
+            row.push({ romaji: romaji || '', char: char || '' });
+          } else {
+            row.push({ romaji: '', char: part });
+          }
+        }
+        if (row.length > 0) grid.push(row);
+      }
+      return grid;
+    }
+
+    // Excel file input handler
+    if (formExcelInput && formText) {
+      formExcelInput.addEventListener('change', (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        const fileName = file.name.toLowerCase();
+        const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+
+        if (isExcel) {
+          showToast(`Membaca file Excel "${file.name}"...`);
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            try {
+              const data = new Uint8Array(evt.target?.result as ArrayBuffer);
+              const workbook = (window as any).XLSX.read(data, { type: 'array' });
+              const sheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[sheetName];
+              const jsonRows: any[][] = (window as any).XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+              const formattedLines: string[] = [];
+              for (const row of jsonRows) {
+                if (!row || row.length === 0) continue;
+                if (row.length === 2) {
+                  formattedLines.push(`${row[0]} = ${row[1]}`);
+                } else {
+                  const rowItems: string[] = [];
+                  for (let i = 0; i < row.length; i += 2) {
+                    if (row[i] !== undefined && row[i+1] !== undefined) {
+                      rowItems.push(`${row[i]} = ${row[i+1]}`);
+                    }
+                  }
+                  if (rowItems.length > 0) formattedLines.push(rowItems.join(' | '));
+                }
+              }
+
+              formText.value = formattedLines.join('\n');
+              renderCreatorPreview();
+              showToast(`✓ Berhasil memuat ${formattedLines.length} baris dari Excel!`);
+            } catch {
+              showToast('Gagal memproses file Excel.');
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        } else {
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            formText.value = evt.target?.result as string;
+            renderCreatorPreview();
+            showToast(`✓ File teks/CSV dimuat!`);
+          };
+          reader.readAsText(file);
+        }
+      });
+    }
+
+    function renderCreatorPreview() {
+      if (!creatorPreview || !formText) return;
+      const grid = parseTextToGrid(formText.value);
+      if (grid.length === 0) {
+        creatorPreview.innerHTML = '<span class="text-smoke italic font-mono">Ketik atau paste dari Excel di kotak atas untuk melihat pratinjau tabel...</span>';
+        return;
+      }
+
+      let html = '<table class="w-full border-collapse border border-rule text-center text-[13px] bg-canvas font-mono"><tbody>';
+      grid.slice(0, 5).forEach((row) => {
+        html += '<tr>';
+        row.forEach((cell: any) => {
+          if (!cell) {
+            html += '<td class="border border-rule p-2 bg-tint/20 text-smoke">-</td>';
+          } else {
+            html += `<td class="border border-rule p-2 font-bold text-ink">${cell.romaji ? cell.romaji + ' = ' : ''}${cell.char}</td>`;
+          }
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      if (grid.length > 5) {
+        html += `<div class="text-[11px] text-smoke mt-2 font-mono">+ ${grid.length - 5} baris lainnya akan dirender</div>`;
+      }
+      creatorPreview.innerHTML = html;
+    }
+
+    formText?.addEventListener('input', renderCreatorPreview);
+
+    // Render Language Tabs (Perbaikan Image 1)
+    function renderTabs() {
+      if (!tabBar) return;
+      tabBar.innerHTML = '';
+      const allTables = getAllTables();
+
+      const filteredTables = allTables.filter(t => {
+        if (categoryFilter === 'all') return true;
+        if (categoryFilter === 'custom') return customTables.some(c => c.id === t.id);
+        return t.category === categoryFilter;
+      });
+
+      if (filteredTables.length === 0) {
+        tabBar.innerHTML = '<span class="text-smoke text-[12px] font-mono italic">Tidak ada bahasa di kategori ini.</span>';
+        return;
+      }
+
+      filteredTables.forEach(t => {
+        const isCustom = customTables.some(c => c.id === t.id);
+        const isActive = t.id === currentTableId;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `px-3.5 py-2 text-[13px] font-mono border transition-all flex items-center gap-2 select-none ${
+          isActive 
+            ? 'bg-ink text-canvas border-ink font-bold shadow-sm' 
+            : 'bg-canvas text-steel border-rule hover:text-ink hover:border-ink hover:bg-tint/40'
+        }`;
+        
+        const flagSpan = t.flag ? `<span class="text-base leading-none">${t.flag}</span>` : '';
+        const customBadge = isCustom ? '<span class="text-[10px] uppercase font-sans tracking-wide opacity-80 px-1 border border-current">[Kustom]</span>' : '';
+        
+        btn.innerHTML = `${flagSpan}<span>${t.name}</span>${customBadge}`;
+        
+        btn.addEventListener('click', () => {
+          currentTableId = t.id;
+          tableSearchQuery = '';
+          if (searchInput) searchInput.value = '';
+          renderTabs();
+          renderCurrentTable();
+        });
+        tabBar.appendChild(btn);
+      });
+    }
+
+    // Category Filter Chips Handlers
+    categoryChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const cat = chip.getAttribute('data-cat');
+        if (!cat) return;
+        categoryFilter = cat;
+        categoryChips.forEach(c => {
+          c.className = 'px-2.5 py-1 border border-rule text-steel hover:text-ink hover:border-ink';
+        });
+        chip.className = 'px-2.5 py-1 border border-ink bg-ink text-canvas font-bold';
+        renderTabs();
+      });
+    });
+
+    // Render Table Grid
+    function renderCurrentTable() {
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId) || allTables[0];
+      if (!currentTable) return;
+
+      const isCustom = customTables.some(c => c.id === currentTable.id);
+      if (customActions) {
+        if (isCustom) {
+          customActions.classList.remove('hidden');
+          customActions.classList.add('flex');
+        } else {
+          customActions.classList.add('hidden');
+          customActions.classList.remove('flex');
+        }
+      }
+
+      if (tableTitle) tableTitle.textContent = currentTable.title;
+      if (tableBadge) tableBadge.textContent = `${currentTable.flag ? currentTable.flag + ' ' : ''}${currentTable.badge || currentTable.name}`;
+      if (tableDescription) tableDescription.textContent = currentTable.description || '';
+
+      let html = '<table class="w-full border-collapse border border-ink text-center bg-canvas select-text font-mono">';
+      html += '<tbody>';
+
+      const filter = tableSearchQuery.trim().toLowerCase();
+
+      currentTable.grid.forEach((row: any[]) => {
+        html += '<tr>';
+        row.forEach((cell: any) => {
+          if (!cell) {
+            html += '<td class="border border-ink p-3 sm:p-4 bg-tint/40 min-w-[70px] sm:min-w-[90px] h-16 sm:h-20"></td>';
+            return;
+          }
+
+          const matches = !filter || 
+            cell.romaji.toLowerCase().includes(filter) || 
+            cell.char.toLowerCase().includes(filter);
+
+          const highlightClass = filter && matches ? 'bg-badge/20 font-bold ring-2 ring-badge' : '';
+          const dimClass = filter && !matches ? 'opacity-25' : '';
+
+          html += `<td 
+            class="border border-ink p-2 sm:p-4 hover:bg-tint cursor-pointer transition-colors min-w-[70px] sm:min-w-[100px] h-16 sm:h-20 ${highlightClass} ${dimClass}"
+            data-char="${cell.char}"
+            data-romaji="${cell.romaji}"
+            data-lang="${currentTable.voiceLang || ''}"
+            title="Klik untuk dengar suara atau salin '${cell.char}'"
+          >`;
+          html += `<div class="flex items-center justify-center gap-1.5 sm:gap-2 text-[15px] sm:text-[18px]">`;
+          if (cell.romaji) {
+            html += `<span class="text-steel font-normal">${cell.romaji}</span>`;
+            html += `<span class="text-smoke select-none">=</span>`;
+          }
+          html += `<span class="text-ink font-bold text-[18px] sm:text-[22px] tracking-wide">${cell.char}</span>`;
+          html += `</div>`;
+          html += `</td>`;
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      if (gridWrapper) gridWrapper.innerHTML = html;
+
+      const cells = gridWrapper?.querySelectorAll('td[data-char]') || [];
+      cells.forEach(td => {
+        td.addEventListener('click', () => {
+          const char = td.getAttribute('data-char') || '';
+          const lang = td.getAttribute('data-lang') || '';
+          const romaji = td.getAttribute('data-romaji') || '';
+          speakText(char, lang);
+          navigator.clipboard?.writeText(char);
+          showToast(`Karakter "${char}" (${romaji}) disalin ke clipboard! 🔊`);
+        });
+      });
+    }
+
+    // Toggle Audio
+    toggleAudioBtn?.addEventListener('click', () => {
+      isAudioEnabled = !isAudioEnabled;
+      if (audioStatusLabel) {
+        audioStatusLabel.textContent = isAudioEnabled ? 'AKTIF' : 'NONAKTIF';
+        audioStatusLabel.className = isAudioEnabled ? 'text-ok font-bold' : 'text-smoke font-bold';
+      }
+      showToast(isAudioEnabled ? '🔊 Suara pelafalan diaktifkan' : '🔇 Suara pelafalan dinonaktifkan');
+    });
+
+    // Copy All Table Text
+    copyAllBtn?.addEventListener('click', () => {
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+      if (!currentTable) return;
+
+      const lines = currentTable.grid.map((row: any[]) => {
+        return row.map(cell => cell ? (cell.romaji ? `${cell.romaji}=${cell.char}` : cell.char) : '-').join('\t');
+      }).join('\n');
+
+      navigator.clipboard?.writeText(lines);
+      showToast(`Teks tabel "${currentTable.name}" disalin ke clipboard!`);
+    });
+
+    // Search input
+    searchInput?.addEventListener('input', (e) => {
+      tableSearchQuery = (e.target as HTMLInputElement).value;
+      renderCurrentTable();
+    });
+
+    // Creator Modal triggers
+    function openCreator() {
+      creatorModal?.classList.remove('hidden');
+      document.getElementById('buat-tabel')?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeCreator() {
+      creatorModal?.classList.add('hidden');
+    }
+
+    openCreatorBtn?.addEventListener('click', openCreator);
+    openCreatorTopBtn?.addEventListener('click', openCreator);
+    closeCreatorBtn?.addEventListener('click', closeCreator);
+    cancelCreatorBtn?.addEventListener('click', closeCreator);
+
+    // Pre-fill creator if URL has create params
+    if (createTarget) {
+      openCreator();
+      const formName = document.getElementById('form-name') as HTMLInputElement | null;
+      const formTitle = document.getElementById('form-title') as HTMLInputElement | null;
+      const formVoice = document.getElementById('form-voice') as HTMLSelectElement | null;
+      if (formName) formName.value = createTarget;
+      if (formTitle) formTitle.value = `Tabel Aksara / Kosakata ${createTarget}`;
+      if (formVoice && voiceTarget) formVoice.value = voiceTarget;
+    }
+
+    // Load Sample Data
+    loadSampleBtn?.addEventListener('click', () => {
+      const sample = `A = あ | I = い | U = う | E = え | O = お
+Ka = か | Ki = き | Ku = く | Ke = け | Ko = こ
+Sa = さ | Shi = し | Su = す | Se = せ | So = そ
+Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
+      if (formText) formText.value = sample;
+      renderCreatorPreview();
+    });
+
+    // Creator Form Submit
+    creatorForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (document.getElementById('form-name') as HTMLInputElement)?.value.trim();
+      const title = (document.getElementById('form-title') as HTMLInputElement)?.value.trim();
+      const desc = (document.getElementById('form-desc') as HTMLInputElement)?.value.trim();
+      const voice = (document.getElementById('form-voice') as HTMLSelectElement)?.value;
+      const text = formText?.value.trim() || '';
+
+      if (!name || !title || !text) return;
+
+      const grid = parseTextToGrid(text);
+      if (grid.length === 0) {
+        showToast('Format teks atau file Excel tidak menghasilkan data tabel!');
+        return;
+      }
+
+      const newId = 'custom-' + Date.now();
+      const newTable = {
+        id: newId,
+        name: name,
+        flag: '✨',
+        category: 'custom',
+        badge: 'Tabel Pengguna',
+        title: title,
+        description: desc || 'Tabel aksara kustom buatan Anda.',
+        voiceLang: voice,
+        grid: grid
+      };
+
+      customTables.push(newTable);
+      saveCustomTablesToStorage();
+
+      // Cloud sync jika login
+      if (currentUser) {
+        try {
+          await saveCustomTableToCloud(currentUser.id, newTable);
+        } catch (err) {
+          console.warn('Gagal simpan tabel ke Supabase:', err);
+        }
+      }
+
+      currentTableId = newId;
+      closeCreator();
+      renderTabs();
+      renderCurrentTable();
+      showToast(`✓ Tabel "${name}" berhasil dibuat dan disimpan!`);
+      document.getElementById('area-belajar')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Delete Custom Table
+    deleteTableBtn?.addEventListener('click', async () => {
+      const isCustom = customTables.some(c => c.id === currentTableId);
+      if (!isCustom) return;
+
+      if (confirm('Yakin ingin menghapus tabel aksara kustom ini?')) {
+        const deletedId = currentTableId;
+        customTables = customTables.filter(c => c.id !== deletedId);
+        saveCustomTablesToStorage();
+
+        if (currentUser) {
+          try {
+            await deleteCustomTableFromCloud(currentUser.id, deletedId);
+          } catch (err) {
+            console.warn('Gagal hapus tabel dari Supabase:', err);
+          }
+        }
+
+        currentTableId = defaultTables[0]?.id || '';
+        renderTabs();
+        renderCurrentTable();
+        showToast('Tabel kustom berhasil dihapus.');
+      }
+    });
+
+    // Check auth on load to fetch user's cloud tables
+    async function initUserCustomTables() {
+      try {
+        currentUser = await getCurrentUser();
+        if (currentUser) {
+          const cloudTables = await fetchUserCustomTablesFromCloud(currentUser.id);
+          if (cloudTables && cloudTables.length > 0) {
+            const existingIds = new Set(customTables.map(t => t.id));
+            let added = false;
+            cloudTables.forEach((t: any) => {
+              if (!existingIds.has(t.id)) {
+                customTables.push({
+                  id: t.id,
+                  name: t.name,
+                  flag: '✨',
+                  category: 'custom',
+                  badge: 'Tabel Pengguna (Cloud)',
+                  title: t.name,
+                  description: t.description || '',
+                  voiceLang: t.script || 'en-US',
+                  grid: t.rows || []
+                });
+                added = true;
+              }
+            });
+            if (added) {
+              saveCustomTablesToStorage();
+              renderTabs();
+              renderCurrentTable();
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Init user custom tables error:', err);
+      }
+    }
+
+    // Initial render
+    renderTabs();
+    renderCurrentTable();
+    initUserCustomTables();
+  }
+</script>

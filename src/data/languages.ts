@@ -6,6 +6,8 @@ export interface TableCell {
 export interface LanguageTable {
   id: string;
   name: string;
+  flag?: string;
+  category?: string;
   badge: string;
   title: string;
   description: string;
@@ -18,6 +20,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'jepang-hiragana',
     name: 'Jepang (Hiragana)',
+    flag: '🇯🇵',
+    category: 'Asia',
     badge: 'Hiragana Dasar',
     title: 'A. Tabel Huruf Hiragana Dasar',
     description: 'Aksara fonetik utama dalam bahasa Jepang yang digunakan untuk kata asli Jepang dan tata bahasa.',
@@ -98,6 +102,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'jepang-katakana',
     name: 'Jepang (Katakana)',
+    flag: '🇯🇵',
+    category: 'Asia',
     badge: 'Katakana Dasar',
     title: 'B. Tabel Huruf Katakana Dasar',
     description: 'Aksara fonetik yang digunakan untuk kata serapan asing, nama non-Jepang, dan penekanan khusus.',
@@ -178,6 +184,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'jerman-dasar',
     name: 'Jerman (Deutsch)',
+    flag: '🇩🇪',
+    category: 'Eropa',
     badge: 'Umlaut & Fonetik Jerman',
     title: 'C. Tabel Huruf Khusus & Fonetik Bahasa Jerman',
     description: 'Huruf khusus bahasa Jerman meliputi Umlaut (Ä, Ö, Ü), Eszett (ß), dan kombinasi bunyi vokal/konsonan penting.',
@@ -216,6 +224,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'korea-hangul',
     name: 'Korea (Hangul)',
+    flag: '🇰🇷',
+    category: 'Asia',
     badge: 'Hangul Dasar',
     title: 'D. Tabel Huruf Hangul Korea Dasar',
     description: 'Aksara alfabetis Korea ciptaan Raja Sejong yang terdiri dari vokal dan konsonan dasar.',
@@ -261,6 +271,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'arab-hijaiyah',
     name: 'Arab (Hijaiyah)',
+    flag: '🇸🇦',
+    category: 'Timur Tengah',
     badge: 'Huruf Hijaiyah',
     title: 'E. Tabel Huruf Hijaiyah Dasar',
     description: '28 huruf abjad bahasa Arab dari Alif sampai Ya.',
@@ -313,6 +325,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'mandarin-dasar',
     name: 'Mandarin (Tiongkok)',
+    flag: '🇨🇳',
+    category: 'Asia',
     badge: 'Pinyin & Hanzi Angka',
     title: 'F. Tabel Angka & Sapaan Dasar Bahasa Mandarin',
     description: 'Karakter Hanzi dasar dan sistem pelafalan Pinyin dalam bahasa Mandarin Tiongkok.',
@@ -344,6 +358,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'thailand-dasar',
     name: 'Thailand (Aksara Thai)',
+    flag: '🇹🇭',
+    category: 'Asia',
     badge: 'Konsonan & Vokal Thai',
     title: 'G. Tabel Aksara Bahasa Thailand Dasar',
     description: 'Aksara fonetik abugida Thailand untuk konsonan utama dan vokal umum.',
@@ -389,6 +405,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'spanyol-dasar',
     name: 'Spanyol (Español)',
+    flag: '🇪🇸',
+    category: 'Eropa',
     badge: 'Alfabet & Aksen Spanyol',
     title: 'H. Tabel Huruf Khusus & Sapaan Bahasa Spanyol',
     description: 'Huruf khusus bahasa Spanyol seperti Eñe (Ñ), vokal beraksen tilde, dan tanda baca pembuka khusus.',
@@ -420,6 +438,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'prancis-dasar',
     name: 'Prancis (Français)',
+    flag: '🇫🇷',
+    category: 'Eropa',
     badge: 'Aksen & Huruf Prancis',
     title: 'I. Tabel Aksen & Huruf Khusus Bahasa Prancis',
     description: 'Tanda aksen fonetik vokal Prancis (Aigu, Grave, Circonflexe) dan ligatur khusus.',
@@ -451,6 +471,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'italia-dasar',
     name: 'Italia (Italiano)',
+    flag: '🇮🇹',
+    category: 'Eropa',
     badge: 'Fonetik & Sapaan Italia',
     title: 'J. Tabel Kombinasi Bunyi & Sapaan Bahasa Italia',
     description: 'Pola bunyi fonetik konsonan ganda bahasa Italia serta kata sapaan umum.',
@@ -482,6 +504,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'rusia-cyrillic',
     name: 'Rusia (Sirilik)',
+    flag: '🇷🇺',
+    category: 'Eropa',
     badge: 'Sirilik Dasar',
     title: 'K. Tabel Huruf Sirilik Rusia Dasar',
     description: 'Aksara Sirilik Rusia yang digunakan di kawasan Eropa Timur dan Asia Utara.',
@@ -541,6 +565,8 @@ export const defaultLanguageTables: LanguageTable[] = [
   {
     id: 'yunani-greek',
     name: 'Yunani (Greek)',
+    flag: '🇬🇷',
+    category: 'Eropa',
     badge: 'Yunani Kuno & Modern',
     title: 'L. Tabel Alfabet Yunani Dasar',
     description: 'Aksara Yunani dasar yang digunakan dalam bahasa Yunani serta simbol ilmiah matematika & sains.',

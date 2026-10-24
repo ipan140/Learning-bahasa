@@ -10,7 +10,7 @@
       <div>
         <h2 id="auth-modal-title" class="text-[18px] font-bold tracking-tight text-ink">Masuk ke Akun</h2>
         <p class="text-[12px] text-steel mt-0.5" id="auth-modal-subtitle">
-          Simpan target belajar dan sinkronkan antar-laptop & smartphone Anda.
+          Simpan target belajar dan sinkronkan antar-laptop &amp; smartphone Anda.
         </p>
       </div>
       <button 
@@ -135,25 +135,6 @@
         </button>
       </form>
 
-      <!-- Quick Key Setup Prompt jika belum diset di Vercel/env -->
-      <div id="quick-key-box" class="hidden p-3 border border-rule bg-smoke/5 text-xs flex flex-col gap-2">
-        <span class="font-bold text-ink">Hubungkan Supabase</span>
-        <p class="text-steel text-[11px] leading-relaxed">
-          Kunci anon belum terbaca dari Vercel. Tempelkan <strong>Publishable key</strong> Anda (yang berawalan <code>sb_publishable_...</code>) untuk menghubungkan sekarang:
-        </p>
-        <div class="flex gap-2">
-          <input 
-            type="password" 
-            id="input-quick-key" 
-            placeholder="sb_publishable_..." 
-            class="flex-1 text-[12px] font-mono px-3 py-1.5 bg-canvas border border-rule text-ink outline-none focus:border-ink"
-          />
-          <button type="button" id="btn-save-quick-key" class="btn btn-primary btn-s text-xs shrink-0">
-            Hubungkan
-          </button>
-        </div>
-      </div>
-
       <!-- Footer Info -->
       <p class="text-[12px] text-steel text-center leading-relaxed pt-2 border-t border-rule" id="auth-footer-text">
         Belum memiliki akun? 
@@ -170,7 +151,6 @@
   import {
     getSupabase,
     isSupabaseConfigured,
-    saveSupabaseConfig,
     getCurrentUser,
     signUpWithEmail,
     signInWithEmail,
@@ -371,7 +351,7 @@
     hideAlert();
 
     if (!isSupabaseConfigured()) {
-      showAlert('Layanan akun sedang dipersiapkan. Mohon isi PUBLIC_SUPABASE_URL & ANON_KEY di file .env terlebih dahulu.', 'error');
+      showAlert('Layanan server akun belum terhubung. Pastikan env telah diset dan di-redeploy di Vercel.', 'error');
       return;
     }
 
@@ -407,22 +387,6 @@
         authSubmitBtn.textContent = currentAuthMode === 'login' ? 'Masuk ke Akun' : 'Buat Akun Saya';
       }
     }
-  });
-
-  // Handler simpan cepat kunci Supabase jika env belum di-redeploy di Vercel
-  const quickKeyBox = document.getElementById('quick-key-box');
-  const inputQuickKey = document.getElementById('input-quick-key') as HTMLInputElement | null;
-  const btnSaveQuickKey = document.getElementById('btn-save-quick-key');
-
-  btnSaveQuickKey?.addEventListener('click', () => {
-    const key = inputQuickKey?.value.trim();
-    if (!key) {
-      showAlert('Harap masukkan Supabase anon key.', 'error');
-      return;
-    }
-    saveSupabaseConfig('https://qqitquxjqupclhlunjq.supabase.co', key);
-    quickKeyBox?.classList.add('hidden');
-    showAlert('✓ Kunci Supabase tersambung! Silakan coba Masuk / Daftar sekarang.', 'success');
   });
 
   // Tombol Logout
@@ -492,6 +456,6 @@
     });
   }
 
-  // Inisialisasi saat halaman pertama kali dibuka
+  // Inisialisasi saat modal dibuka
   checkAuthState();
 </script>

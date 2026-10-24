@@ -3,11 +3,11 @@
   "description": "Aplikasi tabel belajar aksara bahasa: Jepang (Hiragana & Katakana), Korea (Hangul), Arab (Hijaiyah), dan bahasa lainnya.",
   "install": "https://learning-bahasa-nine.vercel.app",
   "announcement": {
-    "text": "✨ Tabel Belajar Aksara & Huruf Bahasa Dinamis - Klik kotak untuk dengar suara",
-    "href": "/"
+    "text": "✨ Studio Belajar Aksara & Huruf Bahasa - Klik kotak untuk dengar suara asli",
+    "href": "/belajar"
   },
   "cta": {
     "label": "+ Buat Tabel",
-    "href": "#buat-tabel"
+    "href": "/belajar#buat-tabel"
   }
 }

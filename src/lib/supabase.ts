@@ -2,23 +2,24 @@ import { createClient, type SupabaseClient, type User } from '@supabase/supabase
 
 // Cache client instance in memory
 let supabaseInstance: SupabaseClient | null = null;
+export const DEFAULT_SUPABASE_URL = 'https://qqitquxjqupclhlunjq.supabase.co';
 
 export function getSupabaseConfig(): { url: string; anonKey: string } | null {
-  const defaultUrl = 'https://qqitquxjqupclhlunjq.supabase.co';
+  const defaultUrl = DEFAULT_SUPABASE_URL;
 
-  // 1. Coba dari environment variable Astro
+  // 1. Coba dari environment variable Astro (Build / Vercel Env)
   const envUrl = import.meta.env.PUBLIC_SUPABASE_URL || defaultUrl;
   const envKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  if (envKey && !envKey.includes('your-anon-key')) {
-    return { url: envUrl, anonKey: envKey };
+  if (envKey && !envKey.includes('your-anon-key') && envKey.trim().length > 10) {
+    return { url: envUrl.trim(), anonKey: envKey.trim() };
   }
 
-  // 2. Coba dari localStorage (pengaturan runtime di browser)
+  // 2. Coba dari localStorage (Pengaturan runtime di browser)
   if (typeof window !== 'undefined') {
     const localUrl = localStorage.getItem('sb_custom_url') || defaultUrl;
     const localKey = localStorage.getItem('sb_custom_key');
-    if (localKey && !localKey.includes('your-anon-key')) {
-      return { url: localUrl, anonKey: localKey };
+    if (localKey && !localKey.includes('your-anon-key') && localKey.trim().length > 10) {
+      return { url: localUrl.trim(), anonKey: localKey.trim() };
     }
   }
 
@@ -31,9 +32,11 @@ export function isSupabaseConfigured(): boolean {
 
 export function saveSupabaseConfig(url: string, anonKey: string) {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('sb_custom_url', url.trim());
-    localStorage.setItem('sb_custom_key', anonKey.trim());
-    supabaseInstance = null; // reset client
+    const cleanUrl = (url || DEFAULT_SUPABASE_URL).trim();
+    const cleanKey = anonKey.trim();
+    localStorage.setItem('sb_custom_url', cleanUrl);
+    localStorage.setItem('sb_custom_key', cleanKey);
+    supabaseInstance = null; // reset client instance agar terinisialisasi ulang
   }
 }
 
@@ -81,7 +84,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
 export async function signUpWithEmail(email: string, password: string) {
   const sb = getSupabase();
-  if (!sb) throw new Error('Supabase belum dikonfigurasi.');
+  if (!sb) throw new Error('Supabase belum terhubung. Harap masukkan Supabase anon key.');
   return await sb.auth.signUp({
     email,
     password,
@@ -90,7 +93,7 @@ export async function signUpWithEmail(email: string, password: string) {
 
 export async function signInWithEmail(email: string, password: string) {
   const sb = getSupabase();
-  if (!sb) throw new Error('Supabase belum dikonfigurasi.');
+  if (!sb) throw new Error('Supabase belum terhubung. Harap masukkan Supabase anon key.');
   return await sb.auth.signInWithPassword({
     email,
     password,
@@ -101,6 +104,14 @@ export async function signOutUser() {
   const sb = getSupabase();
   if (!sb) return;
   return await sb.auth.signOut();
+}
+
+export async function resetPasswordForEmail(email: string) {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Supabase belum terhubung.');
+  return await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : undefined,
+  });
 }
 
 // ================= DATA SYNC HELPERS =================
