@@ -7,7 +7,7 @@ import CommandPalette from './CommandPalette.astro';
 const path = Astro.url.pathname;
 ---
 
-<a href={site.announcement.href} class="block bg-cta text-cta-ink text-[13px] text-center px-4 py-2.5 font-medium hover:underline underline-offset-4">
+<a href={site.announcement.href} class="block bg-cta text-cta-ink text-[12px] sm:text-[13px] text-center px-3 sm:px-4 py-2 sm:py-2.5 font-medium hover:underline underline-offset-4">
   {site.announcement.text} <span aria-hidden="true">-&gt;</span>
 </a>
 

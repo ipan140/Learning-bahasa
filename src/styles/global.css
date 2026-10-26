@@ -112,8 +112,12 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "calt" 1, "liga" 1;
     scroll-padding-top: 80px;
+    overflow-x: clip;
   }
-  body { min-height: 100dvh; }
+  body { 
+    min-height: 100dvh; 
+    overflow-x: clip;
+  }
   h1, h2, h3, h4 { color: var(--ink); text-wrap: balance; }
   p { text-wrap: pretty; }
   ::selection { background: var(--ink); color: var(--canvas); }
