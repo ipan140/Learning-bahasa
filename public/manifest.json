@@ -1,7 +1,7 @@
 {
-  "name": "Belajar Bahasa - Aksara & Database 250 Negara",
+  "name": "Belajar Bahasa - Aksara & Katalog 250 Negara",
   "short_name": "BelajarBahasa",
-  "description": "Aplikasi belajar aksara bahasa fonetik dan database 250 negara dengan audio pengucapan asli dan sinkronisasi cloud.",
+  "description": "Aplikasi belajar aksara bahasa fonetik dan katalog 250 negara dengan audio pengucapan asli dan sinkronisasi cloud.",
   "start_url": "/belajar",
   "scope": "/",
   "display": "standalone",

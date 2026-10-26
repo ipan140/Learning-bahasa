@@ -59,11 +59,11 @@ import { languagePhrasesData } from '../data/phrases';
             <span class="label font-bold text-ink">PILIH AKSARA BAHASA:</span>
             <!-- Category Chips Filter -->
             <div class="flex items-center gap-1.5 text-[12px] font-mono overflow-x-auto pb-1 scrollbar-none" id="category-filter-chips">
-              <button type="button" data-cat="all" class="px-3 py-1 border border-ink bg-ink text-canvas font-bold whitespace-nowrap">Semua</button>
-              <button type="button" data-cat="Asia" class="px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap">Asia</button>
-              <button type="button" data-cat="Eropa" class="px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap">Eropa</button>
-              <button type="button" data-cat="Timur Tengah" class="px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap">Timur Tengah</button>
-              <button type="button" data-cat="custom" class="px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap">Kustom</button>
+              <button type="button" data-cat="all" class="px-3 py-1 border-2 border-cta bg-cta/10 text-ink font-bold whitespace-nowrap shadow-xs cursor-pointer">Semua</button>
+              <button type="button" data-cat="Asia" class="px-3 py-1 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap cursor-pointer">Asia</button>
+              <button type="button" data-cat="Eropa" class="px-3 py-1 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap cursor-pointer">Eropa</button>
+              <button type="button" data-cat="Timur Tengah" class="px-3 py-1 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap cursor-pointer">Timur Tengah</button>
+              <button type="button" data-cat="custom" class="px-3 py-1 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap cursor-pointer">Kustom</button>
             </div>
           </div>
 
@@ -78,21 +78,21 @@ import { languagePhrasesData } from '../data/phrases';
           <button 
             type="button" 
             id="btn-mode-table" 
-            class="px-4 py-2 font-mono text-[13px] border border-ink bg-ink text-canvas font-bold whitespace-nowrap transition-colors"
+            class="px-4 py-2 font-mono text-[13px] border-2 border-cta bg-cta/10 text-ink font-bold whitespace-nowrap transition-colors cursor-pointer shadow-xs"
           >
             📑 Mode Tabel Aksara
           </button>
           <button 
             type="button" 
             id="btn-mode-flashcard" 
-            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink whitespace-nowrap transition-colors"
+            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap transition-colors cursor-pointer"
           >
             🎴 Mode Flashcard &amp; Latihan
           </button>
           <button 
             type="button" 
             id="btn-mode-phrases" 
-            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink whitespace-nowrap transition-colors"
+            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap transition-colors cursor-pointer"
           >
             💬 Frasa Dasar Sehari-hari
           </button>
@@ -122,7 +122,7 @@ import { languagePhrasesData } from '../data/phrases';
 
         <!-- Action & Search Toolbar -->
         <div class="flex flex-wrap items-center justify-between gap-4 p-4 border border-rule bg-canvas">
-          <div class="flex items-center gap-3 flex-1 min-w-[240px]">
+          <div class="flex items-center gap-3 flex-1 min-w-0 w-full sm:w-auto sm:min-w-[240px]">
             <span class="text-smoke text-[13px] font-mono select-none">CARI:</span>
             <input 
               type="text" 
@@ -144,7 +144,7 @@ import { languagePhrasesData } from '../data/phrases';
               type="button" 
               id="toggle-speed-btn" 
               class="btn btn-secondary btn-s font-mono"
-              title="Atur Kecepatan Suara: 0.75x (Lambat) atau 1.0x (Normal)"
+              title="Atur Kecepatan Suara: 0.5x, 0.75x, 1x (default), 1.25x, 1.5x, 2x"
             >
               🐢 Speed: <span id="speed-status-label" class="text-ink font-bold">1.0x</span>
             </button>
@@ -183,14 +183,45 @@ import { languagePhrasesData } from '../data/phrases';
                 Aksara fonetik utama dalam bahasa Jepang.
               </p>
             </div>
-            <div id="custom-table-actions" class="hidden items-center gap-2 shrink-0">
-              <button type="button" id="delete-table-btn" class="px-3 py-1.5 text-[12px] font-mono border border-rule text-smoke hover:text-red-500 hover:border-red-500 transition-colors">
-                ✕ Hapus Tabel Ini
+            <div id="table-toolbar-actions" class="flex items-center gap-2 flex-wrap shrink-0">
+              <button type="button" id="btn-top-add-char" class="btn btn-primary btn-s font-mono text-[12px]" title="Tambah aksara baru ke tabel ini">
+                + Tambah Aksara
+              </button>
+              <button type="button" id="duplicate-table-btn" class="btn btn-secondary btn-s font-mono text-[12px]" title="Duplikat tabel ini ke tabel kustom agar dapat diedit bebas">
+                📋 Duplikat &amp; Edit
+              </button>
+              <button type="button" id="toggle-edit-mode-btn" class="btn btn-secondary btn-s font-mono text-[12px]" title="Aktifkan mode edit untuk mengubah atau menghapus huruf dobel">
+                ✏️ Mode Edit Aksara
+              </button>
+              <button type="button" id="edit-custom-table-btn" class="hidden btn btn-secondary btn-s font-mono text-[12px]" title="Edit seluruh isi tabel (teks/spreadsheet)">
+                📝 Edit Teks
+              </button>
+              <button type="button" id="delete-table-btn" class="hidden px-3 py-1.5 text-[12px] font-mono border border-rule text-smoke hover:text-red-500 hover:border-red-500 transition-colors">
+                ✕ Hapus Tabel
               </button>
             </div>
           </div>
 
           <!-- The Text Grid / Table -->
+          <!-- Edit Mode Toolbar (muncul saat Mode Edit aktif) -->
+          <div id="table-edit-toolbar" class="hidden mb-4 p-3.5 border-2 border-badge bg-badge/10 font-mono text-[13px] flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="text-badge font-bold">✏️ MODE EDIT AKTIF:</span>
+              <span class="text-ink text-xs sm:text-sm">Klik <span class="text-red-500 font-bold">✕</span> pada kotak untuk menghapus huruf dobel, atau <span class="font-bold">✏️</span> untuk mengedit romaji &amp; aksara.</span>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap shrink-0">
+              <button type="button" id="btn-auto-dedup" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer" title="Cari huruf yang kembar/dobel di tabel ini dan hapus otomatis">
+                🧹 Hapus Huruf Dobel Otomatis
+              </button>
+              <button type="button" id="btn-add-char-table" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer">
+                + Tambah Huruf
+              </button>
+              <button type="button" id="btn-finish-edit-mode" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer">
+                ✓ Selesai Edit
+              </button>
+            </div>
+          </div>
+
           <div class="w-full overflow-x-auto pb-4">
             <div id="table-grid-wrapper" class="inline-block min-w-full align-middle">
               <!-- Table will be rendered here -->
@@ -221,10 +252,10 @@ import { languagePhrasesData } from '../data/phrases';
 
             <!-- Toggle Flashcard vs Kuis -->
             <div class="flex items-center gap-1.5 text-[12px] font-mono shrink-0">
-              <button type="button" id="btn-fc-type-card" class="px-3 py-1.5 border border-ink bg-ink text-canvas font-bold">
+              <button type="button" id="btn-fc-type-card" class="px-3 py-1.5 border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer">
                 🎴 Flashcard
               </button>
-              <button type="button" id="btn-fc-type-quiz" class="px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">
+              <button type="button" id="btn-fc-type-quiz" class="px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer">
                 🎯 Kuis Pilihan Ganda
               </button>
             </div>
@@ -321,15 +352,64 @@ import { languagePhrasesData } from '../data/phrases';
         <!-- ============================================== -->
         <!-- VIEW 3: FRASA DASAR SEHARI-HARI                -->
         <!-- ============================================== -->
-        <div id="phrases-container" class="hidden border border-rule bg-canvas p-5 sm:p-6 shadow-sm space-y-6">
-          <div class="border-b border-rule pb-4">
-            <span class="px-2.5 py-1 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider bg-tint">Survival Phrases</span>
-            <h2 id="phrases-title" class="text-[22px] sm:text-[24px] font-bold text-ink tracking-tight mt-1">
-              Frasa Penting Sehari-hari
-            </h2>
-            <p class="text-[13px] text-steel mt-0.5">
-              Kosakata dasar yang wajib diketahui: salam, ucapan terima kasih, dan angka 1 sampai 10 dengan tombol audio asli.
-            </p>
+        <div id="phrases-container" class="hidden border border-rule bg-canvas p-5 sm:p-6 shadow-sm space-y-5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-rule pb-4">
+            <div>
+              <span class="px-2.5 py-1 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider bg-tint">Survival Phrases</span>
+              <h2 id="phrases-title" class="text-[22px] sm:text-[24px] font-bold text-ink tracking-tight mt-1">
+                Frasa Penting Sehari-hari
+              </h2>
+              <p class="text-[13px] text-steel mt-0.5">
+                Kosakata &amp; percakapan dasar: salam, angka, belanja, dan frasa darurat dengan tombol audio asli.
+              </p>
+            </div>
+
+            <!-- Phrases Action Buttons -->
+            <div class="flex items-center gap-2 flex-wrap shrink-0">
+              <button 
+                type="button" 
+                id="btn-open-phrase-modal" 
+                class="btn btn-primary btn-s font-mono text-[12px]"
+                title="Tambah frasa baru ke koleksi bahasa ini"
+              >
+                + Tambah Frasa
+              </button>
+              <button 
+                type="button" 
+                id="btn-open-phrase-import" 
+                class="btn btn-secondary btn-s font-mono text-[12px]"
+                title="Impor kumpulan frasa dari file Excel atau teks"
+              >
+                📁 Impor Excel / CSV
+              </button>
+              <button 
+                type="button" 
+                id="btn-toggle-phrase-edit" 
+                class="btn btn-secondary btn-s font-mono text-[12px]"
+                title="Aktifkan mode edit/hapus untuk frasa"
+              >
+                ✏️ Mode Edit Frasa
+              </button>
+              <button 
+                type="button" 
+                id="btn-reset-phrase" 
+                class="px-2.5 py-1.5 text-[11px] font-mono border border-rule text-smoke hover:text-ink hover:border-ink transition-colors"
+                title="Kembalikan frasa ke bawaan awal"
+              >
+                ↺ Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit Mode Notice Banner -->
+          <div id="phrase-edit-toolbar" class="hidden p-3 border-2 border-badge bg-badge/10 font-mono text-xs text-ink flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="text-badge font-bold">✏️ MODE EDIT FRASA:</span>
+              <span>Klik <span class="font-bold">✏️</span> pada kartu frasa untuk mengedit teks/arti, atau tombol merah <span class="text-red-500 font-bold">✕</span> untuk menghapus frasa.</span>
+            </div>
+            <button type="button" id="btn-finish-phrase-edit" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer shrink-0">
+              ✓ Selesai Edit
+            </button>
           </div>
 
           <div id="phrases-content-wrapper" class="space-y-6">
@@ -348,7 +428,7 @@ import { languagePhrasesData } from '../data/phrases';
     <div id="creator-modal" class="hidden my-8 p-6 sm:p-8 border-2 border-ink bg-canvas shadow-2xl">
       <div class="flex items-center justify-between border-b border-rule pb-4 mb-6">
         <div>
-          <h3 class="text-[22px] font-bold text-ink">Buat Tabel / Materi Bahasa Baru</h3>
+          <h3 id="creator-modal-title" class="text-[22px] font-bold text-ink">Buat Tabel / Materi Bahasa Baru</h3>
           <p class="text-[13px] text-steel mt-1">
             Tambahkan materi atau bahasa apa saja dengan format teks bebas, atau <strong>impor langsung dari file Excel/Spreadsheet</strong> Anda.
           </p>
@@ -451,13 +531,204 @@ import { languagePhrasesData } from '../data/phrases';
           <button type="button" id="cancel-creator-btn" class="btn btn-secondary btn-s font-mono text-[12px]">
             Batal
           </button>
-          <button type="submit" class="btn btn-primary btn-s font-mono text-[12px]">
+          <button type="submit" id="creator-submit-btn" class="btn btn-primary btn-s font-mono text-[12px]">
             Simpan &amp; Tampilkan Tabel
           </button>
         </div>
       </form>
     </div>
   </div>
+  <!-- ========================================== -->
+  <!-- SINGLE CHARACTER / AKSARA EDIT MODAL       -->
+  <!-- ========================================== -->
+  <dialog id="char-edit-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-sm shadow-2xl">
+    <div class="p-5 sm:p-6">
+      <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
+        <h4 id="char-modal-title" class="text-base font-bold text-ink">✏️ Edit Karakter</h4>
+        <button type="button" id="close-char-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
+      </div>
+      <form id="char-edit-form" class="space-y-4">
+        <input type="hidden" id="char-edit-row" value="" />
+        <input type="hidden" id="char-edit-col" value="" />
+        <div>
+          <label class="block text-xs font-mono text-steel mb-1">Aksara / Huruf Asli *</label>
+          <input 
+            type="text" 
+            id="char-edit-char-input" 
+            required
+            placeholder="Misal: あ atau ب"
+            class="w-full px-3 py-2 text-2xl font-bold bg-tint border border-rule text-ink outline-none focus:border-ink font-mono text-center" 
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-mono text-steel mb-1">Cara Baca / Transliterasi (Romaji)</label>
+          <input 
+            type="text" 
+            id="char-edit-romaji-input" 
+            placeholder="Misal: Ka, Alif, dll."
+            class="w-full px-3 py-2 text-sm bg-tint border border-rule text-ink outline-none focus:border-ink font-mono" 
+          />
+        </div>
+        <div class="flex items-center justify-between gap-2 pt-3 border-t border-rule">
+          <button type="button" id="char-edit-delete-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-red-500 hover:border-red-500 hover:bg-red-500/10 cursor-pointer">
+            🗑️ Hapus Huruf
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" id="char-edit-cancel-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-smoke hover:text-ink cursor-pointer">
+              Batal
+            </button>
+            <button type="submit" class="px-3 py-1.5 text-xs font-mono border border-ink bg-ink text-canvas font-bold cursor-pointer">
+              Simpan
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </dialog>
+  <!-- ========================================== -->
+  <!-- PHRASE CREATE & EDIT MODAL                 -->
+  <!-- ========================================== -->
+  <dialog id="phrase-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-md shadow-2xl">
+    <div class="p-5 sm:p-6">
+      <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
+        <h4 id="phrase-modal-title" class="text-base font-bold text-ink">➕ Tambah Frasa Baru</h4>
+        <button type="button" id="close-phrase-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
+      </div>
+      <form id="phrase-form" class="space-y-4">
+        <input type="hidden" id="phrase-edit-cat-idx" value="-1" />
+        <input type="hidden" id="phrase-edit-item-idx" value="-1" />
+
+        <div>
+          <label class="block text-xs font-mono text-steel mb-1">Kategori Frasa *</label>
+          <select id="phrase-cat-select" class="w-full px-3 py-2 text-sm bg-tint border border-rule text-ink outline-none focus:border-ink font-mono">
+            <!-- Dynamically populated -->
+          </select>
+          <input 
+            type="text" 
+            id="phrase-cat-custom-input" 
+            placeholder="Ketik nama kategori baru..." 
+            class="w-full mt-2 px-3 py-2 text-sm bg-tint border border-rule text-ink outline-none focus:border-ink font-mono hidden" 
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-steel mb-1">Teks Frasa Asli (Native Script) *</label>
+          <input 
+            type="text" 
+            id="phrase-native-input" 
+            required 
+            placeholder="Misal: こんにちは atau شكراً" 
+            class="w-full px-3 py-2 text-lg font-bold bg-tint border border-rule text-ink outline-none focus:border-ink font-mono" 
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-steel mb-1">Cara Baca / Transliterasi Latin</label>
+          <input 
+            type="text" 
+            id="phrase-translit-input" 
+            placeholder="Misal: Konnichiwa atau Syukron" 
+            class="w-full px-3 py-2 text-sm bg-tint border border-rule text-ink outline-none focus:border-ink font-mono" 
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-steel mb-1">Arti / Terjemahan Bahasa Indonesia *</label>
+          <input 
+            type="text" 
+            id="phrase-meaning-input" 
+            required 
+            placeholder="Misal: Halo / Selamat siang" 
+            class="w-full px-3 py-2 text-sm bg-tint border border-rule text-ink outline-none focus:border-ink font-mono" 
+          />
+        </div>
+
+        <div class="flex items-center justify-between gap-2 pt-3 border-t border-rule">
+          <button type="button" id="phrase-delete-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-red-500 hover:border-red-500 hover:bg-red-500/10 cursor-pointer hidden">
+            🗑️ Hapus Frasa
+          </button>
+          <div class="flex items-center gap-2 ml-auto">
+            <button type="button" id="phrase-cancel-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-smoke hover:text-ink cursor-pointer">
+              Batal
+            </button>
+            <button type="submit" class="px-3 py-1.5 text-xs font-mono border border-ink bg-ink text-canvas font-bold cursor-pointer">
+              Simpan Frasa
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ========================================== -->
+  <!-- PHRASE IMPORT MODAL (EXCEL / CSV / TEXT)   -->
+  <!-- ========================================== -->
+  <dialog id="phrase-import-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-lg shadow-2xl">
+    <div class="p-5 sm:p-6">
+      <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
+        <div>
+          <h4 class="text-base font-bold text-ink">📁 Impor Kumpulan Frasa</h4>
+          <p class="text-xs text-steel mt-0.5">Unggah spreadsheet atau salin teks banyak frasa sekaligus.</p>
+        </div>
+        <button type="button" id="close-phrase-import-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
+      </div>
+
+      <form id="phrase-import-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-mono text-steel mb-1">Pilih Kategori Tujuan *</label>
+          <select id="phrase-import-cat-select" class="w-full px-3 py-2 text-sm bg-tint border border-rule text-ink outline-none focus:border-ink font-mono">
+            <!-- Dynamically populated -->
+          </select>
+          <input 
+            type="text" 
+            id="phrase-import-cat-custom" 
+            placeholder="Ketik nama kategori baru..." 
+            class="w-full mt-2 px-3 py-2 text-sm bg-tint border border-rule text-ink outline-none focus:border-ink font-mono hidden" 
+          />
+        </div>
+
+        <div class="p-3 border border-rule bg-tint/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="font-bold text-xs text-ink block">Impor File Excel / CSV</span>
+            <span class="text-[11px] text-smoke">3 Kolom: [Teks Asli] [Cara Baca] [Arti]</span>
+          </div>
+          <label class="btn btn-secondary btn-s shrink-0 cursor-pointer text-xs font-mono">
+            📁 Pilih File Excel
+            <input type="file" id="phrase-excel-input" accept=".xlsx, .xls, .csv" class="hidden" />
+          </label>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="phrase-import-text" class="block text-xs font-mono text-steel">Atau Paste Teks Langsung:</label>
+            <span class="text-[11px] font-mono text-smoke">Format: <code>Asli = Baca = Arti</code></span>
+          </div>
+          <textarea 
+            id="phrase-import-text" 
+            rows="5" 
+            placeholder="Arigatou = Arigatou gozaimasu = Terima kasih&#10;Konnichiwa = Konnichiwa = Selamat siang&#10;Sumimasen = Permisi / Maaf" 
+            class="w-full px-3 py-2 text-xs bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+          ></textarea>
+        </div>
+
+        <div>
+          <span class="block text-[11px] font-mono text-smoke uppercase tracking-wider mb-1">Pratinjau Hasil Pembacaan:</span>
+          <div id="phrase-import-preview" class="max-h-28 overflow-y-auto p-2.5 border border-rule bg-tint/20 text-xs font-mono text-smoke">
+            Masukkan teks atau unggah file untuk melihat pratinjau...
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-rule">
+          <button type="button" id="phrase-import-cancel-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-smoke hover:text-ink cursor-pointer">
+            Batal
+          </button>
+          <button type="submit" class="px-4 py-1.5 text-xs font-mono border border-ink bg-ink text-canvas font-bold cursor-pointer">
+            Simpan Semua Frasa
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
 </Base>
 
 <!-- Load SheetJS for Excel Reading -->
@@ -470,7 +741,15 @@ import { languagePhrasesData } from '../data/phrases';
     saveCustomTableToCloud, 
     deleteCustomTableFromCloud,
     fetchUserProgressFromCloud,
-    saveUserProgressToCloud
+    saveUserProgressToCloud,
+    fetchUserPhrasesFromCloud,
+    saveUserPhrasesToCloud,
+    deleteUserPhrasesFromCloud,
+    fetchUserPhraseCategoriesFromCloud,
+    saveUserPhraseCategoryToCloud,
+    saveUserQuizScoreToCloud,
+    saveUserPreferencesToCloud,
+    fetchUserPreferencesFromCloud
   } from '../lib/supabase';
 
   const appEl = document.getElementById('main-app');
@@ -491,6 +770,10 @@ import { languagePhrasesData } from '../data/phrases';
     let isUnaddedState = false;
     let unaddedInfo = { country: '', language: '', flag: '', voice: '' };
     let currentUser: any = null;
+
+    // Edit Mode State
+    let isEditModeActive = false;
+    let editingTableId: string | null = null;
 
     // Flashcard state
     let fcIndex = 0;
@@ -569,19 +852,47 @@ import { languagePhrasesData } from '../data/phrases';
     const speedStatusLabel = document.getElementById('speed-status-label');
     const copyAllBtn = document.getElementById('copy-all-btn');
 
+    // Edit Mode Toolbar & Action Elements
+    const toggleEditModeBtn = document.getElementById('toggle-edit-mode-btn');
+    const tableEditToolbar = document.getElementById('table-edit-toolbar');
+    const btnAutoDedup = document.getElementById('btn-auto-dedup');
+    const btnAddCharTable = document.getElementById('btn-add-char-table');
+    const btnTopAddChar = document.getElementById('btn-top-add-char');
+    btnTopAddChar?.addEventListener('click', () => {
+      openCharModal(-1, -1, '', '');
+    });
+    const btnFinishEditMode = document.getElementById('btn-finish-edit-mode');
+    const duplicateTableBtn = document.getElementById('duplicate-table-btn');
+    const editCustomTableBtn = document.getElementById('edit-custom-table-btn');
+    const deleteTableBtn = document.getElementById('delete-table-btn');
+
+    // Character Modal Elements
+    const charEditModal = document.getElementById('char-edit-modal') as HTMLDialogElement | null;
+    const charEditForm = document.getElementById('char-edit-form') as HTMLFormElement | null;
+    const charEditRow = document.getElementById('char-edit-row') as HTMLInputElement | null;
+    const charEditCol = document.getElementById('char-edit-col') as HTMLInputElement | null;
+    const charEditCharInput = document.getElementById('char-edit-char-input') as HTMLInputElement | null;
+    const charEditRomajiInput = document.getElementById('char-edit-romaji-input') as HTMLInputElement | null;
+    const charEditDeleteBtn = document.getElementById('char-edit-delete-btn');
+    const charEditCancelBtn = document.getElementById('char-edit-cancel-btn');
+    const closeCharModalBtn = document.getElementById('close-char-modal-btn');
+    const charModalTitle = document.getElementById('char-modal-title');
+
     // Creator elements
     const openCreatorBtn = document.getElementById('open-creator-btn');
     const openCreatorTopBtn = document.getElementById('open-creator-top-btn');
     const closeCreatorBtn = document.getElementById('close-creator-btn');
     const cancelCreatorBtn = document.getElementById('cancel-creator-btn');
     const creatorModal = document.getElementById('creator-modal');
+    const creatorModalTitle = document.getElementById('creator-modal-title');
+    const creatorSubmitBtn = document.getElementById('creator-submit-btn');
     const creatorForm = document.getElementById('creator-form');
     const formText = document.getElementById('form-text') as HTMLTextAreaElement | null;
     const formExcelInput = document.getElementById('form-excel-input') as HTMLInputElement | null;
     const creatorPreview = document.getElementById('creator-preview');
     const loadSampleBtn = document.getElementById('load-sample-btn');
-    const customActions = document.getElementById('custom-table-actions');
-    const deleteTableBtn = document.getElementById('delete-table-btn');
+
+    // Toast
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
     const toastClose = document.getElementById('toast-close');
@@ -616,6 +927,44 @@ import { languagePhrasesData } from '../data/phrases';
     // Phrases DOM Elements
     const phrasesTitle = document.getElementById('phrases-title');
     const phrasesContentWrapper = document.getElementById('phrases-content-wrapper');
+
+    // Phrases CRUD & Import Elements
+    const btnOpenPhraseModal = document.getElementById('btn-open-phrase-modal');
+    const btnOpenPhraseImport = document.getElementById('btn-open-phrase-import');
+    const btnTogglePhraseEdit = document.getElementById('btn-toggle-phrase-edit');
+    const btnResetPhrase = document.getElementById('btn-reset-phrase');
+    const phraseEditToolbar = document.getElementById('phrase-edit-toolbar');
+    const btnFinishPhraseEdit = document.getElementById('btn-finish-phrase-edit');
+
+    // Phrase Modal DOM Elements
+    const phraseModal = document.getElementById('phrase-modal') as HTMLDialogElement | null;
+    const phraseModalTitle = document.getElementById('phrase-modal-title');
+    const phraseForm = document.getElementById('phrase-form') as HTMLFormElement | null;
+    const phraseEditCatIdx = document.getElementById('phrase-edit-cat-idx') as HTMLInputElement | null;
+    const phraseEditItemIdx = document.getElementById('phrase-edit-item-idx') as HTMLInputElement | null;
+    const phraseCatSelect = document.getElementById('phrase-cat-select') as HTMLSelectElement | null;
+    const phraseCatCustomInput = document.getElementById('phrase-cat-custom-input') as HTMLInputElement | null;
+    const phraseNativeInput = document.getElementById('phrase-native-input') as HTMLInputElement | null;
+    const phraseTranslitInput = document.getElementById('phrase-translit-input') as HTMLInputElement | null;
+    const phraseMeaningInput = document.getElementById('phrase-meaning-input') as HTMLInputElement | null;
+    const phraseDeleteBtn = document.getElementById('phrase-delete-btn');
+    const phraseCancelBtn = document.getElementById('phrase-cancel-btn');
+    const closePhraseModalBtn = document.getElementById('close-phrase-modal-btn');
+
+    // Phrase Import Modal DOM Elements
+    const phraseImportModal = document.getElementById('phrase-import-modal') as HTMLDialogElement | null;
+    const closePhraseImportBtn = document.getElementById('close-phrase-import-btn');
+    const phraseImportCancelBtn = document.getElementById('phrase-import-cancel-btn');
+    const phraseImportForm = document.getElementById('phrase-import-form') as HTMLFormElement | null;
+    const phraseImportCatSelect = document.getElementById('phrase-import-cat-select') as HTMLSelectElement | null;
+    const phraseImportCatCustom = document.getElementById('phrase-import-cat-custom') as HTMLInputElement | null;
+    const phraseExcelInput = document.getElementById('phrase-excel-input') as HTMLInputElement | null;
+    const phraseImportText = document.getElementById('phrase-import-text') as HTMLTextAreaElement | null;
+    const phraseImportPreview = document.getElementById('phrase-import-preview');
+
+    // Phrases state: user custom phrases map
+    let userPhrasesMap: Record<string, any> = JSON.parse(localStorage.getItem('user_custom_phrases_map') || '{}');
+    let isPhraseEditModeActive = false;
 
     function showToast(msg: string) {
       if (!toast || !toastMessage) return;
@@ -690,15 +1039,24 @@ import { languagePhrasesData } from '../data/phrases';
       } catch {}
     }
 
-    // Toggle Audio Speed: 1.0x -> 0.75x -> 1.0x
+    // Toggle Audio Speed: 0.5x, 0.75x, 1.0x (default), 1.25x, 1.5x, 2.0x
+    const SPEED_LEVELS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
     toggleSpeedBtn?.addEventListener('click', () => {
-      if (currentAudioRate === 1.0) {
-        currentAudioRate = 0.75;
-      } else {
-        currentAudioRate = 1.0;
+      const currIdx = SPEED_LEVELS.indexOf(currentAudioRate);
+      const nextIdx = (currIdx + 1) % SPEED_LEVELS.length;
+      currentAudioRate = SPEED_LEVELS[nextIdx];
+      if (speedStatusLabel) {
+        speedStatusLabel.textContent = `${currentAudioRate}x`;
       }
-      if (speedStatusLabel) speedStatusLabel.textContent = `${currentAudioRate.toFixed(2)}x`;
-      showToast(`🐢 Kecepatan audio diatur ke ${currentAudioRate.toFixed(2)}x ${currentAudioRate < 1 ? '(Lambat)' : '(Normal)'}`);
+      const label = currentAudioRate === 1.0 
+        ? '(Normal / Default)' 
+        : currentAudioRate < 1.0 
+          ? '(Lambat)' 
+          : '(Cepat)';
+      showToast(`🐢 Kecepatan audio: ${currentAudioRate}x ${label}`);
+      if (currentUser) {
+        saveUserPreferencesToCloud(currentUser.id, { audioSpeed: currentAudioRate, isAudioEnabled: isAudioEnabled }).catch(() => {});
+      }
     });
 
     // Helper: get flat list of valid characters for current table
@@ -746,23 +1104,18 @@ import { languagePhrasesData } from '../data/phrases';
     function switchViewMode(mode: 'table' | 'flashcard' | 'phrases') {
       currentViewMode = mode;
       
-      btnModeTable?.classList.toggle('bg-ink', mode === 'table');
-      btnModeTable?.classList.toggle('text-canvas', mode === 'table');
-      btnModeTable?.classList.toggle('border-ink', mode === 'table');
-      btnModeTable?.classList.toggle('bg-canvas', mode !== 'table');
-      btnModeTable?.classList.toggle('text-steel', mode !== 'table');
+      const setBtnState = (btn: HTMLElement | null, isActive: boolean) => {
+        if (!btn) return;
+        if (isActive) {
+          btn.className = 'px-4 py-2 font-mono text-[13px] border-2 border-cta bg-cta/10 text-ink font-bold whitespace-nowrap transition-colors cursor-pointer shadow-xs';
+        } else {
+          btn.className = 'px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap transition-colors cursor-pointer';
+        }
+      };
 
-      btnModeFlashcard?.classList.toggle('bg-ink', mode === 'flashcard');
-      btnModeFlashcard?.classList.toggle('text-canvas', mode === 'flashcard');
-      btnModeFlashcard?.classList.toggle('border-ink', mode === 'flashcard');
-      btnModeFlashcard?.classList.toggle('bg-canvas', mode !== 'flashcard');
-      btnModeFlashcard?.classList.toggle('text-steel', mode !== 'flashcard');
-
-      btnModePhrases?.classList.toggle('bg-ink', mode === 'phrases');
-      btnModePhrases?.classList.toggle('text-canvas', mode === 'phrases');
-      btnModePhrases?.classList.toggle('border-ink', mode === 'phrases');
-      btnModePhrases?.classList.toggle('bg-canvas', mode !== 'phrases');
-      btnModePhrases?.classList.toggle('text-steel', mode !== 'phrases');
+      setBtnState(btnModeTable, mode === 'table');
+      setBtnState(btnModeFlashcard, mode === 'flashcard');
+      setBtnState(btnModePhrases, mode === 'phrases');
 
       viewerContainer?.classList.toggle('hidden', mode !== 'table');
       flashcardContainer?.classList.toggle('hidden', mode !== 'flashcard');
@@ -780,14 +1133,27 @@ import { languagePhrasesData } from '../data/phrases';
     btnModePhrases?.addEventListener('click', () => switchViewMode('phrases'));
 
     // ========================================================
-    // FLASHCARD & QUIZ LOGIC
+    // FLASHCARD LOGIC
     // ========================================================
+    function initFlashcard() {
+      const cells = getCurrentTableCells();
+      if (cells.length === 0) {
+        showToast('Tabel ini belum memiliki huruf untuk flashcard.');
+        return;
+      }
+      fcIndex = 0;
+      fcIsFlipped = false;
+      updateFlashcardCard();
+      if (fcMode === 'quiz') {
+        initQuizQuestion();
+      }
+    }
+
     btnFcTypeCard?.addEventListener('click', () => {
       fcMode = 'card';
-      btnFcTypeCard?.classList.add('bg-ink', 'text-canvas', 'border-ink');
-      btnFcTypeCard?.classList.remove('bg-canvas', 'text-steel');
-      btnFcTypeQuiz?.classList.remove('bg-ink', 'text-canvas', 'border-ink');
-      btnFcTypeQuiz?.classList.add('bg-canvas', 'text-steel');
+      if (btnFcTypeCard) btnFcTypeCard.className = 'px-3 py-1.5 border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer';
+      if (btnFcTypeQuiz) btnFcTypeQuiz.className = 'px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer';
+
       fcCardSubview?.classList.remove('hidden');
       fcQuizSubview?.classList.add('hidden');
       updateFlashcardCard();
@@ -795,44 +1161,36 @@ import { languagePhrasesData } from '../data/phrases';
 
     btnFcTypeQuiz?.addEventListener('click', () => {
       fcMode = 'quiz';
-      btnFcTypeQuiz?.classList.add('bg-ink', 'text-canvas', 'border-ink');
-      btnFcTypeQuiz?.classList.remove('bg-canvas', 'text-steel');
-      btnFcTypeCard?.classList.remove('bg-ink', 'text-canvas', 'border-ink');
-      btnFcTypeCard?.classList.add('bg-canvas', 'text-steel');
+      if (btnFcTypeQuiz) btnFcTypeQuiz.className = 'px-3 py-1.5 border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer';
+      if (btnFcTypeCard) btnFcTypeCard.className = 'px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer';
+
       fcQuizSubview?.classList.remove('hidden');
       fcCardSubview?.classList.add('hidden');
+      quizScore = 0;
+      if (quizScoreBadge) quizScoreBadge.textContent = 'Skor: 0';
       initQuizQuestion();
     });
-
-    function initFlashcard() {
-      const cells = getCurrentTableCells();
-      if (cells.length === 0) return;
-      if (fcIndex >= cells.length) fcIndex = 0;
-      fcIsFlipped = false;
-      updateFlashcardCard();
-    }
 
     function updateFlashcardCard() {
       const cells = getCurrentTableCells();
       if (cells.length === 0) return;
+      if (fcIndex >= cells.length) fcIndex = 0;
       const cell = cells[fcIndex];
-      const memorizedList = userProgressMap[currentTableId] || [];
-      const isMem = memorizedList.includes(cell.char);
 
-      if (fcCardCounter) fcCardCounter.textContent = `Kartu ${fcIndex + 1} dari ${cells.length}`;
-      if (fcCardStatus) {
-        fcCardStatus.textContent = isMem ? '✓ Sudah Dihafal' : 'Belum Dihafal';
-        fcCardStatus.className = isMem ? 'text-ok font-bold' : 'text-smoke font-mono';
-      }
-
-      if (fcCharDisplay) fcCharDisplay.textContent = cell.char;
-      if (fcRomajiDisplay) fcRomajiDisplay.textContent = cell.romaji || cell.char;
-      if (fcCharSubdisplay) fcCharSubdisplay.textContent = cell.char;
-
-      // Reset flip state
       fcIsFlipped = false;
       fcCardFront?.classList.remove('hidden');
       fcCardBack?.classList.add('hidden');
+
+      if (fcCharDisplay) fcCharDisplay.textContent = cell.char;
+      if (fcRomajiDisplay) fcRomajiDisplay.textContent = cell.romaji || '(Tanpa Romaji)';
+      if (fcCharSubdisplay) fcCharSubdisplay.textContent = cell.char;
+      if (fcCardCounter) fcCardCounter.textContent = `Kartu ${fcIndex + 1} dari ${cells.length}`;
+
+      const memorized = userProgressMap[currentTableId] || [];
+      const isMem = memorized.includes(cell.char);
+      if (fcCardStatus) {
+        fcCardStatus.textContent = isMem ? '✓ SUDAH HAFAL' : '';
+      }
     }
 
     fcFlashcard?.addEventListener('click', () => {
@@ -872,7 +1230,6 @@ import { languagePhrasesData } from '../data/phrases';
         renderCurrentTable();
         showToast(`✓ Huruf "${cell.char}" ditandai sudah hafal!`);
       }
-      // advance to next
       btnFcNext?.click();
     });
 
@@ -925,18 +1282,15 @@ import { languagePhrasesData } from '../data/phrases';
       if (btnQuizNextQuestion) btnQuizNextQuestion.classList.add('hidden');
       if (quizFeedback) quizFeedback.textContent = '';
 
-      // Pick random question
       const targetCell = cells[Math.floor(Math.random() * cells.length)];
       currentQuizAnswer = targetCell.romaji || targetCell.char;
 
       if (quizQuestionChar) quizQuestionChar.textContent = targetCell.char;
 
-      // Pick 3 distractors
       const distractors = cells
         .filter(c => (c.romaji || c.char) !== currentQuizAnswer)
         .map(c => c.romaji || c.char);
       
-      // Shuffle distractors
       const shuffledDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 3);
       const options = [currentQuizAnswer, ...shuffledDistractors].sort(() => 0.5 - Math.random());
 
@@ -970,8 +1324,10 @@ import { languagePhrasesData } from '../data/phrases';
         }
         quizScore += 10;
         if (quizScoreBadge) quizScoreBadge.textContent = `Skor: ${quizScore}`;
+        if (currentUser) {
+          saveUserQuizScoreToCloud(currentUser.id, currentTableId, quizScore).catch(() => {});
+        }
         
-        // Auto mark as memorized
         if (!userProgressMap[currentTableId]) userProgressMap[currentTableId] = [];
         if (!userProgressMap[currentTableId].includes(char)) {
           userProgressMap[currentTableId].push(char);
@@ -999,11 +1355,415 @@ import { languagePhrasesData } from '../data/phrases';
     btnQuizNextQuestion?.addEventListener('click', initQuizQuestion);
 
     // ========================================================
-    // PHRASES VIEW LOGIC
+    // PHRASES VIEW & CRUD LOGIC
+    // ========================================================
+
+    function getActivePhrasesData(langId: string) {
+      if (userPhrasesMap[langId]) {
+        return userPhrasesMap[langId];
+      }
+      return phrasesData[langId] || { categories: [] };
+    }
+
+    function ensureCustomPhrases(langId: string) {
+      if (!userPhrasesMap[langId]) {
+        const base = phrasesData[langId] || { categories: [] };
+        const allTables = getAllTables();
+        const curr = allTables.find(t => t.id === langId);
+        userPhrasesMap[langId] = {
+          voiceLang: base.voiceLang || curr?.voiceLang || 'en-US',
+          categories: JSON.parse(JSON.stringify(base.categories || []))
+        };
+      }
+      return userPhrasesMap[langId];
+    }
+
+    async function saveUserPhrases(langId: string) {
+      localStorage.setItem('user_custom_phrases_map', JSON.stringify(userPhrasesMap));
+      if (!currentUser) {
+        try { currentUser = await getCurrentUser(); } catch {}
+      }
+      if (currentUser) {
+        const cats = userPhrasesMap[langId]?.categories || [];
+        try {
+          await saveUserPhrasesToCloud(currentUser.id, langId, cats);
+        } catch (err) {
+          console.warn('Gagal sinkronisasi frasa ke Supabase:', err);
+        }
+      }
+      window.dispatchEvent(new CustomEvent('user-phrases-saved', { detail: { langId } }));
+    }
+
+    function updatePhraseEditModeUI() {
+      if (btnTogglePhraseEdit) {
+        if (isPhraseEditModeActive) {
+          btnTogglePhraseEdit.className = 'btn btn-s font-mono bg-badge text-canvas border-badge font-bold';
+        } else {
+          btnTogglePhraseEdit.className = 'btn btn-secondary btn-s font-mono text-[12px]';
+        }
+      }
+      if (phraseEditToolbar) {
+        phraseEditToolbar.classList.toggle('hidden', !isPhraseEditModeActive);
+      }
+    }
+
+    btnTogglePhraseEdit?.addEventListener('click', () => {
+      isPhraseEditModeActive = !isPhraseEditModeActive;
+      updatePhraseEditModeUI();
+      renderPhrases();
+      if (isPhraseEditModeActive) {
+        showToast('✏️ Mode Edit Frasa Aktif: Klik ✏️ untuk edit atau ✕ untuk hapus frasa.');
+      } else {
+        showToast('Mode Edit Frasa ditutup.');
+      }
+    });
+
+    btnFinishPhraseEdit?.addEventListener('click', () => {
+      isPhraseEditModeActive = false;
+      updatePhraseEditModeUI();
+      renderPhrases();
+      showToast('✓ Selesai mengedit frasa.');
+    });
+
+    btnResetPhrase?.addEventListener('click', () => {
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+      if (confirm(`Kembalikan frasa bahasa "${currentTable?.name || 'ini'}" ke daftar bawaan awal? Semua frasa kustom bahasa ini akan di-reset.`)) {
+        delete userPhrasesMap[currentTableId];
+        localStorage.setItem('user_custom_phrases_map', JSON.stringify(userPhrasesMap));
+        if (currentUser) {
+          deleteUserPhrasesFromCloud(currentUser.id, currentTableId).catch(() => {});
+        }
+        renderPhrases();
+        showToast('✓ Frasa berhasil dikembalikan ke bawaan awal.');
+      }
+    });
+
+    const DEFAULT_PHRASE_CATEGORIES = [
+      'Salam & Ungkapan Populer',
+      'Angka & Berhitung',
+      'Restoran & Kuliner',
+      'Arah & Transportasi',
+      'Belanja & Transaksi',
+      'Darurat & Kesehatan',
+      'Percakapan Santai',
+      'Waktu & Hari'
+    ];
+
+    let userCustomCategories: string[] = JSON.parse(localStorage.getItem('user_phrase_categories') || '[]');
+
+    function populateCategorySelect(selectEl: HTMLSelectElement | null, customInputEl: HTMLInputElement | null, selectedCatName: string = '') {
+      if (!selectEl) return;
+      const data = getActivePhrasesData(currentTableId);
+      const currentCats: string[] = (data.categories || []).map((c: any) => c.categoryName);
+
+      // Merge current language categories, default master categories, and user custom categories
+      const allCatNames: string[] = [];
+      const seen = new Set<string>();
+
+      [...currentCats, ...DEFAULT_PHRASE_CATEGORIES, ...userCustomCategories].forEach(name => {
+        const trimmed = (name || '').trim();
+        if (trimmed && !seen.has(trimmed.toLowerCase())) {
+          seen.add(trimmed.toLowerCase());
+          allCatNames.push(trimmed);
+        }
+      });
+
+      selectEl.innerHTML = '';
+      allCatNames.forEach(catName => {
+        const opt = document.createElement('option');
+        opt.value = catName;
+        opt.textContent = catName;
+        if (catName.toLowerCase() === (selectedCatName || '').toLowerCase()) {
+          opt.selected = true;
+        }
+        selectEl.appendChild(opt);
+      });
+
+      const newOpt = document.createElement('option');
+      newOpt.value = '__NEW__';
+      newOpt.textContent = '+ Buat Kategori Baru...';
+      selectEl.appendChild(newOpt);
+
+      if (customInputEl) {
+        customInputEl.classList.toggle('hidden', selectEl.value !== '__NEW__');
+        if (selectEl.value === '__NEW__') customInputEl.focus();
+        selectEl.onchange = () => {
+          customInputEl.classList.toggle('hidden', selectEl.value !== '__NEW__');
+          if (selectEl.value === '__NEW__') customInputEl.focus();
+        };
+      }
+    }
+
+    function saveCategoryToGlobalList(catName: string) {
+      if (!catName || !catName.trim()) return;
+      const trimmed = catName.trim();
+      const isDefault = DEFAULT_PHRASE_CATEGORIES.some(c => c.toLowerCase() === trimmed.toLowerCase());
+      const isExisting = userCustomCategories.some(c => c.toLowerCase() === trimmed.toLowerCase());
+      if (!isDefault && !isExisting) {
+        userCustomCategories.push(trimmed);
+        localStorage.setItem('user_phrase_categories', JSON.stringify(userCustomCategories));
+        if (currentUser) {
+          saveUserPhraseCategoryToCloud(currentUser.id, trimmed).catch(() => {});
+        }
+      }
+    }
+
+    function openPhraseModal(catIdx: number = -1, itemIdx: number = -1, defaultCatName: string = '') {
+      if (!phraseModal) return;
+      if (phraseEditCatIdx) phraseEditCatIdx.value = String(catIdx);
+      if (phraseEditItemIdx) phraseEditItemIdx.value = String(itemIdx);
+
+      const isEdit = catIdx >= 0 && itemIdx >= 0;
+      if (phraseModalTitle) {
+        phraseModalTitle.textContent = isEdit ? '✏️ Edit Frasa' : '➕ Tambah Frasa Baru';
+      }
+      if (phraseDeleteBtn) {
+        phraseDeleteBtn.classList.toggle('hidden', !isEdit);
+      }
+
+      const data = getActivePhrasesData(currentTableId);
+      let catName = defaultCatName;
+      if (isEdit && data.categories[catIdx]) {
+        catName = data.categories[catIdx].categoryName;
+        const item = data.categories[catIdx].items[itemIdx];
+        if (phraseNativeInput) phraseNativeInput.value = item?.native || '';
+        if (phraseTranslitInput) phraseTranslitInput.value = item?.transliteration || '';
+        if (phraseMeaningInput) phraseMeaningInput.value = item?.meaning || '';
+      } else {
+        if (phraseNativeInput) phraseNativeInput.value = '';
+        if (phraseTranslitInput) phraseTranslitInput.value = '';
+        if (phraseMeaningInput) phraseMeaningInput.value = '';
+      }
+
+      populateCategorySelect(phraseCatSelect, phraseCatCustomInput, catName);
+      if (phraseCatCustomInput) phraseCatCustomInput.value = '';
+
+      phraseModal.showModal();
+    }
+
+    function closePhraseModal() {
+      phraseModal?.close();
+    }
+
+    btnOpenPhraseModal?.addEventListener('click', () => openPhraseModal(-1, -1));
+    closePhraseModalBtn?.addEventListener('click', closePhraseModal);
+    phraseCancelBtn?.addEventListener('click', closePhraseModal);
+
+    phraseForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const catIdx = parseInt(phraseEditCatIdx?.value || '-1');
+      const itemIdx = parseInt(phraseEditItemIdx?.value || '-1');
+      
+      let targetCatName = phraseCatSelect?.value || 'Umum';
+      if (targetCatName === '__NEW__') {
+        targetCatName = phraseCatCustomInput?.value.trim() || 'Kategori Baru';
+      }
+      saveCategoryToGlobalList(targetCatName);
+
+      const native = phraseNativeInput?.value.trim() || '';
+      const transliteration = phraseTranslitInput?.value.trim() || '';
+      const meaning = phraseMeaningInput?.value.trim() || '';
+
+      if (!native || !meaning) return;
+
+      const phrasesDataObj = ensureCustomPhrases(currentTableId);
+      const isEdit = catIdx >= 0 && itemIdx >= 0;
+
+      if (isEdit) {
+        const oldCat = phrasesDataObj.categories[catIdx];
+        if (oldCat && oldCat.categoryName === targetCatName) {
+          oldCat.items[itemIdx] = { native, transliteration, meaning };
+        } else {
+          // Moved category or changed category
+          if (oldCat) {
+            oldCat.items.splice(itemIdx, 1);
+            if (oldCat.items.length === 0) {
+              phrasesDataObj.categories.splice(catIdx, 1);
+            }
+          }
+          let destCat = phrasesDataObj.categories.find((c: any) => c.categoryName.toLowerCase() === targetCatName.toLowerCase());
+          if (!destCat) {
+            destCat = { categoryName: targetCatName, items: [] };
+            phrasesDataObj.categories.push(destCat);
+          }
+          destCat.items.push({ native, transliteration, meaning });
+        }
+        showToast(`✓ Frasa "${native}" berhasil diperbarui!`);
+      } else {
+        // New item
+        let destCat = phrasesDataObj.categories.find((c: any) => c.categoryName.toLowerCase() === targetCatName.toLowerCase());
+        if (!destCat) {
+          destCat = { categoryName: targetCatName, items: [] };
+          phrasesDataObj.categories.push(destCat);
+        }
+        destCat.items.push({ native, transliteration, meaning });
+        showToast(`✓ Frasa "${native}" berhasil ditambahkan!`);
+      }
+
+      saveUserPhrases(currentTableId);
+      closePhraseModal();
+      renderPhrases();
+    });
+
+    phraseDeleteBtn?.addEventListener('click', () => {
+      const catIdx = parseInt(phraseEditCatIdx?.value || '-1');
+      const itemIdx = parseInt(phraseEditItemIdx?.value || '-1');
+      if (catIdx >= 0 && itemIdx >= 0) {
+        const phrasesDataObj = ensureCustomPhrases(currentTableId);
+        const cat = phrasesDataObj.categories[catIdx];
+        if (cat) {
+          const removed = cat.items.splice(itemIdx, 1)[0];
+          if (cat.items.length === 0) {
+            phrasesDataObj.categories.splice(catIdx, 1);
+          }
+          saveUserPhrases(currentTableId);
+          closePhraseModal();
+          renderPhrases();
+          showToast(`✓ Frasa "${removed?.native || ''}" berhasil dihapus!`);
+        }
+      }
+    });
+
+    // ========================================================
+    // PHRASE IMPORT MODAL (EXCEL / CSV / TEXT)
+    // ========================================================
+    function openPhraseImportModal() {
+      if (!phraseImportModal) return;
+      populateCategorySelect(phraseImportCatSelect, phraseImportCatCustom);
+      if (phraseImportCatCustom) phraseImportCatCustom.value = '';
+      if (phraseImportText) phraseImportText.value = '';
+      if (phraseImportPreview) phraseImportPreview.innerHTML = 'Masukkan teks atau unggah file untuk melihat pratinjau...';
+      phraseImportModal.showModal();
+    }
+
+    function closePhraseImportModal() {
+      phraseImportModal?.close();
+    }
+
+    btnOpenPhraseImport?.addEventListener('click', openPhraseImportModal);
+    closePhraseImportBtn?.addEventListener('click', closePhraseImportModal);
+    phraseImportCancelBtn?.addEventListener('click', closePhraseImportModal);
+
+    function parsePhraseImportText(text: string): Array<{ native: string, transliteration: string, meaning: string }> {
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const items: Array<{ native: string, transliteration: string, meaning: string }> = [];
+
+      for (const line of lines) {
+        let parts: string[] = [];
+        if (line.includes('=')) {
+          parts = line.split('=').map(p => p.trim());
+        } else if (line.includes('|')) {
+          parts = line.split('|').map(p => p.trim());
+        } else if (line.includes('\t')) {
+          parts = line.split('\t').map(p => p.trim());
+        } else if (line.includes(',')) {
+          parts = line.split(',').map(p => p.trim());
+        }
+
+        if (parts.length >= 3) {
+          items.push({ native: parts[0], transliteration: parts[1], meaning: parts[2] });
+        } else if (parts.length === 2) {
+          items.push({ native: parts[0], transliteration: '', meaning: parts[1] });
+        } else if (parts.length === 1 && parts[0]) {
+          items.push({ native: parts[0], transliteration: '', meaning: parts[0] });
+        }
+      }
+      return items;
+    }
+
+    function updatePhraseImportPreview() {
+      if (!phraseImportPreview || !phraseImportText) return;
+      const items = parsePhraseImportText(phraseImportText.value);
+      if (items.length === 0) {
+        phraseImportPreview.innerHTML = 'Masukkan teks atau unggah file untuk melihat pratinjau...';
+        return;
+      }
+      let html = `<div class="font-bold text-ink mb-1">✓ Terdeteksi ${items.length} frasa siap diimpor:</div><ul class="space-y-1 list-disc list-inside">`;
+      items.slice(0, 5).forEach(it => {
+        html += `<li><b class="text-ink">${it.native}</b> ${it.transliteration ? '(' + it.transliteration + ')' : ''} → <span class="italic text-steel">${it.meaning}</span></li>`;
+      });
+      if (items.length > 5) {
+        html += `<li class="text-smoke italic">+ ${items.length - 5} frasa lainnya...</li>`;
+      }
+      html += '</ul>';
+      phraseImportPreview.innerHTML = html;
+    }
+
+    phraseImportText?.addEventListener('input', updatePhraseImportPreview);
+
+    if (phraseExcelInput) {
+      phraseExcelInput.addEventListener('change', (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        showToast(`Membaca file "${file.name}"...`);
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const data = new Uint8Array(evt.target?.result as ArrayBuffer);
+            const workbook = (window as any).XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonRows: any[][] = (window as any).XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            const lines: string[] = [];
+            for (const row of jsonRows) {
+              if (!row || row.length === 0) continue;
+              if (row.length >= 3) {
+                lines.push(`${row[0]} = ${row[1]} = ${row[2]}`);
+              } else if (row.length === 2) {
+                lines.push(`${row[0]} = ${row[1]}`);
+              }
+            }
+
+            if (phraseImportText) {
+              phraseImportText.value = lines.join('\n');
+              updatePhraseImportPreview();
+              showToast(`✓ Berhasil memuat ${lines.length} baris frasa dari spreadsheet!`);
+            }
+          } catch {
+            showToast('Gagal memproses file spreadsheet frasa.');
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    phraseImportForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let targetCatName = phraseImportCatSelect?.value || 'Umum';
+      if (targetCatName === '__NEW__') {
+        targetCatName = phraseImportCatCustom?.value.trim() || 'Kategori Baru';
+      }
+      saveCategoryToGlobalList(targetCatName);
+
+      const items = parsePhraseImportText(phraseImportText?.value || '');
+      if (items.length === 0) {
+        showToast('Tidak ada data frasa yang valid untuk diimpor.');
+        return;
+      }
+
+      const phrasesDataObj = ensureCustomPhrases(currentTableId);
+      let destCat = phrasesDataObj.categories.find((c: any) => c.categoryName.toLowerCase() === targetCatName.toLowerCase());
+      if (!destCat) {
+        destCat = { categoryName: targetCatName, items: [] };
+        phrasesDataObj.categories.push(destCat);
+      }
+
+      destCat.items.push(...items);
+      saveUserPhrases(currentTableId);
+      closePhraseImportModal();
+      renderPhrases();
+      showToast(`✓ Berhasil mengimpor ${items.length} frasa ke kategori "${targetCatName}"!`);
+    });
+
+    // ========================================================
+    // RENDER PHRASES
     // ========================================================
     function renderPhrases() {
       if (!phrasesContentWrapper) return;
-      const data = phrasesData[currentTableId];
+      const data = getActivePhrasesData(currentTableId);
       const allTables = getAllTables();
       const currentTable = allTables.find(t => t.id === currentTableId);
 
@@ -1013,41 +1773,104 @@ import { languagePhrasesData } from '../data/phrases';
 
       if (!data || !data.categories || data.categories.length === 0) {
         phrasesContentWrapper.innerHTML = `
-          <div class="py-10 text-center border border-dashed border-rule text-smoke font-mono text-xs">
-            Frasa dasar untuk bahasa "${currentTable?.name || ''}" sedang dipersiapkan.
+          <div class="py-12 px-4 text-center border-2 border-dashed border-rule bg-canvas text-smoke font-mono space-y-3">
+            <div class="text-3xl">💬</div>
+            <div class="text-sm font-bold text-ink">Belum Ada Frasa untuk Bahasa "${currentTable?.name || ''}"</div>
+            <p class="text-xs text-steel max-w-md mx-auto font-sans">
+              Mulai koleksi frasa penting Anda sendiri sekarang. Anda bisa menambahkan satu per satu atau langsung impor dari file Excel/CSV!
+            </p>
+            <div class="flex items-center justify-center gap-2 pt-2">
+              <button type="button" id="btn-empty-add-phrase" class="btn btn-primary btn-s font-mono text-xs">
+                + Tambah Frasa Pertama
+              </button>
+              <button type="button" id="btn-empty-import-phrase" class="btn btn-secondary btn-s font-mono text-xs">
+                📁 Impor dari Excel
+              </button>
+            </div>
           </div>
         `;
+        document.getElementById('btn-empty-add-phrase')?.addEventListener('click', () => openPhraseModal(-1, -1));
+        document.getElementById('btn-empty-import-phrase')?.addEventListener('click', openPhraseImportModal);
         return;
       }
 
       let html = '';
-      data.categories.forEach((cat: any) => {
+      data.categories.forEach((cat: any, catIdx: number) => {
         html += `
-          <div class="p-4 sm:p-5 border border-rule bg-canvas space-y-3">
-            <h3 class="text-[15px] font-bold text-ink border-b border-rule pb-2 flex items-center justify-between">
-              <span>${cat.categoryName}</span>
-              <span class="text-[11px] font-mono text-smoke font-normal">${cat.items.length} frasa</span>
-            </h3>
+          <div class="p-4 sm:p-5 border border-rule bg-canvas space-y-3 shadow-xs">
+            <div class="border-b border-rule pb-2.5 flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <h3 class="text-[15px] font-bold text-ink">${cat.categoryName}</h3>
+                <span class="text-[11px] font-mono text-smoke font-normal bg-tint px-2 py-0.5 border border-rule">${cat.items.length} frasa</span>
+              </div>
+              <div class="flex items-center gap-1.5 font-mono text-xs">
+                ${isPhraseEditModeActive ? `
+                  <button 
+                    type="button" 
+                    class="btn-cat-add px-2 py-1 border border-rule hover:border-ink hover:bg-canvas text-ink text-[11px] font-bold cursor-pointer"
+                    data-cat-idx="${catIdx}"
+                    data-cat-name="${cat.categoryName}"
+                    title="Tambah frasa baru ke kategori ini"
+                  >
+                    + Tambah
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn-cat-delete px-2 py-1 border border-red-500/40 text-red-500 hover:bg-red-500 hover:text-white text-[11px] cursor-pointer"
+                    data-cat-idx="${catIdx}"
+                    data-cat-name="${cat.categoryName}"
+                    title="Hapus seluruh kategori ini"
+                  >
+                    ✕ Hapus Kategori
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
         `;
 
-        cat.items.forEach((item: any) => {
+        cat.items.forEach((item: any, itemIdx: number) => {
           html += `
-            <div class="p-3 border border-rule bg-smoke/5 hover:border-ink transition-colors flex items-center justify-between gap-3 font-mono">
+            <div class="p-3 border border-rule bg-smoke/5 hover:border-ink transition-colors flex items-center justify-between gap-3 font-mono relative ${isPhraseEditModeActive ? 'ring-1 ring-badge/40' : ''}">
               <div class="min-w-0 flex-1">
                 <div class="text-[16px] font-bold text-ink tracking-wide truncate">${item.native}</div>
-                <div class="text-[12px] text-steel font-medium mt-0.5">${item.transliteration}</div>
+                <div class="text-[12px] text-steel font-medium mt-0.5">${item.transliteration || ''}</div>
                 <div class="text-[11px] text-smoke italic font-sans mt-0.5">${item.meaning}</div>
               </div>
-              <button 
-                type="button" 
-                class="btn-speak-phrase px-2.5 py-1.5 border border-rule hover:border-ink hover:bg-canvas text-ink text-xs shrink-0 select-none cursor-pointer"
-                data-native="${item.native}"
-                data-lang="${data.voiceLang || currentTable?.voiceLang || 'en-US'}"
-                title="Dengarkan pengucapan audio"
-              >
-                🔊
-              </button>
+
+              <div class="flex items-center gap-1 shrink-0">
+                ${isPhraseEditModeActive ? `
+                  <button 
+                    type="button" 
+                    class="btn-edit-phrase px-2 py-1.5 border border-rule hover:border-ink bg-canvas text-ink text-xs cursor-pointer shadow-xs"
+                    data-cat="${catIdx}"
+                    data-item="${itemIdx}"
+                    title="Edit frasa ini"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn-delete-phrase px-2 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs cursor-pointer shadow-xs font-bold"
+                    data-cat="${catIdx}"
+                    data-item="${itemIdx}"
+                    data-native="${item.native}"
+                    title="Hapus frasa ini"
+                  >
+                    ✕
+                  </button>
+                ` : ''}
+                <button 
+                  type="button" 
+                  class="btn-speak-phrase px-2.5 py-1.5 border border-rule hover:border-ink hover:bg-canvas text-ink text-xs select-none cursor-pointer"
+                  data-native="${item.native}"
+                  data-lang="${data.voiceLang || currentTable?.voiceLang || 'en-US'}"
+                  title="Dengarkan pengucapan audio"
+                >
+                  🔊
+                </button>
+              </div>
             </div>
           `;
         });
@@ -1060,17 +1883,70 @@ import { languagePhrasesData } from '../data/phrases';
 
       phrasesContentWrapper.innerHTML = html;
 
-      // Event listener for speak buttons
+      // Audio buttons
       phrasesContentWrapper.querySelectorAll('.btn-speak-phrase').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
           const text = btn.getAttribute('data-native') || '';
           const lang = btn.getAttribute('data-lang') || '';
           speakText(text, lang);
         });
       });
+
+      // Edit Mode buttons
+      if (isPhraseEditModeActive) {
+        phrasesContentWrapper.querySelectorAll('.btn-edit-phrase').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const catIdx = parseInt(btn.getAttribute('data-cat') || '-1');
+            const itemIdx = parseInt(btn.getAttribute('data-item') || '-1');
+            openPhraseModal(catIdx, itemIdx);
+          });
+        });
+
+        phrasesContentWrapper.querySelectorAll('.btn-delete-phrase').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const catIdx = parseInt(btn.getAttribute('data-cat') || '-1');
+            const itemIdx = parseInt(btn.getAttribute('data-item') || '-1');
+            const native = btn.getAttribute('data-native') || '';
+            if (catIdx >= 0 && itemIdx >= 0) {
+              const phrasesDataObj = ensureCustomPhrases(currentTableId);
+              const cat = phrasesDataObj.categories[catIdx];
+              if (cat) {
+                cat.items.splice(itemIdx, 1);
+                if (cat.items.length === 0) {
+                  phrasesDataObj.categories.splice(catIdx, 1);
+                }
+                saveUserPhrases(currentTableId);
+                renderPhrases();
+                showToast(`✓ Frasa "${native}" berhasil dihapus!`);
+              }
+            }
+          });
+        });
+
+        phrasesContentWrapper.querySelectorAll('.btn-cat-add').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const catName = btn.getAttribute('data-cat-name') || '';
+            openPhraseModal(-1, -1, catName);
+          });
+        });
+
+        phrasesContentWrapper.querySelectorAll('.btn-cat-delete').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const catIdx = parseInt(btn.getAttribute('data-cat-idx') || '-1');
+            const catName = btn.getAttribute('data-cat-name') || '';
+            if (confirm(`Yakin ingin menghapus seluruh kategori "${catName}" beserta semua frasa di dalamnya?`)) {
+              const phrasesDataObj = ensureCustomPhrases(currentTableId);
+              phrasesDataObj.categories.splice(catIdx, 1);
+              saveUserPhrases(currentTableId);
+              renderPhrases();
+              showToast(`✓ Kategori "${catName}" berhasil dihapus!`);
+            }
+          });
+        });
+      }
     }
 
-    // Parse Text to Grid
     function parseTextToGrid(text: string) {
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
       const grid: any[] = [];
@@ -1191,6 +2067,238 @@ import { languagePhrasesData } from '../data/phrases';
 
     formText?.addEventListener('input', renderCreatorPreview);
 
+    // ========================================================
+    // EDIT & DEDUPLICATION HELPERS
+    // ========================================================
+
+    // Ensure the active table is cloned to custom so edits/deletions persist
+    function ensureCustomTableForEditing(): any {
+      const existingCustom = customTables.find(c => c.id === currentTableId);
+      if (existingCustom) return existingCustom;
+
+      const allTables = getAllTables();
+      const curr = allTables.find(t => t.id === currentTableId) || defaultTables[0];
+      const newId = 'custom-' + Date.now();
+      const cloned = {
+        id: newId,
+        name: `${curr.name} (Kustom)`,
+        flag: curr.flag || '✨',
+        category: 'custom',
+        badge: 'Tabel Kustom',
+        title: `${curr.title} (Kustom)`,
+        description: curr.description || 'Tabel kustom hasil suntingan Anda.',
+        voiceLang: curr.voiceLang || 'en-US',
+        grid: JSON.parse(JSON.stringify(curr.grid))
+      };
+      customTables.push(cloned);
+      saveCustomTablesToStorage();
+      if (currentUser) {
+        saveCustomTableToCloud(currentUser.id, cloned).catch(() => {});
+      }
+      currentTableId = newId;
+      renderTabs();
+      showToast('Tabel disalin ke Tabel Kustom agar perubahan & penghapusan tersimpan!');
+      return cloned;
+    }
+
+    function updateEditModeUI() {
+      if (toggleEditModeBtn) {
+        if (isEditModeActive) {
+          toggleEditModeBtn.className = 'btn btn-s font-mono bg-badge text-canvas border-badge font-bold';
+        } else {
+          toggleEditModeBtn.className = 'btn btn-secondary btn-s font-mono text-[12px]';
+        }
+      }
+      if (tableEditToolbar) {
+        tableEditToolbar.classList.toggle('hidden', !isEditModeActive);
+      }
+    }
+
+    toggleEditModeBtn?.addEventListener('click', () => {
+      isEditModeActive = !isEditModeActive;
+      updateEditModeUI();
+      renderCurrentTable();
+      if (isEditModeActive) {
+        showToast('✏️ Mode Edit Aktif: Hapus huruf dobel dengan tombol ✕ merah, atau klik ✏️ untuk edit.');
+      } else {
+        showToast('Mode Edit ditutup.');
+      }
+    });
+
+    btnFinishEditMode?.addEventListener('click', () => {
+      isEditModeActive = false;
+      updateEditModeUI();
+      renderCurrentTable();
+      showToast('✓ Selesai mengedit tabel.');
+    });
+
+    // Auto Deduplication: cleans all characters appearing > 1 time
+    btnAutoDedup?.addEventListener('click', () => {
+      const allTables = getAllTables();
+      const curr = allTables.find(t => t.id === currentTableId);
+      if (!curr) return;
+
+      const charCounts: Record<string, number> = {};
+      curr.grid.forEach((row: any[]) => {
+        row.forEach((cell: any) => {
+          if (cell && cell.char) {
+            charCounts[cell.char] = (charCounts[cell.char] || 0) + 1;
+          }
+        });
+      });
+
+      const duplicateChars = Object.keys(charCounts).filter(ch => charCounts[ch] > 1);
+      if (duplicateChars.length === 0) {
+        showToast('Tidak ada karakter dobel di tabel ini.');
+        return;
+      }
+
+      if (confirm(`Ditemukan ${duplicateChars.length} aksara kembar/dobel (${duplicateChars.slice(0, 5).join(', ')}...). Hapus semua kemunculan duplikatnya secara otomatis?`)) {
+        const table = ensureCustomTableForEditing();
+        const seen = new Set<string>();
+        let removedCount = 0;
+
+        table.grid.forEach((row: any[], rIdx: number) => {
+          row.forEach((cell: any, cIdx: number) => {
+            if (cell && cell.char) {
+              if (seen.has(cell.char)) {
+                table.grid[rIdx][cIdx] = null;
+                removedCount++;
+              } else {
+                seen.add(cell.char);
+              }
+            }
+          });
+        });
+
+        table.grid = table.grid.filter((row: any[]) => row.some((c: any) => c !== null));
+
+        saveCustomTablesToStorage();
+        if (currentUser) {
+          saveCustomTableToCloud(currentUser.id, table).catch(() => {});
+        }
+        renderCurrentTable();
+        updateProgressUI();
+        showToast(`🧹 Berhasil menghapus ${removedCount} karakter dobel!`);
+      }
+    });
+
+    // Duplicate Table Action
+    duplicateTableBtn?.addEventListener('click', () => {
+      const allTables = getAllTables();
+      const curr = allTables.find(t => t.id === currentTableId);
+      if (!curr) return;
+      const newId = 'custom-' + Date.now();
+      const cloned = {
+        id: newId,
+        name: `${curr.name} (Salinan)`,
+        flag: curr.flag || '✨',
+        category: 'custom',
+        badge: 'Tabel Kustom',
+        title: `${curr.title} (Salinan)`,
+        description: curr.description || '',
+        voiceLang: curr.voiceLang || 'en-US',
+        grid: JSON.parse(JSON.stringify(curr.grid))
+      };
+      customTables.push(cloned);
+      saveCustomTablesToStorage();
+      if (currentUser) {
+        saveCustomTableToCloud(currentUser.id, cloned).catch(() => {});
+      }
+      currentTableId = newId;
+      isEditModeActive = true;
+      updateEditModeUI();
+      renderTabs();
+      renderCurrentTable();
+      updateProgressUI();
+      showToast(`✓ Tabel "${curr.name}" diduplikasi! Mode Edit kini aktif.`);
+    });
+
+    // Single Character Modal logic
+    function openCharModal(row: number, col: number, char: string = '', romaji: string = '') {
+      if (!charEditModal) return;
+      if (charEditRow) charEditRow.value = String(row);
+      if (charEditCol) charEditCol.value = String(col);
+      if (charEditCharInput) charEditCharInput.value = char;
+      if (charEditRomajiInput) charEditRomajiInput.value = romaji;
+      if (charModalTitle) {
+        charModalTitle.textContent = row === -1 ? '+ Tambah Huruf Baru' : `✏️ Edit Huruf: ${char}`;
+      }
+      if (charEditDeleteBtn) {
+        charEditDeleteBtn.style.display = row === -1 ? 'none' : 'block';
+      }
+      charEditModal.showModal();
+    }
+
+    function closeCharModal() {
+      charEditModal?.close();
+    }
+
+    closeCharModalBtn?.addEventListener('click', closeCharModal);
+    charEditCancelBtn?.addEventListener('click', closeCharModal);
+
+    charEditForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const rIdx = parseInt(charEditRow?.value || '-1');
+      const cIdx = parseInt(charEditCol?.value || '-1');
+      const newChar = charEditCharInput?.value.trim() || '';
+      const newRomaji = charEditRomajiInput?.value.trim() || '';
+
+      if (!newChar) return;
+      const table = ensureCustomTableForEditing();
+      if (!table || !table.grid) return;
+
+      if (rIdx === -1 && cIdx === -1) {
+        if (table.grid.length === 0) {
+          table.grid.push([{ char: newChar, romaji: newRomaji }]);
+        } else {
+          const lastRow = table.grid[table.grid.length - 1];
+          if (lastRow.length < 5) {
+            lastRow.push({ char: newChar, romaji: newRomaji });
+          } else {
+            table.grid.push([{ char: newChar, romaji: newRomaji }]);
+          }
+        }
+        showToast(`✓ Huruf "${newChar}" berhasil ditambahkan!`);
+      } else {
+        if (table.grid[rIdx] && table.grid[rIdx][cIdx] !== undefined) {
+          table.grid[rIdx][cIdx] = { char: newChar, romaji: newRomaji };
+          showToast(`✓ Karakter "${newChar}" berhasil diperbarui!`);
+        }
+      }
+
+      saveCustomTablesToStorage();
+      if (currentUser) {
+        saveCustomTableToCloud(currentUser.id, table).catch(() => {});
+      }
+      closeCharModal();
+      renderCurrentTable();
+      updateProgressUI();
+    });
+
+    charEditDeleteBtn?.addEventListener('click', () => {
+      const rIdx = parseInt(charEditRow?.value || '-1');
+      const cIdx = parseInt(charEditCol?.value || '-1');
+      if (rIdx >= 0 && cIdx >= 0) {
+        const table = ensureCustomTableForEditing();
+        const ch = table.grid?.[rIdx]?.[cIdx]?.char || '';
+        table.grid[rIdx][cIdx] = null;
+        table.grid = table.grid.filter((r: any[]) => r.some((c: any) => c !== null));
+        saveCustomTablesToStorage();
+        if (currentUser) {
+          saveCustomTableToCloud(currentUser.id, table).catch(() => {});
+        }
+        closeCharModal();
+        renderCurrentTable();
+        updateProgressUI();
+        showToast(`✓ Huruf "${ch}" berhasil dihapus!`);
+      }
+    });
+
+    btnAddCharTable?.addEventListener('click', () => {
+      openCharModal(-1, -1, '', '');
+    });
+
     // Render Language Tabs
     function renderTabs() {
       if (!tabBar) return;
@@ -1226,10 +2334,10 @@ import { languagePhrasesData } from '../data/phrases';
         const isActive = !isUnaddedState && t.id === currentTableId;
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `p-2 sm:px-3 sm:py-2 text-[12px] sm:text-[13px] font-mono border transition-all flex items-center justify-start gap-1.5 select-none w-full min-w-0 ${
+        btn.className = `p-2 sm:px-3 sm:py-2 text-[12px] sm:text-[13px] font-mono border transition-all flex items-center justify-start gap-1.5 select-none w-full min-w-0 cursor-pointer ${
           isActive 
-            ? 'bg-ink text-canvas border-ink font-bold shadow-sm' 
-            : 'bg-canvas text-steel border-rule hover:text-ink hover:border-ink hover:bg-tint/40'
+            ? 'border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs' 
+            : 'border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40'
         }`;
         
         const flagSpan = t.flag ? `<span class="text-base leading-none shrink-0">${t.flag}</span>` : '';
@@ -1264,9 +2372,9 @@ import { languagePhrasesData } from '../data/phrases';
           currentTableId = defaultTables[0]?.id || '';
         }
         categoryChips.forEach(c => {
-          c.className = 'px-3 py-1 border border-rule text-steel hover:text-ink hover:border-ink whitespace-nowrap';
+          c.className = 'px-3 py-1 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap cursor-pointer';
         });
-        chip.className = 'px-3 py-1 border border-ink bg-ink text-canvas font-bold whitespace-nowrap';
+        chip.className = 'px-3 py-1 border-2 border-cta bg-cta/10 text-ink font-bold whitespace-nowrap shadow-xs cursor-pointer';
         renderTabs();
         renderCurrentTable();
       });
@@ -1275,7 +2383,9 @@ import { languagePhrasesData } from '../data/phrases';
     // Render Table Grid
     function renderCurrentTable() {
       if (isUnaddedState) {
-        if (customActions) customActions.classList.add('hidden');
+        if (duplicateTableBtn) duplicateTableBtn.classList.add('hidden');
+        if (editCustomTableBtn) editCustomTableBtn.classList.add('hidden');
+        if (deleteTableBtn) deleteTableBtn.classList.add('hidden');
         if (tableBadge) {
           tableBadge.textContent = `${unaddedInfo.flag} ${unaddedInfo.country} · BELUM TERSEDIA`;
           tableBadge.className = 'px-2.5 py-1 text-[11px] font-mono border border-badge text-badge bg-badge/10 uppercase tracking-wider font-bold';
@@ -1321,7 +2431,7 @@ import { languagePhrasesData } from '../data/phrases';
           `;
 
           document.getElementById('btn-trigger-create-unadded')?.addEventListener('click', () => {
-            openCreator();
+            openCreator(false);
             const formName = document.getElementById('form-name') as HTMLInputElement | null;
             const formTitle = document.getElementById('form-title') as HTMLInputElement | null;
             const formVoice = document.getElementById('form-voice') as HTMLSelectElement | null;
@@ -1342,10 +2452,9 @@ import { languagePhrasesData } from '../data/phrases';
       }
 
       const isCustom = customTables.some(c => c.id === currentTable.id);
-      if (customActions) {
-        customActions.classList.toggle('hidden', !isCustom);
-        customActions.classList.toggle('flex', isCustom);
-      }
+      if (duplicateTableBtn) duplicateTableBtn.classList.remove('hidden');
+      if (editCustomTableBtn) editCustomTableBtn.classList.toggle('hidden', !isCustom);
+      if (deleteTableBtn) deleteTableBtn.classList.toggle('hidden', !isCustom);
 
       if (tableTitle) tableTitle.textContent = currentTable.title;
       if (tableBadge) tableBadge.textContent = `${currentTable.flag ? currentTable.flag + ' ' : ''}${currentTable.badge || currentTable.name}`;
@@ -1353,16 +2462,26 @@ import { languagePhrasesData } from '../data/phrases';
 
       const memorizedList = userProgressMap[currentTable.id] || [];
 
+      // Count duplicate characters
+      const charCounts: Record<string, number> = {};
+      currentTable.grid.forEach((row: any[]) => {
+        row.forEach((cell: any) => {
+          if (cell && cell.char) {
+            charCounts[cell.char] = (charCounts[cell.char] || 0) + 1;
+          }
+        });
+      });
+
       let html = '<table class="w-full border-collapse border border-ink text-center bg-canvas select-text font-mono">';
       html += '<tbody>';
 
       const filter = tableSearchQuery.trim().toLowerCase();
 
-      currentTable.grid.forEach((row: any[]) => {
+      currentTable.grid.forEach((row: any[], rIdx: number) => {
         html += '<tr>';
-        row.forEach((cell: any) => {
+        row.forEach((cell: any, cIdx: number) => {
           if (!cell) {
-            html += '<td class="border border-ink p-3 sm:p-4 bg-tint/40 min-w-[70px] sm:min-w-[90px] h-16 sm:h-20"></td>';
+            html += '<td class="border border-ink p-3 sm:p-4 bg-tint/40 min-w-[75px] sm:min-w-[90px] h-16 sm:h-20"></td>';
             return;
           }
 
@@ -1370,23 +2489,33 @@ import { languagePhrasesData } from '../data/phrases';
             cell.romaji.toLowerCase().includes(filter) || 
             cell.char.toLowerCase().includes(filter);
 
+          const isDuplicate = charCounts[cell.char] > 1;
           const highlightClass = filter && matches ? 'bg-badge/20 font-bold ring-2 ring-badge' : '';
           const dimClass = filter && !matches ? 'opacity-25' : '';
           const isMemorized = memorizedList.includes(cell.char);
+          const duplicateBorder = (isEditModeActive && isDuplicate) ? 'ring-2 ring-red-500 bg-red-500/10' : '';
 
           html += `<td 
-            class="border border-ink p-2 sm:p-4 hover:bg-tint cursor-pointer transition-colors min-w-[70px] sm:min-w-[100px] h-16 sm:h-20 relative select-none ${highlightClass} ${dimClass} ${isMemorized ? 'bg-ok/5 ring-1 ring-ok/40' : ''}"
+            class="border border-ink p-2 sm:p-4 hover:bg-tint cursor-pointer transition-colors min-w-[75px] sm:min-w-[100px] h-16 sm:h-20 relative select-none ${highlightClass} ${dimClass} ${duplicateBorder} ${isMemorized ? 'bg-ok/5 ring-1 ring-ok/40' : ''}"
             data-char="${cell.char}"
-            data-romaji="${cell.romaji}"
+            data-romaji="${cell.romaji || ''}"
             data-lang="${currentTable.voiceLang || ''}"
-            title="Klik untuk dengar suara atau salin '${cell.char}'"
+            data-row="${rIdx}"
+            data-col="${cIdx}"
+            title="${isEditModeActive ? 'Klik tombol ✕ untuk hapus atau ✏️ untuk edit' : 'Klik untuk dengar suara atau salin'}"
           >`;
-          
-          if (isMemorized) {
+
+          if (isEditModeActive) {
+            if (isDuplicate) {
+              html += `<span class="absolute top-1 left-7 text-[8px] font-bold text-red-500 bg-red-500/10 px-1 border border-red-500/40 select-none leading-tight" title="Huruf kembar/dobel di tabel">DOBEL</span>`;
+            }
+            html += `<button type="button" class="btn-cell-edit absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] bg-canvas border border-rule hover:border-ink text-ink font-bold z-10 cursor-pointer shadow-sm" data-row="${rIdx}" data-col="${cIdx}" title="Edit karakter ini">✏️</button>`;
+            html += `<button type="button" class="btn-cell-delete absolute top-1 right-1 w-5 h-5 flex items-center justify-center text-[11px] bg-canvas border border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-bold z-10 cursor-pointer shadow-sm" data-row="${rIdx}" data-col="${cIdx}" data-char="${cell.char}" title="Hapus karakter ini">✕</button>`;
+          } else if (isMemorized) {
             html += `<span class="absolute top-1 right-1 text-[10px] font-bold text-ok select-none" title="Sudah Hafal">✓</span>`;
           }
 
-          html += `<div class="flex items-center justify-center gap-1.5 sm:gap-2 text-[15px] sm:text-[18px]">`;
+          html += `<div class="flex items-center justify-center gap-1.5 sm:gap-2 text-[15px] sm:text-[18px] ${isEditModeActive ? 'pt-2' : ''}">`;
           if (cell.romaji) {
             html += `<span class="text-steel font-normal">${cell.romaji}</span>`;
             html += `<span class="text-smoke select-none">=</span>`;
@@ -1401,9 +2530,53 @@ import { languagePhrasesData } from '../data/phrases';
       html += '</tbody></table>';
       if (gridWrapper) gridWrapper.innerHTML = html;
 
+      // Cell Edit & Delete button listeners
+      if (isEditModeActive) {
+        gridWrapper?.querySelectorAll('.btn-cell-delete').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const rIdx = parseInt(btn.getAttribute('data-row') || '-1');
+            const cIdx = parseInt(btn.getAttribute('data-col') || '-1');
+            const ch = btn.getAttribute('data-char') || '';
+            if (rIdx >= 0 && cIdx >= 0) {
+              const table = ensureCustomTableForEditing();
+              if (table && table.grid && table.grid[rIdx]) {
+                table.grid[rIdx][cIdx] = null;
+                table.grid = table.grid.filter((r: any[]) => r.some((c: any) => c !== null));
+                saveCustomTablesToStorage();
+                if (currentUser) {
+                  saveCustomTableToCloud(currentUser.id, table).catch(() => {});
+                }
+                renderCurrentTable();
+                updateProgressUI();
+                showToast(`✓ Huruf "${ch}" berhasil dihapus dari tabel!`);
+              }
+            }
+          });
+        });
+
+        gridWrapper?.querySelectorAll('.btn-cell-edit').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const rIdx = parseInt(btn.getAttribute('data-row') || '-1');
+            const cIdx = parseInt(btn.getAttribute('data-col') || '-1');
+            const allTables = getAllTables();
+            const curr = allTables.find(t => t.id === currentTableId);
+            const cell = curr?.grid?.[rIdx]?.[cIdx];
+            if (cell) {
+              openCharModal(rIdx, cIdx, cell.char, cell.romaji || '');
+            }
+          });
+        });
+      }
+
+      // Normal click to hear audio or copy
       const cells = gridWrapper?.querySelectorAll('td[data-char]') || [];
       cells.forEach(td => {
-        td.addEventListener('click', () => {
+        td.addEventListener('click', (e) => {
+          if (isEditModeActive && ((e.target as HTMLElement).closest('.btn-cell-delete') || (e.target as HTMLElement).closest('.btn-cell-edit'))) {
+            return;
+          }
           const char = td.getAttribute('data-char') || '';
           const lang = td.getAttribute('data-lang') || '';
           const romaji = td.getAttribute('data-romaji') || '';
@@ -1422,6 +2595,9 @@ import { languagePhrasesData } from '../data/phrases';
         audioStatusLabel.className = isAudioEnabled ? 'text-ok font-bold' : 'text-smoke font-bold';
       }
       showToast(isAudioEnabled ? '🔊 Suara pelafalan diaktifkan' : '🔇 Suara pelafalan dinonaktifkan');
+      if (currentUser) {
+        saveUserPreferencesToCloud(currentUser.id, { audioSpeed: currentAudioRate, isAudioEnabled: isAudioEnabled }).catch(() => {});
+      }
     });
 
     // Copy All Table Text
@@ -1454,7 +2630,12 @@ import { languagePhrasesData } from '../data/phrases';
     });
 
     // Creator Modal triggers
-    function openCreator() {
+    function openCreator(isEdit = false) {
+      if (!isEdit) {
+        editingTableId = null;
+        if (creatorModalTitle) creatorModalTitle.textContent = 'Buat Tabel / Materi Bahasa Baru';
+        if (creatorSubmitBtn) creatorSubmitBtn.textContent = 'Simpan & Tampilkan Tabel';
+      }
       creatorModal?.classList.remove('hidden');
       document.getElementById('buat-tabel')?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -1462,10 +2643,40 @@ import { languagePhrasesData } from '../data/phrases';
       creatorModal?.classList.add('hidden');
     }
 
-    openCreatorBtn?.addEventListener('click', openCreator);
-    openCreatorTopBtn?.addEventListener('click', openCreator);
+    openCreatorBtn?.addEventListener('click', () => openCreator(false));
+    openCreatorTopBtn?.addEventListener('click', () => openCreator(false));
     closeCreatorBtn?.addEventListener('click', closeCreator);
     cancelCreatorBtn?.addEventListener('click', closeCreator);
+
+    // Edit full custom table button
+    editCustomTableBtn?.addEventListener('click', () => {
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+      if (!currentTable) return;
+
+      editingTableId = currentTable.id;
+      if (creatorModalTitle) creatorModalTitle.textContent = `Edit Tabel: ${currentTable.name}`;
+      if (creatorSubmitBtn) creatorSubmitBtn.textContent = 'Simpan Perubahan Tabel';
+
+      const formName = document.getElementById('form-name') as HTMLInputElement | null;
+      const formTitle = document.getElementById('form-title') as HTMLInputElement | null;
+      const formDesc = document.getElementById('form-desc') as HTMLInputElement | null;
+      const formVoice = document.getElementById('form-voice') as HTMLSelectElement | null;
+
+      if (formName) formName.value = currentTable.name;
+      if (formTitle) formTitle.value = currentTable.title;
+      if (formDesc) formDesc.value = currentTable.description || '';
+      if (formVoice && currentTable.voiceLang) formVoice.value = currentTable.voiceLang;
+
+      if (formText) {
+        formText.value = currentTable.grid.map((row: any[]) => {
+          return row.map(c => c ? (c.romaji ? `${c.romaji} = ${c.char}` : c.char) : '-').join(' | ');
+        }).join('\n');
+      }
+
+      renderCreatorPreview();
+      openCreator(true);
+    });
 
     if (createTarget) {
       const formName = document.getElementById('form-name') as HTMLInputElement | null;
@@ -1498,6 +2709,33 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       if (grid.length === 0) {
         showToast('Format teks tidak menghasilkan data tabel!');
         return;
+      }
+
+      if (editingTableId) {
+        const existingIdx = customTables.findIndex(c => c.id === editingTableId);
+        if (existingIdx !== -1) {
+          customTables[existingIdx].name = name;
+          customTables[existingIdx].title = title;
+          customTables[existingIdx].description = desc || 'Tabel aksara kustom buatan Anda.';
+          customTables[existingIdx].voiceLang = voice;
+          customTables[existingIdx].grid = grid;
+          
+          saveCustomTablesToStorage();
+          if (currentUser) {
+            try {
+              await saveCustomTableToCloud(currentUser.id, customTables[existingIdx]);
+            } catch {}
+          }
+          currentTableId = editingTableId;
+          editingTableId = null;
+          closeCreator();
+          renderTabs();
+          renderCurrentTable();
+          updateProgressUI();
+          showToast(`✓ Tabel "${name}" berhasil diperbarui!`);
+          document.getElementById('area-belajar')?.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
       }
 
       const newId = 'custom-' + Date.now();
@@ -1595,6 +2833,18 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
             localStorage.setItem('user_study_progress_map', JSON.stringify(userProgressMap));
             updateProgressUI();
             renderCurrentTable();
+          }
+
+          // 3. Fetch user custom phrases from Supabase
+          const cloudPhrases = await fetchUserPhrasesFromCloud(currentUser.id);
+          if (cloudPhrases && Object.keys(cloudPhrases).length > 0) {
+            Object.keys(cloudPhrases).forEach(langId => {
+              userPhrasesMap[langId] = {
+                categories: cloudPhrases[langId]
+              };
+            });
+            localStorage.setItem('user_custom_phrases_map', JSON.stringify(userPhrasesMap));
+            if (currentViewMode === 'phrases') renderPhrases();
           }
         }
       } catch (err) {

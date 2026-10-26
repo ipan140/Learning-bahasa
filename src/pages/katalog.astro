@@ -6,7 +6,7 @@ import { worldCountries } from '../data/countries';
 
 <Base 
   title="Katalog 250 Negara di Dunia - Belajar Bahasa" 
-  description="Database lengkap 250 negara di dunia dengan informasi bahasa, aksara, ibukota, dan fitur target belajar mandiri yang tersinkron ke cloud."
+  description="Katalog lengkap 250 negara di dunia dengan informasi bahasa, aksara, ibukota, dan fitur target belajar mandiri yang tersinkron ke cloud."
 >
   <Section top={false} inner="px-6 pt-12 pb-18 lg:pt-16 lg:pb-24 max-md:px-5">
     
@@ -14,7 +14,7 @@ import { worldCountries } from '../data/countries';
     <div class="w-full">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-rule">
         <div>
-          <p class="label"><b>[02]</b> database 250 negara &amp; target belajar</p>
+          <p class="label"><b>[02]</b> katalog 250 negara &amp; target belajar</p>
           <h1 class="mt-3 text-[clamp(28px,3.8vw,46px)] leading-[1.08] font-bold tracking-[-0.035em] text-ink">
             Katalog 250 Negara di Dunia
           </h1>
@@ -60,10 +60,10 @@ import { worldCountries } from '../data/countries';
           
           <!-- Region Filter Pills -->
           <div class="flex flex-wrap items-center gap-1.5 text-[13px]" id="country-region-filters">
-            <button type="button" data-filter="all" class="px-3.5 py-1.5 font-mono border border-ink bg-ink text-canvas font-bold">
+            <button type="button" data-filter="all" class="px-3.5 py-1.5 font-mono border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer">
               Semua (<span id="total-country-count">250</span>)
             </button>
-            <button type="button" data-filter="targets" class="px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">
+            <button type="button" data-filter="targets" class="px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer">
               ⭐ Target Saya (<span id="filter-target-count">0</span>)
             </button>
             <button type="button" data-filter="Asia" class="px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">Asia</button>
@@ -537,9 +537,9 @@ import { worldCountries } from '../data/countries';
         countryDisplayLimit = 36;
 
         filterButtons.forEach(b => {
-          b.className = 'px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink';
+          b.className = 'px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer';
         });
-        btn.className = 'px-3.5 py-1.5 font-mono border border-ink bg-ink text-canvas font-bold';
+        btn.className = 'px-3.5 py-1.5 font-mono border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer';
 
         renderCountries();
       });

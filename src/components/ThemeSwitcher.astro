@@ -4,7 +4,7 @@
 
 <div class="theme-switch inline-flex border border-rule text-[12px]" role="group" aria-label="Color theme">
   {['light', 'dark'].map((t) => (
-    <button type="button" data-set-theme={t} class="flex items-center gap-1.5 px-2.5 py-1 text-smoke">
+    <button type="button" data-set-theme={t} class="flex items-center gap-1.5 px-2.5 py-1 text-smoke cursor-pointer">
       <span class:list={['size-[7px] border border-current', t === 'dark' && 'bg-current']} aria-hidden="true"></span>{t}
     </button>
   ))}
@@ -16,11 +16,19 @@
 </style>
 
 <script>
+  import { getCurrentUser, saveUserPreferencesToCloud } from '../lib/supabase';
+
   document.querySelectorAll<HTMLButtonElement>('[data-set-theme]').forEach((b) =>
-    b.addEventListener('click', () => {
+    b.addEventListener('click', async () => {
       const t = b.dataset.setTheme!;
       document.documentElement.dataset.theme = t;
       try { localStorage.setItem('theme', t); } catch {}
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          await saveUserPreferencesToCloud(user.id, { theme: t });
+        }
+      } catch {}
     }),
   );
 </script>

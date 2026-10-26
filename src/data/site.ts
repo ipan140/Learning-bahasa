@@ -29,7 +29,7 @@ export const site = {
       ] 
     },
     { 
-      title: 'Database 250 Negara', 
+      title: 'Katalog 250 Negara', 
       links: [
         ['Semua 250 Negara Terintegrasi', '/katalog'], 
         ['Kawasan Asia & Oseania', '/katalog?region=Asia'], 
@@ -42,7 +42,7 @@ export const site = {
       title: 'Fitur Sistem', 
       links: [
         ['Studio Belajar Aksara', '/belajar'], 
-        ['Database 250 Negara Lengkap', '/katalog'], 
+        ['Katalog 250 Negara Lengkap', '/katalog'], 
         ['Integrasi Cloud Otomatis', '/#panduan']
       ] 
     },

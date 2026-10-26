@@ -108,3 +108,100 @@ create policy "User can update own progress"
 create policy "User can delete own progress" 
   on public.user_study_progress for delete 
   using (auth.uid() = user_id);
+
+
+-- 4. TABEL FRASA KUSTOM & IMPORT (SURVIVAL PHRASES DENGAN KATEGORI, AUDIO, & TERJEMAHAN)
+create table if not exists public.user_custom_phrases (
+  id text primary key,                                   -- contoh: 'phrases-hiragana' atau uuid
+  user_id uuid references auth.users(id) on delete cascade not null,
+  language_id text not null,                             -- contoh: 'hiragana', 'arab-hijaiyah', atau id tabel kustom
+  categories jsonb not null default '[]'::jsonb,         -- kumpulan kategori frasa [{ categoryName: 'Salam', items: [{ native, transliteration, meaning }] }]
+  updated_at timestamptz default now() not null,
+  constraint unique_user_lang_phrases unique (user_id, language_id)
+);
+
+-- Aktifkan RLS
+alter table public.user_custom_phrases enable row level security;
+
+-- Pengguna hanya bisa membaca frasa miliknya sendiri
+create policy "User can view own custom phrases" 
+  on public.user_custom_phrases for select 
+  using (auth.uid() = user_id);
+
+-- Pengguna hanya bisa menambah frasa miliknya sendiri
+create policy "User can insert own custom phrases" 
+  on public.user_custom_phrases for insert 
+  with check (auth.uid() = user_id);
+
+-- Pengguna hanya bisa mengubah frasa miliknya sendiri
+create policy "User can update own custom phrases" 
+  on public.user_custom_phrases for update 
+  using (auth.uid() = user_id);
+
+-- Pengguna hanya bisa menghapus frasa miliknya sendiri
+create policy "User can delete own custom phrases" 
+  on public.user_custom_phrases for delete 
+  using (auth.uid() = user_id);
+
+
+-- 5. TABEL KATEGORI FRASA GLOBAL PENGGUNA (DAPAT DIPAKAI DI SEMUA BAHASA)
+create table if not exists public.user_phrase_categories (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  name text not null,
+  icon text default '💬',
+  created_at timestamptz default now() not null,
+  constraint unique_user_phrase_category unique (user_id, name)
+);
+
+-- Aktifkan RLS
+alter table public.user_phrase_categories enable row level security;
+
+-- Pengguna hanya bisa membaca kategori miliknya sendiri
+create policy "User can view own phrase categories" 
+  on public.user_phrase_categories for select 
+  using (auth.uid() = user_id);
+
+-- Pengguna hanya bisa menambah kategori miliknya sendiri
+create policy "User can insert own phrase categories" 
+  on public.user_phrase_categories for insert 
+  with check (auth.uid() = user_id);
+
+-- Pengguna hanya bisa mengubah kategori miliknya sendiri
+create policy "User can update own phrase categories" 
+  on public.user_phrase_categories for update 
+  using (auth.uid() = user_id);
+
+-- Pengguna hanya bisa menghapus kategori miliknya sendiri
+create policy "User can delete own phrase categories" 
+  on public.user_phrase_categories for delete 
+  using (auth.uid() = user_id);
+
+
+-- 6. TABEL PREFERENSI & PENGATURAN BELAJAR PENGGUNA (TEMA, KECEPATAN SUARA, AUDIO)
+create table if not exists public.user_preferences (
+  user_id uuid references auth.users(id) on delete cascade primary key,
+  theme text default 'dark',
+  audio_speed numeric default 1.0,
+  audio_enabled boolean default true,
+  updated_at timestamptz default now() not null
+);
+
+-- Aktifkan RLS
+alter table public.user_preferences enable row level security;
+
+-- Pengguna hanya bisa membaca dan mengubah preferensinya sendiri
+create policy "User can manage own preferences" 
+  on public.user_preferences for all 
+  using (auth.uid() = user_id) 
+  with check (auth.uid() = user_id);
+
+
+-- ==============================================================================
+-- 7. INDEX PERFORMA (OPTIMASI KECEPATAN LOAD DATA DI LAPTOP & HP)
+-- ==============================================================================
+create index if not exists idx_user_targets_user_id on public.user_targets(user_id);
+create index if not exists idx_user_custom_tables_user_id on public.user_custom_tables(user_id);
+create index if not exists idx_user_study_progress_user_id on public.user_study_progress(user_id);
+create index if not exists idx_user_custom_phrases_user_id on public.user_custom_phrases(user_id);
+create index if not exists idx_user_phrase_categories_user_id on public.user_phrase_categories(user_id);

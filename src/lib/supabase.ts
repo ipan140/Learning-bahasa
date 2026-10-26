@@ -226,9 +226,9 @@ export async function saveCustomTableToCloud(userId: string, table: any): Promis
         id: table.id,
         user_id: userId,
         name: table.name,
-        script: table.script || '',
+        script: table.voiceLang || table.script || '',
         description: table.description || '',
-        rows: table.rows || [],
+        rows: table.grid || table.rows || [],
       }, { onConflict: 'id' });
     if (error) {
       console.error('Gagal saveCustomTableToCloud:', error);
@@ -367,4 +367,237 @@ export async function saveTargetNoteToCloud(userId: string, countryId: string, n
     console.error('Error saveTargetNoteToCloud:', err);
     return false;
   }
+}
+
+
+// ================= USER PHRASES SYNC HELPERS =================
+
+/** Ambil seluruh kumpulan frasa kustom pengguna dari Supabase */
+export async function fetchUserPhrasesFromCloud(userId: string): Promise<Record<string, any>> {
+  const sb = getSupabase();
+  if (!sb) return {};
+  try {
+    const { data, error } = await sb
+      .from('user_custom_phrases')
+      .select('language_id, categories')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.warn('Gagal fetch user_custom_phrases:', error);
+      return {};
+    }
+    const map: Record<string, any> = {};
+    (data || []).forEach((row: any) => {
+      map[row.language_id] = row.categories || [];
+    });
+    return map;
+  } catch (err) {
+    console.error('Error fetchUserPhrasesFromCloud:', err);
+    return {};
+  }
+}
+
+/** Simpan kumpulan frasa untuk satu bahasa ke Supabase */
+export async function saveUserPhrasesToCloud(userId: string, languageId: string, categories: any[]): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { error } = await sb
+      .from('user_custom_phrases')
+      .upsert({
+        id: `phrases-${userId}-${languageId}`,
+        user_id: userId,
+        language_id: languageId,
+        categories: categories,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id, language_id' });
+
+    if (error) {
+      console.error('Gagal saveUserPhrasesToCloud:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error saveUserPhrasesToCloud:', err);
+    return false;
+  }
+}
+
+/** Hapus frasa kustom untuk satu bahasa di Supabase */
+export async function deleteUserPhrasesFromCloud(userId: string, languageId: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { error } = await sb
+      .from('user_custom_phrases')
+      .delete()
+      .eq('user_id', userId)
+      .eq('language_id', languageId);
+
+    if (error) {
+      console.error('Gagal deleteUserPhrasesFromCloud:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error deleteUserPhrasesFromCloud:', err);
+    return false;
+  }
+}
+
+
+// ================= PHRASE CATEGORIES & PREFERENCES HELPERS =================
+
+/** Ambil daftar kategori frasa kustom buatan pengguna dari Supabase */
+export async function fetchUserPhraseCategoriesFromCloud(userId: string): Promise<string[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  try {
+    const { data, error } = await sb
+      .from('user_phrase_categories')
+      .select('name')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.warn('Gagal fetch user_phrase_categories:', error);
+      return [];
+    }
+    return (data || []).map((row: any) => row.name);
+  } catch (err) {
+    console.error('Error fetchUserPhraseCategoriesFromCloud:', err);
+    return [];
+  }
+}
+
+/** Simpan satu nama kategori frasa baru ke Supabase */
+export async function saveUserPhraseCategoryToCloud(userId: string, categoryName: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb || !categoryName.trim()) return false;
+  try {
+    const { error } = await sb
+      .from('user_phrase_categories')
+      .upsert({
+        user_id: userId,
+        name: categoryName.trim(),
+      }, { onConflict: 'user_id, name' });
+
+    if (error) {
+      console.error('Gagal saveUserPhraseCategoryToCloud:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error saveUserPhraseCategoryToCloud:', err);
+    return false;
+  }
+}
+
+/** Hapus kategori frasa kustom dari Supabase */
+export async function deleteUserPhraseCategoryFromCloud(userId: string, categoryName: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { error } = await sb
+      .from('user_phrase_categories')
+      .delete()
+      .eq('user_id', userId)
+      .eq('name', categoryName.trim());
+
+    if (error) {
+      console.error('Gagal deleteUserPhraseCategoryFromCloud:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error deleteUserPhraseCategoryFromCloud:', err);
+    return false;
+  }
+}
+
+/** Simpan skor kuis ke Supabase */
+export async function saveUserQuizScoreToCloud(userId: string, tableId: string, score: number): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { error } = await sb
+      .from('user_study_progress')
+      .upsert({
+        user_id: userId,
+        table_id: tableId,
+        score: score,
+        last_practiced_at: new Date().toISOString()
+      }, { onConflict: 'user_id, table_id' });
+
+    if (error) {
+      console.error('Gagal saveUserQuizScoreToCloud:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error saveUserQuizScoreToCloud:', err);
+    return false;
+  }
+}
+
+
+// ================= USER PREFERENCES (SETTINGS) HELPERS =================
+
+/** Simpan preferensi pengguna (kecepatan audio, status audio, tema) ke Supabase */
+export async function saveUserPreferencesToCloud(userId: string, prefs: { audioSpeed?: number; isAudioEnabled?: boolean; theme?: string }): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    // 1. Simpan ke user_metadata Supabase Auth (selalu tersedia & instan)
+    await sb.auth.updateUser({
+      data: {
+        preferences: prefs
+      }
+    });
+
+    // 2. Simpan juga ke tabel user_preferences jika tabel tersebut sudah dijalankan di SQL
+    try {
+      await sb
+        .from('user_preferences')
+        .upsert({
+          user_id: userId,
+          audio_speed: prefs.audioSpeed,
+          audio_enabled: prefs.isAudioEnabled,
+          theme: prefs.theme,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+    } catch {}
+
+    return true;
+  } catch (err) {
+    console.warn('Gagal saveUserPreferencesToCloud:', err);
+    return false;
+  }
+}
+
+/** Ambil preferensi pengguna dari Supabase */
+export async function fetchUserPreferencesFromCloud(user: any): Promise<{ audioSpeed?: number; isAudioEnabled?: boolean; theme?: string } | null> {
+  if (!user) return null;
+  // Cek metadata dulu
+  if (user.user_metadata?.preferences) {
+    return user.user_metadata.preferences;
+  }
+  const sb = getSupabase();
+  if (!sb) return null;
+  try {
+    const { data } = await sb
+      .from('user_preferences')
+      .select('audio_speed, audio_enabled, theme')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (data) {
+      return {
+        audioSpeed: Number(data.audio_speed),
+        isAudioEnabled: Boolean(data.audio_enabled),
+        theme: data.theme
+      };
+    }
+  } catch {}
+  return null;
 }

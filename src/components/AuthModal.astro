@@ -97,14 +97,26 @@
       <!-- Ringkasan Materi Tersimpan di Cloud -->
       <div class="p-4 border border-rule flex flex-col gap-3">
         <span class="text-[11px] font-mono text-smoke uppercase tracking-wider">Integrasi Data Tersimpan</span>
-        <div class="grid grid-cols-2 gap-3 text-center">
-          <div class="p-3 bg-smoke/5 border border-rule">
-            <div class="text-[22px] font-bold font-mono text-ink" id="sync-target-count">0</div>
-            <div class="text-[12px] text-steel mt-0.5">Target Negara</div>
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-mono text-smoke uppercase tracking-wider">Statistik Belajar Anda</span>
+          <span id="sync-streak-badge" class="px-2 py-0.5 text-[10px] font-mono font-bold bg-badge/15 text-badge border border-badge/30">🔥 Aktif Belajar</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+          <div class="p-2.5 bg-smoke/5 border border-rule">
+            <div class="text-[20px] font-bold font-mono text-ink" id="sync-target-count">0</div>
+            <div class="text-[11px] text-steel mt-0.5">Target Negara</div>
           </div>
-          <div class="p-3 bg-smoke/5 border border-rule">
-            <div class="text-[22px] font-bold font-mono text-ink" id="sync-table-count">0</div>
-            <div class="text-[12px] text-steel mt-0.5">Tabel Aksara</div>
+          <div class="p-2.5 bg-smoke/5 border border-rule">
+            <div class="text-[20px] font-bold font-mono text-ink" id="sync-table-count">0</div>
+            <div class="text-[11px] text-steel mt-0.5">Tabel Kustom</div>
+          </div>
+          <div class="p-2.5 bg-smoke/5 border border-rule">
+            <div class="text-[20px] font-bold font-mono text-ok" id="sync-memorized-count">0</div>
+            <div class="text-[11px] text-steel mt-0.5">Huruf Hafal</div>
+          </div>
+          <div class="p-2.5 bg-smoke/5 border border-rule">
+            <div class="text-[20px] font-bold font-mono text-ink" id="sync-phrase-count">0</div>
+            <div class="text-[11px] text-steel mt-0.5">Koleksi Frasa</div>
           </div>
         </div>
 
@@ -213,8 +225,11 @@
     batchSyncTargetsToCloud,
     fetchUserCustomTablesFromCloud,
     fetchUserProgressFromCloud,
+    saveUserProgressToCloud,
     saveCustomTableToCloud,
-    deleteCustomTableFromCloud
+    deleteCustomTableFromCloud,
+    fetchUserPhrasesFromCloud,
+    saveUserPhrasesToCloud
   } from '../lib/supabase';
 
   let currentAuthMode: 'login' | 'register' = 'login';
@@ -247,6 +262,9 @@
 
   const syncTargetCount = document.getElementById('sync-target-count');
   const syncTableCount = document.getElementById('sync-table-count');
+  const syncMemorizedCount = document.getElementById('sync-memorized-count');
+  const syncPhraseCount = document.getElementById('sync-phrase-count');
+  const syncStreakBadge = document.getElementById('sync-streak-badge');
   const syncCharCount = document.getElementById('sync-char-count');
 
   function showAlert(msg: string, type: 'error' | 'success' | 'info' = 'info') {
@@ -431,12 +449,41 @@
     try {
       const cloudTargets = await fetchUserTargetsFromCloud(userId);
       const cloudTables = await fetchUserCustomTablesFromCloud(userId);
+      const cloudProgress = await fetchUserProgressFromCloud(userId);
+      const cloudPhrases = await fetchUserPhrasesFromCloud(userId);
 
       if (syncTargetCount) syncTargetCount.textContent = String(cloudTargets.length);
       if (syncTableCount) syncTableCount.textContent = String(cloudTables.length);
 
+      // Hitung total huruf hafal (dari cloud atau localStorage)
+      let totalMemorized = 0;
+      const progressSource = (cloudProgress && Object.keys(cloudProgress).length > 0) 
+        ? cloudProgress 
+        : JSON.parse(localStorage.getItem('user_study_progress_map') || '{}');
+      Object.values(progressSource).forEach((chars: any) => {
+        if (Array.isArray(chars)) totalMemorized += chars.length;
+      });
+      if (syncMemorizedCount) syncMemorizedCount.textContent = String(totalMemorized);
+
+      // Hitung total koleksi frasa (dari cloud atau localStorage)
+      let totalPhrases = 0;
+      const phrasesSource = (cloudPhrases && Object.keys(cloudPhrases).length > 0)
+        ? cloudPhrases
+        : JSON.parse(localStorage.getItem('user_custom_phrases_map') || '{}');
+      Object.values(phrasesSource).forEach((langObj: any) => {
+        const cats = Array.isArray(langObj) ? langObj : (langObj?.categories || []);
+        cats.forEach((c: any) => {
+          if (Array.isArray(c?.items)) totalPhrases += c.items.length;
+        });
+      });
+      if (syncPhraseCount) syncPhraseCount.textContent = String(totalPhrases);
+
+      if (syncStreakBadge) {
+        syncStreakBadge.textContent = totalMemorized > 0 ? '🔥 Aktif Belajar' : '🌱 Baru Mulai';
+      }
+
       window.dispatchEvent(new CustomEvent('supabase-data-loaded', {
-        detail: { targets: cloudTargets, tables: cloudTables }
+        detail: { targets: cloudTargets, tables: cloudTables, progress: cloudProgress, phrases: cloudPhrases }
       }));
     } catch (err) {
       console.error('Update sync stats failed:', err);
@@ -461,7 +508,22 @@
         await saveCustomTableToCloud(activeUser.id, t);
       }
 
-      showAlert('✓ Seluruh data berhasil terintegrasi!', 'success');
+      // 3. Sinkronkan progres hafalan huruf
+      const localProgress: Record<string, string[]> = JSON.parse(localStorage.getItem('user_study_progress_map') || '{}');
+      for (const tableId of Object.keys(localProgress)) {
+        await saveUserProgressToCloud(activeUser.id, tableId, localProgress[tableId]);
+      }
+
+      // 4. Sinkronkan koleksi frasa kustom
+      const localPhrases: Record<string, any> = JSON.parse(localStorage.getItem('user_custom_phrases_map') || '{}');
+      for (const langId of Object.keys(localPhrases)) {
+        const cats = localPhrases[langId]?.categories || [];
+        if (cats.length > 0) {
+          await saveUserPhrasesToCloud(activeUser.id, langId, cats);
+        }
+      }
+
+      showAlert('✓ Seluruh data & materi berhasil terintegrasi!', 'success');
       await updateSyncStats(activeUser.id);
     } catch (err: any) {
       showAlert('Gagal sinkronisasi: ' + (err.message || 'Terjadi kesalahan'), 'error');
