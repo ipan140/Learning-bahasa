@@ -1,0 +1,17 @@
+{
+  "name": "Belajar Bahasa - Aksara & Database 250 Negara",
+  "short_name": "BelajarBahasa",
+  "description": "Aplikasi belajar aksara bahasa fonetik dan database 250 negara dengan audio pengucapan asli dan sinkronisasi cloud.",
+  "start_url": "/belajar",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0e0e0e",
+  "theme_color": "#4C2365",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

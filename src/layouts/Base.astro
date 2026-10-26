@@ -20,6 +20,8 @@ const jsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#4C2365" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
     <meta property="og:type" content={type} />
@@ -42,5 +44,13 @@ const jsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name
       <slot />
     </main>
     {footer && <Footer />}
+
+    <script is:inline>
+      if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

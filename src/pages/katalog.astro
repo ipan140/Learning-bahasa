@@ -24,6 +24,9 @@ import { worldCountries } from '../data/countries';
         </div>
 
         <div class="flex items-center gap-2 flex-wrap shrink-0">
+          <button type="button" id="btn-open-trivia" class="btn btn-primary btn-s text-[12px] font-mono">
+            🎮 Kuis 250 Negara
+          </button>
           <button type="button" id="btn-cloud-sync-trigger" class="btn btn-secondary btn-s text-[12px]" title="Masuk untuk sinkronisasi materi ke smartphone & laptop lain">
             ☁️ Sinkron Akun
           </button>
@@ -103,6 +106,86 @@ import { worldCountries } from '../data/countries';
 
     </div>
   </Section>
+
+  <!-- ============================================== -->
+  <!-- MODAL KUIS TRIVIA 250 NEGARA                   -->
+  <!-- ============================================== -->
+  <dialog id="trivia-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[480px] shadow-2xl">
+    <div class="p-6 max-sm:p-5 flex flex-col gap-4">
+      <div class="flex items-start justify-between pb-3 border-b border-rule">
+        <div>
+          <h2 class="text-[18px] font-bold tracking-tight text-ink">🎮 Kuis Trivia 250 Negara</h2>
+          <p class="text-[12px] text-steel mt-0.5">Uji pengetahuan Anda tentang bahasa resmi &amp; ibukota negara di dunia.</p>
+        </div>
+        <button type="button" id="close-trivia-btn" class="text-xs font-mono px-2 py-1 border border-rule hover:bg-smoke/10 text-smoke hover:text-ink shrink-0 ml-3">
+          [x]
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between text-xs font-mono text-smoke">
+        <span id="trivia-streak-label">🔥 Streak: 0</span>
+        <span id="trivia-score-label" class="font-bold text-ink">Skor: 0</span>
+      </div>
+
+      <div class="p-6 border-2 border-ink bg-canvas flex flex-col items-center justify-center text-center shadow-sm">
+        <div id="trivia-flag-display" class="text-[54px] leading-none mb-2">🇯🇵</div>
+        <div id="trivia-country-name" class="text-[20px] font-bold text-ink mb-1">Jepang</div>
+        <p id="trivia-question-text" class="text-xs text-steel font-mono">Apa bahasa resmi dari negara ini?</p>
+      </div>
+
+      <div id="trivia-feedback" class="h-6 text-xs font-mono font-bold text-center"></div>
+
+      <div id="trivia-options-grid" class="grid grid-cols-2 gap-2.5">
+        <!-- Rendered by client script -->
+      </div>
+
+      <div class="pt-3 border-t border-rule flex justify-end">
+        <button type="button" id="btn-next-trivia" class="btn btn-primary btn-s w-full justify-center hidden font-mono text-xs">
+          Soal Selanjutnya →
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+
+  <!-- ============================================== -->
+  <!-- MODAL CATATAN TARGET PRIBADI                   -->
+  <!-- ============================================== -->
+  <dialog id="target-note-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[440px] shadow-2xl">
+    <div class="p-6 max-sm:p-5 flex flex-col gap-4">
+      <div class="flex items-start justify-between pb-3 border-b border-rule">
+        <div>
+          <h2 class="text-[17px] font-bold tracking-tight text-ink" id="note-modal-title">✏️ Catatan Target Belajar</h2>
+          <p class="text-[12px] text-steel mt-0.5" id="note-modal-subtitle">Tulis target, rencana, atau motivasi belajar Anda.</p>
+        </div>
+        <button type="button" id="close-note-modal-btn" class="text-xs font-mono px-2 py-1 border border-rule hover:bg-smoke/10 text-smoke hover:text-ink shrink-0 ml-3">
+          [x]
+        </button>
+      </div>
+
+      <div>
+        <label for="input-target-note" class="block text-[11px] font-mono text-smoke uppercase tracking-wider mb-1.5">
+          Catatan Pribadi (Tersinkron ke Cloud)
+        </label>
+        <textarea 
+          id="input-target-note" 
+          rows="4" 
+          placeholder="Misal: Target hafalan 50 kosakata sebelum akhir tahun, persiapan liburan, dll..." 
+          class="w-full px-3.5 py-2.5 text-[13px] bg-canvas border border-rule focus:border-ink focus:outline-none text-ink font-mono"
+        ></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-rule">
+        <button type="button" id="btn-cancel-note" class="btn btn-secondary btn-s font-mono text-xs">
+          Batal
+        </button>
+        <button type="button" id="btn-save-note" class="btn btn-primary btn-s font-mono text-xs">
+          Simpan Catatan
+        </button>
+      </div>
+    </div>
+  </dialog>
+
 </Base>
 
 <script>
@@ -110,7 +193,9 @@ import { worldCountries } from '../data/countries';
     getCurrentUser,
     fetchUserTargetsFromCloud,
     addTargetToCloud,
-    removeTargetFromCloud
+    removeTargetFromCloud,
+    saveTargetNoteToCloud,
+    fetchUserTargetsWithNotesFromCloud
   } from '../lib/supabase';
 
   const container = document.getElementById('countries-app');
@@ -118,10 +203,27 @@ import { worldCountries } from '../data/countries';
     const rawCountries = container.getAttribute('data-countries');
     const allCountries: any[] = rawCountries ? JSON.parse(rawCountries) : [];
 
-    // Local Storage target countries
-    let targetCountryIds: string[] = JSON.parse(localStorage.getItem('target_countries') || '["JP", "KR", "DE"]');
-    
-    // Baca parameter URL jika dibuka dari footer/link eksternal (misal: ?region=Asia atau ?filter=targets)
+    // Local Storage target countries (Default kosong [], dinamis)
+    let rawTargetIds: any[] = JSON.parse(localStorage.getItem('target_countries') || '[]');
+    let targetCountryIds: string[] = rawTargetIds
+      .map(id => {
+        const found = allCountries.find(c => c.id.toLowerCase() === String(id).toLowerCase() || c.code.toUpperCase() === String(id).toUpperCase());
+        return found ? found.id : null;
+      })
+      .filter(Boolean) as string[];
+    targetCountryIds = Array.from(new Set(targetCountryIds));
+
+    let userNotesMap: Record<string, string> = JSON.parse(localStorage.getItem('user_target_notes') || '{}');
+    let activeEditingCountryId = '';
+
+    const noteModal = document.getElementById('target-note-modal') as HTMLDialogElement | null;
+    const noteModalTitle = document.getElementById('note-modal-title');
+    const inputTargetNote = document.getElementById('input-target-note') as HTMLTextAreaElement | null;
+    const btnSaveNote = document.getElementById('btn-save-note');
+    const btnCancelNote = document.getElementById('btn-cancel-note');
+    const closeNoteModalBtn = document.getElementById('close-note-modal-btn');
+
+    // Baca parameter URL
     const urlParams = new URLSearchParams(window.location.search);
     const initialRegion = urlParams.get('region');
     const initialFilter = urlParams.get('filter');
@@ -155,8 +257,17 @@ import { worldCountries } from '../data/countries';
       toast.classList.remove('hidden');
       setTimeout(() => toast.classList.add('hidden'), 4000);
     }
-
     toastClose?.addEventListener('click', () => toast?.classList.add('hidden'));
+
+    function isCountryTargeted(c: any): boolean {
+      if (!c) return false;
+      const cid = (c.id || '').toLowerCase();
+      const ccode = (c.code || '').toUpperCase();
+      return targetCountryIds.some(t => {
+        const val = String(t).trim();
+        return val.toLowerCase() === cid || val.toUpperCase() === ccode;
+      });
+    }
 
     function saveTargetsToStorage() {
       localStorage.setItem('target_countries', JSON.stringify(targetCountryIds));
@@ -164,7 +275,8 @@ import { worldCountries } from '../data/countries';
     }
 
     function updateBadges() {
-      if (targetCountSpan) targetCountSpan.textContent = String(targetCountryIds.length);
+      const count = allCountries.filter(c => isCountryTargeted(c)).length;
+      if (targetCountSpan) targetCountSpan.textContent = String(count);
       if (totalCountSpan) totalCountSpan.textContent = String(allCountries.length);
     }
 
@@ -177,7 +289,7 @@ import { worldCountries } from '../data/countries';
       const filtered = allCountries.filter(c => {
         let matchesFilter = true;
         if (countryFilter === 'targets') {
-          matchesFilter = targetCountryIds.includes(c.id);
+          matchesFilter = isCountryTargeted(c);
         } else if (countryFilter !== 'all') {
           matchesFilter = c.region === countryFilter || (c.subregion && c.subregion.includes(countryFilter));
         }
@@ -208,8 +320,28 @@ import { worldCountries } from '../data/countries';
       }
 
       if (visible.length === 0) {
+        if (countryFilter === 'targets') {
+          countriesGrid.innerHTML = `
+            <div class="col-span-full p-10 border border-dashed border-rule text-center bg-tint text-steel select-none font-mono">
+              <div class="text-[40px] mb-2 leading-none">⭐</div>
+              <p class="font-bold text-[18px] text-ink">Belum Ada Target Belajar</p>
+              <p class="text-[13px] mt-2 text-smoke max-w-[48ch] mx-auto font-sans leading-relaxed">
+                Anda belum menandai negara target belajar. Klik tombol bintang (☆) pada kartu negara mana saja untuk menjadikannya target belajar Anda!
+              </p>
+              <button type="button" id="btn-empty-see-all" class="mt-5 btn btn-primary btn-s font-mono text-xs">
+                ← Jelajahi Semua 250 Negara
+              </button>
+            </div>
+          `;
+          document.getElementById('btn-empty-see-all')?.addEventListener('click', () => {
+            const allBtn = document.querySelector<HTMLButtonElement>('#country-region-filters button[data-filter="all"]');
+            allBtn?.click();
+          });
+          return;
+        }
+
         countriesGrid.innerHTML = `
-          <div class="col-span-full p-8 border border-dashed border-rule text-center bg-tint text-steel">
+          <div class="col-span-full p-8 border border-dashed border-rule text-center bg-tint text-steel font-mono">
             <p class="font-bold text-[16px] text-ink">Tidak ada negara yang sesuai pencarian / filter.</p>
             <p class="text-[13px] mt-1 text-smoke">Coba kata kunci lain atau pilih tab "Semua (${allCountries.length})".</p>
           </div>
@@ -218,7 +350,7 @@ import { worldCountries } from '../data/countries';
       }
 
       countriesGrid.innerHTML = visible.map(c => {
-        const isTargeted = targetCountryIds.includes(c.id);
+        const isTargeted = isCountryTargeted(c);
         const hasTable = Boolean(c.tableId);
 
         return `
@@ -260,16 +392,46 @@ import { worldCountries } from '../data/countries';
                   <span class="text-ink font-semibold text-right truncate">${c.language}</span>
                 </div>
               </div>
+
+              ${isTargeted ? `
+                <div class="mt-3 pt-2.5 border-t border-dashed border-rule">
+                  <div class="flex items-center justify-between text-[11px] font-mono">
+                    <span class="text-smoke">Catatan:</span>
+                    <button 
+                      type="button" 
+                      data-edit-note="${c.id}" 
+                      class="text-cta hover:underline font-bold cursor-pointer"
+                    >
+                      ${userNotesMap[c.id] ? '✏️ Edit Catatan' : '+ Tambah Catatan'}
+                    </button>
+                  </div>
+                  ${userNotesMap[c.id] ? `
+                    <div class="mt-1.5 p-2 bg-smoke/5 border-l-2 border-cta text-[11px] text-steel font-mono italic">
+                      "${userNotesMap[c.id]}"
+                    </div>
+                  ` : ''}
+                </div>
+              ` : ''}
             </div>
 
             <div class="mt-4 pt-3 border-t border-rule">
               ${hasTable ? `
-                <a 
-                  href="/belajar?lang=${c.tableId}"
-                  class="btn btn-primary btn-s text-[12px] w-full justify-center text-center font-mono"
-                >
-                  📖 Buka Tabel Aksara
-                </a>
+                <div class="grid grid-cols-2 gap-2">
+                  <a 
+                    href="/belajar?lang=${c.tableId}"
+                    class="btn btn-primary btn-s text-[11px] justify-center text-center font-mono truncate"
+                    title="Buka tabel aksara"
+                  >
+                    📖 Tabel
+                  </a>
+                  <a 
+                    href="/belajar?lang=${c.tableId}&mode=phrases"
+                    class="btn btn-secondary btn-s text-[11px] justify-center text-center font-mono truncate"
+                    title="Pelajari frasa percakapan penting sehari-hari"
+                  >
+                    💬 Frasa
+                  </a>
+                </div>
               ` : `
                 <a 
                   href="/belajar?unadded=${encodeURIComponent(c.name)}&country=${encodeURIComponent(c.name)}&language=${encodeURIComponent(c.language)}&flag=${encodeURIComponent(c.flag || '')}&voice=${encodeURIComponent(c.voiceLang || 'en-US')}"
@@ -288,14 +450,20 @@ import { worldCountries } from '../data/countries';
         btn.addEventListener('click', async () => {
           const cid = btn.getAttribute('data-toggle-target');
           if (!cid) return;
-          const isAdded = !targetCountryIds.includes(cid);
+          const country = allCountries.find(c => c.id === cid || c.code.toLowerCase() === cid.toLowerCase());
+          const targetId = country ? country.id : cid;
+          const isAdded = !isCountryTargeted(country || { id: targetId });
 
           if (isAdded) {
-            targetCountryIds.push(cid);
-            showToast(`⭐ Negara ditambahkan ke target belajar Anda!`);
+            targetCountryIds.push(targetId);
+            targetCountryIds = Array.from(new Set(targetCountryIds));
+            showToast(`⭐ ${country ? country.name : 'Negara'} ditambahkan ke target belajar Anda!`);
           } else {
-            targetCountryIds = targetCountryIds.filter(id => id !== cid);
-            showToast(`Negara dihapus dari target.`);
+            targetCountryIds = targetCountryIds.filter(id => {
+              const val = String(id).trim().toLowerCase();
+              return val !== targetId.toLowerCase() && (country ? val !== country.code.toLowerCase() : true);
+            });
+            showToast('Negara dihapus dari target.');
           }
 
           saveTargetsToStorage();
@@ -305,9 +473,9 @@ import { worldCountries } from '../data/countries';
           if (currentUser) {
             try {
               if (isAdded) {
-                await addTargetToCloud(currentUser.id, cid);
+                await addTargetToCloud(currentUser.id, targetId);
               } else {
-                await removeTargetFromCloud(currentUser.id, cid);
+                await removeTargetFromCloud(currentUser.id, targetId);
               }
             } catch (err) {
               console.warn('Gagal sinkron target ke Supabase:', err);
@@ -315,7 +483,50 @@ import { worldCountries } from '../data/countries';
           }
         });
       });
+
+      // Attach Note edit listeners
+      countriesGrid.querySelectorAll('[data-edit-note]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cid = btn.getAttribute('data-edit-note');
+          if (!cid) return;
+          const country = allCountries.find(c => c.id === cid);
+          activeEditingCountryId = cid;
+          if (noteModalTitle) noteModalTitle.textContent = `✏️ Catatan: ${country ? country.flag + ' ' + country.name : 'Target Belajar'}`;
+          if (inputTargetNote) inputTargetNote.value = userNotesMap[cid] || '';
+          noteModal?.showModal();
+        });
+      });
     }
+
+    // Modal Note Handlers
+    closeNoteModalBtn?.addEventListener('click', () => noteModal?.close());
+    btnCancelNote?.addEventListener('click', () => noteModal?.close());
+
+    btnSaveNote?.addEventListener('click', async () => {
+      if (!activeEditingCountryId) return;
+      const noteText = inputTargetNote?.value.trim() || '';
+      
+      if (noteText) {
+        userNotesMap[activeEditingCountryId] = noteText;
+        showToast('✓ Catatan target berhasil disimpan!');
+      } else {
+        delete userNotesMap[activeEditingCountryId];
+        showToast('Catatan dihapus.');
+      }
+
+      localStorage.setItem('user_target_notes', JSON.stringify(userNotesMap));
+      noteModal?.close();
+      renderCountries();
+
+      // Cloud sync jika user login
+      if (currentUser) {
+        try {
+          await saveTargetNoteToCloud(currentUser.id, activeEditingCountryId, noteText);
+        } catch (err) {
+          console.warn('Gagal simpan catatan ke cloud:', err);
+        }
+      }
+    });
 
     // Filter Buttons Handlers
     filterButtons.forEach(btn => {
@@ -353,56 +564,169 @@ import { worldCountries } from '../data/countries';
         app: 'belajar-bahasa',
         exportedAt: new Date().toISOString(),
         targetCountries: targetCountryIds,
+        notes: userNotesMap,
         customTables: JSON.parse(localStorage.getItem('custom_character_tables') || '[]')
       };
       const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `backup-belajar-bahasa-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `belajar-bahasa-backup-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast('✓ Cadangan data JSON berhasil diunduh!');
+      showToast('Cadangan data berhasil diunduh!');
     });
 
     // Import JSON
-    const importFileInput = document.getElementById('input-import-file') as HTMLInputElement | null;
-    importFileInput?.addEventListener('change', (e) => {
+    document.getElementById('input-import-file')?.addEventListener('change', (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = (evt) => {
         try {
-          const json = JSON.parse(evt.target?.result as string);
-          if (Array.isArray(json.targetCountries)) {
-            targetCountryIds = Array.from(new Set([...targetCountryIds, ...json.targetCountries]));
+          const parsed = JSON.parse(evt.target?.result as string);
+          if (Array.isArray(parsed.targetCountries)) {
+            targetCountryIds = Array.from(new Set([...targetCountryIds, ...parsed.targetCountries]));
             saveTargetsToStorage();
           }
-          if (Array.isArray(json.customTables)) {
-            const localTables = JSON.parse(localStorage.getItem('custom_character_tables') || '[]');
-            const ids = new Set(localTables.map((t: any) => t.id));
-            json.customTables.forEach((t: any) => {
-              if (!ids.has(t.id)) localTables.push(t);
+          if (parsed.notes && typeof parsed.notes === 'object') {
+            Object.assign(userNotesMap, parsed.notes);
+            localStorage.setItem('user_target_notes', JSON.stringify(userNotesMap));
+          }
+          if (Array.isArray(parsed.customTables)) {
+            const existing = JSON.parse(localStorage.getItem('custom_character_tables') || '[]');
+            const existingIds = new Set(existing.map((t: any) => t.id));
+            parsed.customTables.forEach((t: any) => {
+              if (!existingIds.has(t.id)) existing.push(t);
             });
-            localStorage.setItem('custom_character_tables', JSON.stringify(localTables));
+            localStorage.setItem('custom_character_tables', JSON.stringify(existing));
           }
           renderCountries();
-          showToast('✓ Berhasil memulihkan data cadangan JSON!');
+          showToast('✓ Data cadangan berhasil dipulihkan!');
         } catch {
-          showToast('File JSON tidak valid atau rusak!');
+          showToast('File JSON tidak valid.');
         }
       };
       reader.readAsText(file);
     });
 
-    // Cloud Sync trigger button in Katalog
+    // Trigger Auth Modal
     document.getElementById('btn-cloud-sync-trigger')?.addEventListener('click', () => {
       const authModal = document.getElementById('auth-modal') as HTMLDialogElement | null;
       authModal?.showModal();
     });
 
-    // Check auth on load to fetch Supabase targets
+    // TRIVIA QUIZ LOGIC
+    const triviaModal = document.getElementById('trivia-modal') as HTMLDialogElement | null;
+    const btnOpenTrivia = document.getElementById('btn-open-trivia');
+    const closeTriviaBtn = document.getElementById('close-trivia-btn');
+    const triviaStreakLabel = document.getElementById('trivia-streak-label');
+    const triviaScoreLabel = document.getElementById('trivia-score-label');
+    const triviaFlagDisplay = document.getElementById('trivia-flag-display');
+    const triviaCountryName = document.getElementById('trivia-country-name');
+    const triviaQuestionText = document.getElementById('trivia-question-text');
+    const triviaFeedback = document.getElementById('trivia-feedback');
+    const triviaOptionsGrid = document.getElementById('trivia-options-grid');
+    const btnNextTrivia = document.getElementById('btn-next-trivia');
+
+    let triviaScore = 0;
+    let triviaStreak = 0;
+    let triviaCorrectAnswer = '';
+
+    btnOpenTrivia?.addEventListener('click', () => {
+      triviaModal?.showModal();
+      nextTriviaQuestion();
+    });
+
+    closeTriviaBtn?.addEventListener('click', () => {
+      triviaModal?.close();
+    });
+
+    function nextTriviaQuestion() {
+      if (allCountries.length < 4) return;
+      if (btnNextTrivia) btnNextTrivia.classList.add('hidden');
+      if (triviaFeedback) triviaFeedback.textContent = '';
+
+      const questionType = Math.random() > 0.5 ? 0 : 1;
+      const targetCountry = allCountries[Math.floor(Math.random() * allCountries.length)];
+
+      if (triviaFlagDisplay) triviaFlagDisplay.textContent = targetCountry.flag;
+      if (triviaCountryName) triviaCountryName.textContent = targetCountry.name;
+
+      if (questionType === 0) {
+        if (triviaQuestionText) triviaQuestionText.textContent = 'Apa bahasa resmi dari negara ini?';
+        triviaCorrectAnswer = targetCountry.officialLanguage || targetCountry.language;
+        
+        const otherLangs = Array.from(new Set(allCountries.map(c => c.officialLanguage || c.language)))
+          .filter(l => l && l !== triviaCorrectAnswer);
+        const shuffledDistractors = otherLangs.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [triviaCorrectAnswer, ...shuffledDistractors].sort(() => 0.5 - Math.random());
+        renderTriviaOptions(options);
+      } else {
+        if (triviaQuestionText) triviaQuestionText.textContent = 'Apa ibukota dari negara ini?';
+        triviaCorrectAnswer = targetCountry.capital;
+        
+        const otherCapitals = Array.from(new Set(allCountries.map(c => c.capital)))
+          .filter(cap => cap && cap !== triviaCorrectAnswer);
+        const shuffledDistractors = otherCapitals.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [triviaCorrectAnswer, ...shuffledDistractors].sort(() => 0.5 - Math.random());
+        renderTriviaOptions(options);
+      }
+    }
+
+    function renderTriviaOptions(options: string[]) {
+      if (!triviaOptionsGrid) return;
+      triviaOptionsGrid.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'py-3 px-3 border border-rule bg-canvas hover:border-ink font-mono font-medium text-[13px] text-ink transition-colors shadow-sm text-left truncate';
+        btn.textContent = opt;
+        btn.title = opt;
+
+        btn.addEventListener('click', () => {
+          const allBtns = triviaOptionsGrid.querySelectorAll('button');
+          allBtns.forEach(b => (b.disabled = true));
+
+          if (opt === triviaCorrectAnswer) {
+            btn.classList.remove('border-rule', 'bg-canvas');
+            btn.classList.add('border-ok', 'bg-ok/20', 'text-ok', 'font-bold');
+            if (triviaFeedback) {
+              triviaFeedback.textContent = '✓ BENAR!';
+              triviaFeedback.className = 'h-6 text-xs font-mono font-bold text-center text-ok';
+            }
+            triviaScore += 10;
+            triviaStreak += 1;
+          } else {
+            btn.classList.remove('border-rule', 'bg-canvas');
+            btn.classList.add('border-red-500', 'bg-red-500/10', 'text-red-500');
+            allBtns.forEach(b => {
+              if (b.textContent === triviaCorrectAnswer) {
+                b.classList.remove('border-rule');
+                b.classList.add('border-ok', 'bg-ok/20', 'text-ok', 'font-bold');
+              }
+            });
+            if (triviaFeedback) {
+              triviaFeedback.textContent = `SALAH! Jawaban: "${triviaCorrectAnswer}".`;
+              triviaFeedback.className = 'h-6 text-xs font-mono font-bold text-center text-red-500';
+            }
+            triviaStreak = 0;
+          }
+
+          if (triviaScoreLabel) triviaScoreLabel.textContent = `Skor: ${triviaScore}`;
+          if (triviaStreakLabel) triviaStreakLabel.textContent = `🔥 Streak: ${triviaStreak}`;
+          if (btnNextTrivia) btnNextTrivia.classList.remove('hidden');
+        });
+
+        triviaOptionsGrid.appendChild(btn);
+      });
+    }
+
+    btnNextTrivia?.addEventListener('click', nextTriviaQuestion);
+
+    // Check auth on load to fetch Supabase targets & notes
     async function initUserTargets() {
       try {
         currentUser = await getCurrentUser();
@@ -411,8 +735,15 @@ import { worldCountries } from '../data/countries';
           if (cloudTargets && cloudTargets.length > 0) {
             targetCountryIds = Array.from(new Set([...targetCountryIds, ...cloudTargets]));
             saveTargetsToStorage();
-            renderCountries();
           }
+
+          const cloudNotes = await fetchUserTargetsWithNotesFromCloud(currentUser.id);
+          if (cloudNotes && Object.keys(cloudNotes).length > 0) {
+            Object.assign(userNotesMap, cloudNotes);
+            localStorage.setItem('user_target_notes', JSON.stringify(userNotesMap));
+          }
+
+          renderCountries();
         }
       } catch (err) {
         console.warn('Init user targets error:', err);

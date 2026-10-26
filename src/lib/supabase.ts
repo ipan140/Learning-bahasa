@@ -261,3 +261,110 @@ export async function deleteCustomTableFromCloud(userId: string, tableId: string
     return false;
   }
 }
+
+// ================= PROGRESS SYNC HELPERS =================
+
+/** Ambil seluruh progres belajar aksara user dari Supabase */
+export async function fetchUserProgressFromCloud(userId: string): Promise<Record<string, string[]>> {
+  const sb = getSupabase();
+  if (!sb) return {};
+  try {
+    const { data, error } = await sb
+      .from('user_study_progress')
+      .select('table_id, memorized_chars')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.warn('Gagal fetch user_study_progress:', error);
+      return {};
+    }
+    const map: Record<string, string[]> = {};
+    (data || []).forEach((row: any) => {
+      map[row.table_id] = Array.isArray(row.memorized_chars) ? row.memorized_chars : [];
+    });
+    return map;
+  } catch (err) {
+    console.error('Error fetchUserProgressFromCloud:', err);
+    return {};
+  }
+}
+
+/** Simpan progres huruf yang dihafal untuk suatu tabel aksara ke Supabase */
+export async function saveUserProgressToCloud(
+  userId: string,
+  tableId: string,
+  memorizedChars: string[],
+  score: number = 0
+): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { error } = await sb
+      .from('user_study_progress')
+      .upsert({
+        user_id: userId,
+        table_id: tableId,
+        memorized_chars: memorizedChars,
+        score: score,
+        last_practiced_at: new Date().toISOString(),
+      }, { onConflict: 'user_id, table_id' });
+
+    if (error) {
+      console.error('Gagal saveUserProgressToCloud:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error saveUserProgressToCloud:', err);
+    return false;
+  }
+}
+
+/** Ambil target negara beserta catatannya dari Supabase */
+export async function fetchUserTargetsWithNotesFromCloud(userId: string): Promise<Record<string, string>> {
+  const sb = getSupabase();
+  if (!sb) return {};
+  try {
+    const { data, error } = await sb
+      .from('user_targets')
+      .select('country_id, notes')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.warn('Gagal fetch user_targets with notes:', error);
+      return {};
+    }
+    const map: Record<string, string> = {};
+    (data || []).forEach((row: any) => {
+      map[row.country_id] = row.notes || '';
+    });
+    return map;
+  } catch (err) {
+    console.error('Error fetchUserTargetsWithNotesFromCloud:', err);
+    return {};
+  }
+}
+
+/** Simpan catatan pribadi untuk target negara di Supabase */
+export async function saveTargetNoteToCloud(userId: string, countryId: string, notes: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { error } = await sb
+      .from('user_targets')
+      .upsert({
+        user_id: userId,
+        country_id: countryId,
+        notes: notes.trim(),
+      }, { onConflict: 'user_id, country_id' });
+
+    if (error) {
+      console.error('Gagal saveTargetNoteToCloud:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error saveTargetNoteToCloud:', err);
+    return false;
+  }
+}

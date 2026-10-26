@@ -2,11 +2,12 @@
 import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 import { defaultLanguageTables } from '../data/languages';
+import { languagePhrasesData } from '../data/phrases';
 ---
 
 <Base 
   title="Studio Belajar Aksara & Huruf Bahasa - Belajar Bahasa" 
-  description="Tabel interaktif aksara bahasa: Jepang (Hiragana & Katakana), Jerman, Korea (Hangul), Arab (Hijaiyah), Mandarin, Thai, dan lainnya dengan audio lafal asli."
+  description="Tabel interaktif aksara bahasa: Jepang (Hiragana & Katakana), Jerman, Korea (Hangul), Arab (Hijaiyah), Mandarin, Thai, dan lainnya dengan audio lafal asli, flashcard latihan, dan sinkronisasi cloud."
 >
   
   <!-- [01] MAIN APP: Area Belajar Aksara -->
@@ -19,7 +20,7 @@ import { defaultLanguageTables } from '../data/languages';
             Tabel Huruf &amp; Aksara Bahasa
           </h1>
           <p class="mt-3 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
-            Pilih aksara bahasa di bawah ini. Klik tiap kotak karakter untuk mendengarkan lafal audio aslinya atau menyalin karakter ke clipboard.
+            Pilih aksara bahasa di bawah ini. Anda dapat belajar menggunakan tabel interaktif, berlatih dengan kartu flashcard &amp; kuis, atau mempelajari frasa percakapan penting sehari-hari.
           </p>
         </div>
         <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
@@ -38,6 +39,7 @@ import { defaultLanguageTables } from '../data/languages';
       id="main-app" 
       class="mt-8"
       data-defaults={JSON.stringify(defaultLanguageTables)}
+      data-phrases={JSON.stringify(languagePhrasesData)}
     >
 
       <!-- Notification Toast -->
@@ -51,7 +53,7 @@ import { defaultLanguageTables } from '../data/languages';
       <!-- ========================================== -->
       <div id="section-tables" class="space-y-6">
         
-        <!-- Language Switcher Bar (Perbaikan Image 1) -->
+        <!-- Language Switcher Bar -->
         <div class="p-4 sm:p-5 border border-rule bg-canvas shadow-sm space-y-3.5">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <span class="label font-bold text-ink">PILIH AKSARA BAHASA:</span>
@@ -65,9 +67,56 @@ import { defaultLanguageTables } from '../data/languages';
             </div>
           </div>
 
-          <!-- Buttons Container (Responsive 2-column grid on mobile, multi-column on desktop) -->
+          <!-- Buttons Container (Responsive grid) -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 pt-1" id="tab-bar">
             <!-- Rendered by client script -->
+          </div>
+        </div>
+
+        <!-- Mode Switcher Tabs (Tabel, Flashcard, Frasa Penting) -->
+        <div class="flex items-center gap-2 border-b border-rule pb-2 overflow-x-auto scrollbar-none">
+          <button 
+            type="button" 
+            id="btn-mode-table" 
+            class="px-4 py-2 font-mono text-[13px] border border-ink bg-ink text-canvas font-bold whitespace-nowrap transition-colors"
+          >
+            📑 Mode Tabel Aksara
+          </button>
+          <button 
+            type="button" 
+            id="btn-mode-flashcard" 
+            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink whitespace-nowrap transition-colors"
+          >
+            🎴 Mode Flashcard &amp; Latihan
+          </button>
+          <button 
+            type="button" 
+            id="btn-mode-phrases" 
+            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink whitespace-nowrap transition-colors"
+          >
+            💬 Frasa Dasar Sehari-hari
+          </button>
+        </div>
+
+        <!-- Progress Tracker Banner -->
+        <div id="study-progress-box" class="p-4 border border-rule bg-smoke/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="font-bold text-ink uppercase tracking-wider">Progres Hafalan:</span>
+            <span id="progress-count-label" class="text-ok font-bold">0 / 0 Huruf</span>
+            <span id="progress-percent-label" class="text-smoke">(0%)</span>
+          </div>
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="flex-1 sm:w-48 h-2.5 bg-rule overflow-hidden">
+              <div id="progress-fill-bar" class="h-full bg-ok transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <button 
+              type="button" 
+              id="btn-reset-progress" 
+              class="text-smoke hover:text-red-500 text-[11px] underline shrink-0 transition-colors"
+              title="Reset tanda hafalan pada bahasa ini"
+            >
+              Reset
+            </button>
           </div>
         </div>
 
@@ -87,9 +136,17 @@ import { defaultLanguageTables } from '../data/languages';
               type="button" 
               id="toggle-audio-btn" 
               class="btn btn-secondary btn-s"
-              title="Aktifkan/Nonaktifkan Suara Pengucapan saat kotak diklik"
+              title="Aktifkan/Nonaktifkan Suara Pengucapan"
             >
               🔊 Suara: <span id="audio-status-label" class="text-ok font-bold">AKTIF</span>
+            </button>
+            <button 
+              type="button" 
+              id="toggle-speed-btn" 
+              class="btn btn-secondary btn-s font-mono"
+              title="Atur Kecepatan Suara: 0.75x (Lambat) atau 1.0x (Normal)"
+            >
+              🐢 Speed: <span id="speed-status-label" class="text-ink font-bold">1.0x</span>
             </button>
             <button 
               type="button" 
@@ -109,7 +166,9 @@ import { defaultLanguageTables } from '../data/languages';
           </div>
         </div>
 
-        <!-- Main Viewer Table Card -->
+        <!-- ============================================== -->
+        <!-- VIEW 1: TABEL LENGKAP                          -->
+        <!-- ============================================== -->
         <div id="viewer-container" class="border border-rule bg-canvas p-5 sm:p-6 shadow-sm">
           <!-- Table Title & Description -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-rule pb-4 mb-6">
@@ -140,8 +199,141 @@ import { defaultLanguageTables } from '../data/languages';
 
           <!-- Instructions footer -->
           <div class="mt-6 p-4 border border-dashed border-rule text-[13px] text-smoke flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-tint/30">
-            <span>💡 <strong>Tips:</strong> Klik kotak huruf untuk mendengarkan pengucapan audio aslinya.</span>
+            <span>💡 <strong>Tips:</strong> Klik kotak huruf untuk mendengar audio asli &amp; salin karakter. Huruf bergaris hijau menandakan sudah Anda tandai hafal.</span>
             <span class="font-mono text-[12px]">Format: [Romaji/Cara Baca] = [Aksara]</span>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VIEW 2: FLASHCARD & LATIHAN HAFALAN            -->
+        <!-- ============================================== -->
+        <div id="flashcard-container" class="hidden border border-rule bg-canvas p-6 sm:p-8 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-rule pb-4 mb-6">
+            <div>
+              <span class="px-2.5 py-1 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider bg-tint">Mode Latihan</span>
+              <h2 class="text-[22px] sm:text-[24px] font-bold text-ink tracking-tight mt-1">
+                Latihan Hafalan Huruf &amp; Aksara
+              </h2>
+              <p class="text-[13px] text-steel mt-0.5">
+                Uji ingatan Anda. Balik kartu untuk memeriksa bacaan atau uji dengan kuis pilihan ganda.
+              </p>
+            </div>
+
+            <!-- Toggle Flashcard vs Kuis -->
+            <div class="flex items-center gap-1.5 text-[12px] font-mono shrink-0">
+              <button type="button" id="btn-fc-type-card" class="px-3 py-1.5 border border-ink bg-ink text-canvas font-bold">
+                🎴 Flashcard
+              </button>
+              <button type="button" id="btn-fc-type-quiz" class="px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">
+                🎯 Kuis Pilihan Ganda
+              </button>
+            </div>
+          </div>
+
+          <!-- 2A. Kartu Flashcard -->
+          <div id="fc-card-subview" class="max-w-md mx-auto flex flex-col items-center">
+            <div class="w-full flex items-center justify-between text-xs font-mono text-smoke mb-3">
+              <span id="fc-card-counter">Kartu 1 dari 46</span>
+              <span id="fc-card-status" class="text-ok font-bold"></span>
+            </div>
+
+            <!-- Big Flip Card -->
+            <div 
+              id="fc-flashcard" 
+              class="w-full min-h-[260px] p-8 border-2 border-ink bg-canvas hover:bg-smoke/5 cursor-pointer flex flex-col items-center justify-center text-center transition-all select-none shadow-md relative"
+              title="Klik untuk membalik kartu"
+            >
+              <span class="absolute top-3 right-3 text-[11px] font-mono text-smoke">🔄 Klik untuk balik</span>
+              
+              <!-- Front Side (Karakter Besar) -->
+              <div id="fc-card-front" class="flex flex-col items-center justify-center">
+                <span id="fc-char-display" class="text-[68px] sm:text-[80px] font-bold text-ink leading-none">あ</span>
+                <span class="text-xs text-smoke font-mono mt-4">Tebak cara baca aksara ini...</span>
+              </div>
+
+              <!-- Back Side (Romaji & Audio) -->
+              <div id="fc-card-back" class="hidden flex flex-col items-center justify-center">
+                <span id="fc-romaji-display" class="text-[32px] sm:text-[40px] font-bold text-ink leading-tight">A</span>
+                <span id="fc-char-subdisplay" class="text-[20px] text-steel font-mono mt-1">あ</span>
+                <button type="button" id="btn-fc-speak" class="mt-4 btn btn-secondary btn-s font-mono text-xs">
+                  🔊 Dengarkan Lafal
+                </button>
+              </div>
+            </div>
+
+            <!-- Action Buttons: Belum vs Sudah Hafal -->
+            <div class="w-full grid grid-cols-2 gap-3 mt-5">
+              <button 
+                type="button" 
+                id="btn-fc-unmemorized" 
+                class="py-3 px-4 border border-rule bg-canvas hover:border-red-500 hover:text-red-500 text-steel font-mono text-[13px] font-bold text-center transition-colors"
+              >
+                ↺ Belum Hafal
+              </button>
+              <button 
+                type="button" 
+                id="btn-fc-memorized" 
+                class="py-3 px-4 border border-ok bg-ok/10 hover:bg-ok text-ok hover:text-canvas font-mono text-[13px] font-bold text-center transition-colors shadow-sm"
+              >
+                ✓ Sudah Hafal!
+              </button>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="w-full flex items-center justify-between gap-2 mt-5 pt-4 border-t border-rule text-xs font-mono">
+              <button type="button" id="btn-fc-prev" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink">
+                ← Sebelumnya
+              </button>
+              <button type="button" id="btn-fc-random" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink">
+                🎲 Acak Huruf
+              </button>
+              <button type="button" id="btn-fc-next" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink">
+                Selanjutnya →
+              </button>
+            </div>
+          </div>
+
+          <!-- 2B. Kuis Pilihan Ganda -->
+          <div id="fc-quiz-subview" class="hidden max-w-md mx-auto flex flex-col items-center">
+            <div class="w-full flex items-center justify-between text-xs font-mono text-smoke mb-3">
+              <span>Pertanyaan Soal</span>
+              <span id="quiz-score-badge" class="text-ink font-bold">Skor: 0</span>
+            </div>
+
+            <div class="w-full p-8 border-2 border-ink bg-canvas flex flex-col items-center justify-center text-center shadow-md">
+              <span class="text-xs text-smoke font-mono mb-2 uppercase tracking-wider">Bagaimana cara membaca aksara ini?</span>
+              <span id="quiz-question-char" class="text-[72px] font-bold text-ink leading-none">あ</span>
+            </div>
+
+            <div id="quiz-feedback" class="h-6 mt-3 text-xs font-mono font-bold text-center"></div>
+
+            <!-- 4 Multiple Choice Options -->
+            <div id="quiz-options-grid" class="w-full grid grid-cols-2 gap-3 mt-3">
+              <!-- Rendered by JS -->
+            </div>
+
+            <button type="button" id="btn-quiz-next-question" class="w-full mt-4 btn btn-primary py-2.5 font-mono text-xs justify-center hidden">
+              Soal Berikutnya →
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VIEW 3: FRASA DASAR SEHARI-HARI                -->
+        <!-- ============================================== -->
+        <div id="phrases-container" class="hidden border border-rule bg-canvas p-5 sm:p-6 shadow-sm space-y-6">
+          <div class="border-b border-rule pb-4">
+            <span class="px-2.5 py-1 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider bg-tint">Survival Phrases</span>
+            <h2 id="phrases-title" class="text-[22px] sm:text-[24px] font-bold text-ink tracking-tight mt-1">
+              Frasa Penting Sehari-hari
+            </h2>
+            <p class="text-[13px] text-steel mt-0.5">
+              Kosakata dasar yang wajib diketahui: salam, ucapan terima kasih, dan angka 1 sampai 10 dengan tombol audio asli.
+            </p>
+          </div>
+
+          <div id="phrases-content-wrapper" class="space-y-6">
+            <!-- Rendered by client script -->
           </div>
         </div>
 
@@ -199,112 +391,121 @@ import { defaultLanguageTables } from '../data/languages';
             />
           </div>
           <div>
-            <label for="form-voice" class="block text-[13px] font-mono text-steel mb-1.5">Kode Suara Audio (Opsional)</label>
-            <select id="form-voice" class="w-full px-3.5 py-2.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono">
+            <label for="form-voice" class="block text-[13px] font-mono text-steel mb-1.5">Suara Pengucapan (Speech Voice)</label>
+            <select 
+              id="form-voice" 
+              class="w-full px-3.5 py-2.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+            >
               <option value="ja-JP">Jepang (ja-JP)</option>
               <option value="de-DE">Jerman (de-DE)</option>
               <option value="ko-KR">Korea (ko-KR)</option>
+              <option value="ar-SA">Arab (ar-SA)</option>
               <option value="zh-CN">Mandarin (zh-CN)</option>
               <option value="th-TH">Thailand (th-TH)</option>
-              <option value="ar-SA">Arab (ar-SA)</option>
-              <option value="ru-RU">Rusia (ru-RU)</option>
-              <option value="fr-FR">Prancis (fr-FR)</option>
               <option value="es-ES">Spanyol (es-ES)</option>
-              <option value="it-IT">Italia (it-IT)</option>
-              <option value="pt-PT">Portugis (pt-PT)</option>
-              <option value="nl-NL">Belanda (nl-NL)</option>
+              <option value="fr-FR">Prancis (fr-FR)</option>
+              <option value="ru-RU">Rusia (ru-RU)</option>
               <option value="en-US">Inggris (en-US)</option>
-              <option value="id-ID">Indonesia (id-ID)</option>
             </select>
           </div>
         </div>
 
-        <!-- Content Area with Excel Import Toolbar -->
         <div>
-          <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <div class="flex items-center justify-between mb-1.5">
             <label for="form-text" class="block text-[13px] font-mono text-steel">
-              Isi Tabel * (Bisa copy-paste langsung dari Excel atau upload file)
+              Isi Karakter / Huruf * (Teks atau Baris Excel)
             </label>
-            <div class="flex items-center gap-3">
-              <label class="btn btn-secondary btn-s text-[12px] cursor-pointer flex items-center gap-1.5 font-bold hover:border-ink font-mono">
-                <span>📊 Import Excel / CSV</span>
-                <input type="file" id="form-excel-input" accept=".xlsx, .xls, .csv, .tsv, .txt" class="hidden" />
-              </label>
-              <button type="button" id="load-sample-btn" class="text-[12px] text-smoke hover:text-ink font-mono">
-                Contoh Data
-              </button>
-            </div>
+            <span class="text-[12px] font-mono text-smoke">Format: <code>Romaji = Karakter</code></span>
           </div>
           <textarea 
             id="form-text" 
-            rows="8" 
-            required
-            placeholder={"Bisa paste langsung dari Excel (Ctrl+V) atau ketik:\nA = あ | I = い | U = う | E = え | O = お\nKa = か | Ki = き | Ku = く | Ke = け | Ko = こ\natau format kolom: Romaji [TAB] Karakter"}
-            class="w-full px-3.5 py-3 text-[14px] font-mono bg-tint border border-rule text-ink outline-none focus:border-ink leading-relaxed"
+            rows="6" 
+            required 
+            placeholder="A = あ | I = い | U = う | E = え | O = お&#10;Ka = か | Ki = き | Ku = く | Ke = け | Ko = こ"
+            class="w-full px-3.5 py-2.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
           ></textarea>
-          <div class="mt-2 text-[12px] text-smoke flex items-center justify-between flex-wrap gap-2 font-mono">
-            <span>💡 <strong>Tips Excel:</strong> Cukup blok sel di Excel/Google Sheets, tekan <code>Ctrl+C</code>, lalu paste <code>Ctrl+V</code> di sini!</span>
-            <span class="text-ok font-bold">Mendukung .xlsx, .csv, &amp; Copy-Paste Excel ✓</span>
+        </div>
+
+        <div class="p-4 border border-rule bg-tint/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span class="font-bold text-[13px] text-ink block">Punya file Spreadsheet / Excel?</span>
+            <span class="text-[12px] text-smoke">Unggah file .xlsx atau .csv untuk dikonversi otomatis menjadi tabel.</span>
+          </div>
+          <label class="btn btn-secondary btn-s shrink-0 cursor-pointer text-[12px]">
+            📁 Pilih File Excel / CSV
+            <input type="file" id="form-excel-input" accept=".xlsx, .xls, .csv" class="hidden" />
+          </label>
+        </div>
+
+        <div>
+          <label class="block text-[12px] font-mono text-smoke mb-1.5 uppercase tracking-wider">Pratinjau Tabel (5 Baris Pertama):</label>
+          <div id="creator-preview" class="p-4 border border-rule bg-canvas overflow-x-auto min-h-[80px]">
+            <span class="text-smoke italic font-mono text-[12px]">Ketik atau paste dari Excel di kotak atas untuk melihat pratinjau tabel...</span>
           </div>
         </div>
 
-        <!-- Realtime Preview inside Creator -->
-        <div class="border-t border-rule pt-4">
-          <span class="label">Live Preview Tabel:</span>
-          <div id="creator-preview" class="mt-3 p-3 bg-tint border border-rule min-h-[80px] overflow-x-auto text-[13px]">
-            <span class="text-smoke italic font-mono">Ketik atau paste dari Excel di kotak atas untuk melihat pratinjau tabel...</span>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-rule">
-          <button type="button" id="cancel-creator-btn" class="btn btn-secondary">Batal</button>
-          <button type="submit" id="save-table-btn" class="btn btn-primary">Simpan Tabel Aksara</button>
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-rule">
+          <button type="button" id="load-sample-btn" class="btn btn-secondary btn-s font-mono text-[12px]">
+            Muat Contoh Data
+          </button>
+          <button type="button" id="cancel-creator-btn" class="btn btn-secondary btn-s font-mono text-[12px]">
+            Batal
+          </button>
+          <button type="submit" class="btn btn-primary btn-s font-mono text-[12px]">
+            Simpan &amp; Tampilkan Tabel
+          </button>
         </div>
       </form>
     </div>
   </div>
-
 </Base>
 
 <!-- Load SheetJS for Excel Reading -->
 <script is:inline src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
-  import {
-    getCurrentUser,
-    saveCustomTableToCloud,
+  import { 
+    getCurrentUser, 
+    fetchUserCustomTablesFromCloud, 
+    saveCustomTableToCloud, 
     deleteCustomTableFromCloud,
-    fetchUserCustomTablesFromCloud
+    fetchUserProgressFromCloud,
+    saveUserProgressToCloud
   } from '../lib/supabase';
 
-  const container = document.getElementById('main-app');
-  if (container) {
-    const rawDefaults = container.getAttribute('data-defaults');
-    const defaultTables: any[] = rawDefaults ? JSON.parse(rawDefaults) : [];
-
+  const appEl = document.getElementById('main-app');
+  if (appEl) {
+    const defaultTables: any[] = JSON.parse(appEl.dataset.defaults || '[]');
+    const phrasesData: Record<string, any> = JSON.parse(appEl.dataset.phrases || '{}');
     let customTables: any[] = JSON.parse(localStorage.getItem('custom_character_tables') || '[]');
+    
+    // User study progress (memorized chars map): { tableId: string[] }
+    let userProgressMap: Record<string, string[]> = JSON.parse(localStorage.getItem('user_study_progress_map') || '{}');
+
     let currentTableId = defaultTables[0]?.id || '';
-    let isAudioEnabled = true;
-    let tableSearchQuery = '';
     let categoryFilter = 'all';
+    let currentViewMode: 'table' | 'flashcard' | 'phrases' = 'table';
+    let isAudioEnabled = true;
+    let currentAudioRate = 1.0;
+    let tableSearchQuery = '';
+    let isUnaddedState = false;
+    let unaddedInfo = { country: '', language: '', flag: '', voice: '' };
     let currentUser: any = null;
 
-    let isUnaddedState = false;
-    let unaddedInfo = {
-      country: '',
-      language: '',
-      flag: '🏳️',
-      voice: 'en-US'
-    };
-
+    // Flashcard state
+    let fcIndex = 0;
+    let fcIsFlipped = false;
+    let fcMode: 'card' | 'quiz' = 'card';
+    let quizScore = 0;
 
     function getAllTables() {
       return [...defaultTables, ...customTables];
     }
 
-    // Baca URL params misal: /belajar?lang=arab-hijaiyah atau /belajar?unadded=Anguilla atau /belajar?create=Jerman
+    // URL params
     const urlParams = new URLSearchParams(window.location.search);
     const initialLang = urlParams.get('lang');
+    const initialMode = urlParams.get('mode');
     const unaddedTarget = urlParams.get('unadded');
     const createTarget = urlParams.get('create');
     const countryParam = urlParams.get('country') || unaddedTarget || createTarget;
@@ -336,8 +537,27 @@ import { defaultLanguageTables } from '../data/languages';
       }
     }
 
+    // DOM Elements
     const tabBar = document.getElementById('tab-bar');
     const categoryChips = document.querySelectorAll('#category-filter-chips button');
+    
+    // Mode Buttons
+    const btnModeTable = document.getElementById('btn-mode-table');
+    const btnModeFlashcard = document.getElementById('btn-mode-flashcard');
+    const btnModePhrases = document.getElementById('btn-mode-phrases');
+
+    // View Containers
+    const viewerContainer = document.getElementById('viewer-container');
+    const flashcardContainer = document.getElementById('flashcard-container');
+    const phrasesContainer = document.getElementById('phrases-container');
+
+    // Progress Elements
+    const progressCountLabel = document.getElementById('progress-count-label');
+    const progressPercentLabel = document.getElementById('progress-percent-label');
+    const progressFillBar = document.getElementById('progress-fill-bar');
+    const btnResetProgress = document.getElementById('btn-reset-progress');
+
+    // Table elements
     const tableTitle = document.getElementById('table-title');
     const tableBadge = document.getElementById('table-badge');
     const tableDescription = document.getElementById('table-description');
@@ -345,7 +565,11 @@ import { defaultLanguageTables } from '../data/languages';
     const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
     const toggleAudioBtn = document.getElementById('toggle-audio-btn');
     const audioStatusLabel = document.getElementById('audio-status-label');
+    const toggleSpeedBtn = document.getElementById('toggle-speed-btn');
+    const speedStatusLabel = document.getElementById('speed-status-label');
     const copyAllBtn = document.getElementById('copy-all-btn');
+
+    // Creator elements
     const openCreatorBtn = document.getElementById('open-creator-btn');
     const openCreatorTopBtn = document.getElementById('open-creator-top-btn');
     const closeCreatorBtn = document.getElementById('close-creator-btn');
@@ -362,21 +586,58 @@ import { defaultLanguageTables } from '../data/languages';
     const toastMessage = document.getElementById('toast-message');
     const toastClose = document.getElementById('toast-close');
 
+    // Flashcard DOM Elements
+    const btnFcTypeCard = document.getElementById('btn-fc-type-card');
+    const btnFcTypeQuiz = document.getElementById('btn-fc-type-quiz');
+    const fcCardSubview = document.getElementById('fc-card-subview');
+    const fcQuizSubview = document.getElementById('fc-quiz-subview');
+    const fcFlashcard = document.getElementById('fc-flashcard');
+    const fcCardFront = document.getElementById('fc-card-front');
+    const fcCardBack = document.getElementById('fc-card-back');
+    const fcCharDisplay = document.getElementById('fc-char-display');
+    const fcRomajiDisplay = document.getElementById('fc-romaji-display');
+    const fcCharSubdisplay = document.getElementById('fc-char-subdisplay');
+    const fcCardCounter = document.getElementById('fc-card-counter');
+    const fcCardStatus = document.getElementById('fc-card-status');
+    const btnFcSpeak = document.getElementById('btn-fc-speak');
+    const btnFcMemorized = document.getElementById('btn-fc-memorized');
+    const btnFcUnmemorized = document.getElementById('btn-fc-unmemorized');
+    const btnFcPrev = document.getElementById('btn-fc-prev');
+    const btnFcNext = document.getElementById('btn-fc-next');
+    const btnFcRandom = document.getElementById('btn-fc-random');
+
+    // Quiz DOM Elements
+    const quizScoreBadge = document.getElementById('quiz-score-badge');
+    const quizQuestionChar = document.getElementById('quiz-question-char');
+    const quizOptionsGrid = document.getElementById('quiz-options-grid');
+    const quizFeedback = document.getElementById('quiz-feedback');
+    const btnQuizNextQuestion = document.getElementById('btn-quiz-next-question');
+
+    // Phrases DOM Elements
+    const phrasesTitle = document.getElementById('phrases-title');
+    const phrasesContentWrapper = document.getElementById('phrases-content-wrapper');
+
     function showToast(msg: string) {
       if (!toast || !toastMessage) return;
       toastMessage.textContent = msg;
       toast.classList.remove('hidden');
       setTimeout(() => toast.classList.add('hidden'), 4000);
     }
-
     toastClose?.addEventListener('click', () => toast?.classList.add('hidden'));
-
 
     function saveCustomTablesToStorage() {
       localStorage.setItem('custom_character_tables', JSON.stringify(customTables));
     }
 
-    // Google Speech Synthesizer Engine dengan Fallback Audio Stream
+    function saveProgressMap() {
+      localStorage.setItem('user_study_progress_map', JSON.stringify(userProgressMap));
+      if (currentUser && currentTableId) {
+        const chars = userProgressMap[currentTableId] || [];
+        saveUserProgressToCloud(currentUser.id, currentTableId, chars).catch(() => {});
+      }
+    }
+
+    // Web Speech Synthesis
     let cachedVoices: SpeechSynthesisVoice[] = [];
     function loadVoices() {
       if ('speechSynthesis' in window) {
@@ -392,54 +653,421 @@ import { defaultLanguageTables } from '../data/languages';
       if (!isAudioEnabled || !text) return;
       const langCode = lang ? lang.split('-')[0].toLowerCase() : 'ja';
 
-      // 1. Prioritaskan suara resmi Google dari Web Speech API
       if ('speechSynthesis' in window) {
         try {
           window.speechSynthesis.cancel();
           const utter = new SpeechSynthesisUtterance(text);
           if (lang) utter.lang = lang;
-          utter.rate = 0.85;
+          utter.rate = currentAudioRate;
 
           const voices = cachedVoices.length ? cachedVoices : window.speechSynthesis.getVoices();
-          
-          // Cari suara resmi Google untuk bahasa ini
           const googleVoice = voices.find(v => 
             (v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()) && 
             v.name.toLowerCase().includes('google')
           );
-
           const naturalVoice = voices.find(v => 
             (v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()) && 
             (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online'))
           );
-
           const matchedVoice = voices.find(v => 
             v.lang.toLowerCase().startsWith(langCode) || v.lang.toLowerCase() === (lang || '').toLowerCase()
           );
 
-          if (googleVoice) {
-            utter.voice = googleVoice;
-          } else if (naturalVoice) {
-            utter.voice = naturalVoice;
-          } else if (matchedVoice) {
-            utter.voice = matchedVoice;
-          }
+          if (googleVoice) utter.voice = googleVoice;
+          else if (naturalVoice) utter.voice = naturalVoice;
+          else if (matchedVoice) utter.voice = matchedVoice;
 
           window.speechSynthesis.speak(utter);
           return;
-        } catch (e) {
-          console.warn('SpeechSynthesis error, falling back to Google Audio stream:', e);
-        }
+        } catch {}
       }
 
-      // 2. Fallback: Google Translate TTS Audio Stream
+      // Fallback
       try {
         const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(text)}`;
         const audio = new Audio(audioUrl);
         audio.play().catch(() => {});
-      } catch (err) {
-        console.warn('Audio play error:', err);
+      } catch {}
+    }
+
+    // Toggle Audio Speed: 1.0x -> 0.75x -> 1.0x
+    toggleSpeedBtn?.addEventListener('click', () => {
+      if (currentAudioRate === 1.0) {
+        currentAudioRate = 0.75;
+      } else {
+        currentAudioRate = 1.0;
       }
+      if (speedStatusLabel) speedStatusLabel.textContent = `${currentAudioRate.toFixed(2)}x`;
+      showToast(`🐢 Kecepatan audio diatur ke ${currentAudioRate.toFixed(2)}x ${currentAudioRate < 1 ? '(Lambat)' : '(Normal)'}`);
+    });
+
+    // Helper: get flat list of valid characters for current table
+    function getCurrentTableCells(): { char: string; romaji: string }[] {
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+      if (!currentTable) return [];
+      const cells: { char: string; romaji: string }[] = [];
+      currentTable.grid.forEach((row: any[]) => {
+        row.forEach((cell: any) => {
+          if (cell && cell.char) {
+            cells.push({ char: cell.char, romaji: cell.romaji || '' });
+          }
+        });
+      });
+      return cells;
+    }
+
+    // Update Progress UI
+    function updateProgressUI() {
+      const cells = getCurrentTableCells();
+      const total = cells.length;
+      const memorized = (userProgressMap[currentTableId] || []).filter(ch => cells.some(c => c.char === ch));
+      const count = memorized.length;
+      const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+
+      if (progressCountLabel) progressCountLabel.textContent = `${count} / ${total} Huruf`;
+      if (progressPercentLabel) progressPercentLabel.textContent = `(${pct}%)`;
+      if (progressFillBar) progressFillBar.style.width = `${pct}%`;
+    }
+
+    // Reset Progress for current table
+    btnResetProgress?.addEventListener('click', () => {
+      if (confirm('Reset seluruh tanda hafalan untuk aksara bahasa ini?')) {
+        userProgressMap[currentTableId] = [];
+        saveProgressMap();
+        updateProgressUI();
+        renderCurrentTable();
+        if (currentViewMode === 'flashcard') updateFlashcardCard();
+        showToast('Progres hafalan berhasil di-reset.');
+      }
+    });
+
+    // Mode Switchers
+    function switchViewMode(mode: 'table' | 'flashcard' | 'phrases') {
+      currentViewMode = mode;
+      
+      btnModeTable?.classList.toggle('bg-ink', mode === 'table');
+      btnModeTable?.classList.toggle('text-canvas', mode === 'table');
+      btnModeTable?.classList.toggle('border-ink', mode === 'table');
+      btnModeTable?.classList.toggle('bg-canvas', mode !== 'table');
+      btnModeTable?.classList.toggle('text-steel', mode !== 'table');
+
+      btnModeFlashcard?.classList.toggle('bg-ink', mode === 'flashcard');
+      btnModeFlashcard?.classList.toggle('text-canvas', mode === 'flashcard');
+      btnModeFlashcard?.classList.toggle('border-ink', mode === 'flashcard');
+      btnModeFlashcard?.classList.toggle('bg-canvas', mode !== 'flashcard');
+      btnModeFlashcard?.classList.toggle('text-steel', mode !== 'flashcard');
+
+      btnModePhrases?.classList.toggle('bg-ink', mode === 'phrases');
+      btnModePhrases?.classList.toggle('text-canvas', mode === 'phrases');
+      btnModePhrases?.classList.toggle('border-ink', mode === 'phrases');
+      btnModePhrases?.classList.toggle('bg-canvas', mode !== 'phrases');
+      btnModePhrases?.classList.toggle('text-steel', mode !== 'phrases');
+
+      viewerContainer?.classList.toggle('hidden', mode !== 'table');
+      flashcardContainer?.classList.toggle('hidden', mode !== 'flashcard');
+      phrasesContainer?.classList.toggle('hidden', mode !== 'phrases');
+
+      if (mode === 'flashcard') {
+        initFlashcard();
+      } else if (mode === 'phrases') {
+        renderPhrases();
+      }
+    }
+
+    btnModeTable?.addEventListener('click', () => switchViewMode('table'));
+    btnModeFlashcard?.addEventListener('click', () => switchViewMode('flashcard'));
+    btnModePhrases?.addEventListener('click', () => switchViewMode('phrases'));
+
+    // ========================================================
+    // FLASHCARD & QUIZ LOGIC
+    // ========================================================
+    btnFcTypeCard?.addEventListener('click', () => {
+      fcMode = 'card';
+      btnFcTypeCard?.classList.add('bg-ink', 'text-canvas', 'border-ink');
+      btnFcTypeCard?.classList.remove('bg-canvas', 'text-steel');
+      btnFcTypeQuiz?.classList.remove('bg-ink', 'text-canvas', 'border-ink');
+      btnFcTypeQuiz?.classList.add('bg-canvas', 'text-steel');
+      fcCardSubview?.classList.remove('hidden');
+      fcQuizSubview?.classList.add('hidden');
+      updateFlashcardCard();
+    });
+
+    btnFcTypeQuiz?.addEventListener('click', () => {
+      fcMode = 'quiz';
+      btnFcTypeQuiz?.classList.add('bg-ink', 'text-canvas', 'border-ink');
+      btnFcTypeQuiz?.classList.remove('bg-canvas', 'text-steel');
+      btnFcTypeCard?.classList.remove('bg-ink', 'text-canvas', 'border-ink');
+      btnFcTypeCard?.classList.add('bg-canvas', 'text-steel');
+      fcQuizSubview?.classList.remove('hidden');
+      fcCardSubview?.classList.add('hidden');
+      initQuizQuestion();
+    });
+
+    function initFlashcard() {
+      const cells = getCurrentTableCells();
+      if (cells.length === 0) return;
+      if (fcIndex >= cells.length) fcIndex = 0;
+      fcIsFlipped = false;
+      updateFlashcardCard();
+    }
+
+    function updateFlashcardCard() {
+      const cells = getCurrentTableCells();
+      if (cells.length === 0) return;
+      const cell = cells[fcIndex];
+      const memorizedList = userProgressMap[currentTableId] || [];
+      const isMem = memorizedList.includes(cell.char);
+
+      if (fcCardCounter) fcCardCounter.textContent = `Kartu ${fcIndex + 1} dari ${cells.length}`;
+      if (fcCardStatus) {
+        fcCardStatus.textContent = isMem ? '✓ Sudah Dihafal' : 'Belum Dihafal';
+        fcCardStatus.className = isMem ? 'text-ok font-bold' : 'text-smoke font-mono';
+      }
+
+      if (fcCharDisplay) fcCharDisplay.textContent = cell.char;
+      if (fcRomajiDisplay) fcRomajiDisplay.textContent = cell.romaji || cell.char;
+      if (fcCharSubdisplay) fcCharSubdisplay.textContent = cell.char;
+
+      // Reset flip state
+      fcIsFlipped = false;
+      fcCardFront?.classList.remove('hidden');
+      fcCardBack?.classList.add('hidden');
+    }
+
+    fcFlashcard?.addEventListener('click', () => {
+      fcIsFlipped = !fcIsFlipped;
+      if (fcIsFlipped) {
+        fcCardFront?.classList.add('hidden');
+        fcCardBack?.classList.remove('hidden');
+        const cells = getCurrentTableCells();
+        const cell = cells[fcIndex];
+        const allTables = getAllTables();
+        const currentTable = allTables.find(t => t.id === currentTableId);
+        if (cell) speakText(cell.char, currentTable?.voiceLang);
+      } else {
+        fcCardFront?.classList.remove('hidden');
+        fcCardBack?.classList.add('hidden');
+      }
+    });
+
+    btnFcSpeak?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const cells = getCurrentTableCells();
+      const cell = cells[fcIndex];
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+      if (cell) speakText(cell.char, currentTable?.voiceLang);
+    });
+
+    btnFcMemorized?.addEventListener('click', () => {
+      const cells = getCurrentTableCells();
+      const cell = cells[fcIndex];
+      if (!cell) return;
+      if (!userProgressMap[currentTableId]) userProgressMap[currentTableId] = [];
+      if (!userProgressMap[currentTableId].includes(cell.char)) {
+        userProgressMap[currentTableId].push(cell.char);
+        saveProgressMap();
+        updateProgressUI();
+        renderCurrentTable();
+        showToast(`✓ Huruf "${cell.char}" ditandai sudah hafal!`);
+      }
+      // advance to next
+      btnFcNext?.click();
+    });
+
+    btnFcUnmemorized?.addEventListener('click', () => {
+      const cells = getCurrentTableCells();
+      const cell = cells[fcIndex];
+      if (!cell) return;
+      if (userProgressMap[currentTableId]) {
+        userProgressMap[currentTableId] = userProgressMap[currentTableId].filter(ch => ch !== cell.char);
+        saveProgressMap();
+        updateProgressUI();
+        renderCurrentTable();
+      }
+      btnFcNext?.click();
+    });
+
+    btnFcNext?.addEventListener('click', () => {
+      const cells = getCurrentTableCells();
+      if (cells.length === 0) return;
+      fcIndex = (fcIndex + 1) % cells.length;
+      updateFlashcardCard();
+    });
+
+    btnFcPrev?.addEventListener('click', () => {
+      const cells = getCurrentTableCells();
+      if (cells.length === 0) return;
+      fcIndex = (fcIndex - 1 + cells.length) % cells.length;
+      updateFlashcardCard();
+    });
+
+    btnFcRandom?.addEventListener('click', () => {
+      const cells = getCurrentTableCells();
+      if (cells.length === 0) return;
+      fcIndex = Math.floor(Math.random() * cells.length);
+      updateFlashcardCard();
+    });
+
+    // ========================================================
+    // QUIZ MODE LOGIC
+    // ========================================================
+    let currentQuizAnswer = '';
+    function initQuizQuestion() {
+      const cells = getCurrentTableCells();
+      if (cells.length < 4) {
+        if (quizQuestionChar) quizQuestionChar.textContent = '-';
+        if (quizFeedback) quizFeedback.textContent = 'Minimal 4 huruf diperlukan untuk mode kuis.';
+        return;
+      }
+
+      if (btnQuizNextQuestion) btnQuizNextQuestion.classList.add('hidden');
+      if (quizFeedback) quizFeedback.textContent = '';
+
+      // Pick random question
+      const targetCell = cells[Math.floor(Math.random() * cells.length)];
+      currentQuizAnswer = targetCell.romaji || targetCell.char;
+
+      if (quizQuestionChar) quizQuestionChar.textContent = targetCell.char;
+
+      // Pick 3 distractors
+      const distractors = cells
+        .filter(c => (c.romaji || c.char) !== currentQuizAnswer)
+        .map(c => c.romaji || c.char);
+      
+      // Shuffle distractors
+      const shuffledDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 3);
+      const options = [currentQuizAnswer, ...shuffledDistractors].sort(() => 0.5 - Math.random());
+
+      if (quizOptionsGrid) {
+        quizOptionsGrid.innerHTML = '';
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'py-3.5 px-4 border-2 border-rule bg-canvas hover:border-ink font-mono font-bold text-[16px] text-ink transition-colors shadow-sm select-none';
+          btn.textContent = opt;
+          btn.addEventListener('click', () => handleQuizOptionClick(btn, opt, targetCell.char));
+          quizOptionsGrid.appendChild(btn);
+        });
+      }
+    }
+
+    function handleQuizOptionClick(clickedBtn: HTMLButtonElement, chosen: string, char: string) {
+      const allButtons = quizOptionsGrid?.querySelectorAll('button') || [];
+      allButtons.forEach(b => (b.disabled = true));
+
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+      speakText(char, currentTable?.voiceLang);
+
+      if (chosen === currentQuizAnswer) {
+        clickedBtn.classList.remove('border-rule', 'bg-canvas');
+        clickedBtn.classList.add('border-ok', 'bg-ok/20', 'text-ok');
+        if (quizFeedback) {
+          quizFeedback.textContent = '✓ BENAR SEKALI!';
+          quizFeedback.className = 'h-6 mt-3 text-xs font-mono font-bold text-center text-ok';
+        }
+        quizScore += 10;
+        if (quizScoreBadge) quizScoreBadge.textContent = `Skor: ${quizScore}`;
+        
+        // Auto mark as memorized
+        if (!userProgressMap[currentTableId]) userProgressMap[currentTableId] = [];
+        if (!userProgressMap[currentTableId].includes(char)) {
+          userProgressMap[currentTableId].push(char);
+          saveProgressMap();
+          updateProgressUI();
+        }
+      } else {
+        clickedBtn.classList.remove('border-rule', 'bg-canvas');
+        clickedBtn.classList.add('border-red-500', 'bg-red-500/10', 'text-red-500');
+        allButtons.forEach(b => {
+          if (b.textContent === currentQuizAnswer) {
+            b.classList.remove('border-rule');
+            b.classList.add('border-ok', 'bg-ok/20', 'text-ok');
+          }
+        });
+        if (quizFeedback) {
+          quizFeedback.textContent = `SALAH! Jawaban yang benar adalah "${currentQuizAnswer}".`;
+          quizFeedback.className = 'h-6 mt-3 text-xs font-mono font-bold text-center text-red-500';
+        }
+      }
+
+      if (btnQuizNextQuestion) btnQuizNextQuestion.classList.remove('hidden');
+    }
+
+    btnQuizNextQuestion?.addEventListener('click', initQuizQuestion);
+
+    // ========================================================
+    // PHRASES VIEW LOGIC
+    // ========================================================
+    function renderPhrases() {
+      if (!phrasesContentWrapper) return;
+      const data = phrasesData[currentTableId];
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+
+      if (phrasesTitle) {
+        phrasesTitle.textContent = `Frasa Penting: ${currentTable?.name || 'Bahasa'}`;
+      }
+
+      if (!data || !data.categories || data.categories.length === 0) {
+        phrasesContentWrapper.innerHTML = `
+          <div class="py-10 text-center border border-dashed border-rule text-smoke font-mono text-xs">
+            Frasa dasar untuk bahasa "${currentTable?.name || ''}" sedang dipersiapkan.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      data.categories.forEach((cat: any) => {
+        html += `
+          <div class="p-4 sm:p-5 border border-rule bg-canvas space-y-3">
+            <h3 class="text-[15px] font-bold text-ink border-b border-rule pb-2 flex items-center justify-between">
+              <span>${cat.categoryName}</span>
+              <span class="text-[11px] font-mono text-smoke font-normal">${cat.items.length} frasa</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+        `;
+
+        cat.items.forEach((item: any) => {
+          html += `
+            <div class="p-3 border border-rule bg-smoke/5 hover:border-ink transition-colors flex items-center justify-between gap-3 font-mono">
+              <div class="min-w-0 flex-1">
+                <div class="text-[16px] font-bold text-ink tracking-wide truncate">${item.native}</div>
+                <div class="text-[12px] text-steel font-medium mt-0.5">${item.transliteration}</div>
+                <div class="text-[11px] text-smoke italic font-sans mt-0.5">${item.meaning}</div>
+              </div>
+              <button 
+                type="button" 
+                class="btn-speak-phrase px-2.5 py-1.5 border border-rule hover:border-ink hover:bg-canvas text-ink text-xs shrink-0 select-none cursor-pointer"
+                data-native="${item.native}"
+                data-lang="${data.voiceLang || currentTable?.voiceLang || 'en-US'}"
+                title="Dengarkan pengucapan audio"
+              >
+                🔊
+              </button>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      phrasesContentWrapper.innerHTML = html;
+
+      // Event listener for speak buttons
+      phrasesContentWrapper.querySelectorAll('.btn-speak-phrase').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const text = btn.getAttribute('data-native') || '';
+          const lang = btn.getAttribute('data-lang') || '';
+          speakText(text, lang);
+        });
+      });
     }
 
     // Parse Text to Grid
@@ -448,25 +1076,10 @@ import { defaultLanguageTables } from '../data/languages';
       const grid: any[] = [];
       for (const line of lines) {
         let parts: string[] = [];
-        
-        if (line.includes('\t')) {
-          parts = line.split('\t').map(p => p.trim());
-          if (parts.length === 2 && !parts[0].includes('=') && !parts[1].includes('=')) {
-            grid.push([{ romaji: parts[0], char: parts[1] }]);
-            continue;
-          }
-          if (parts.length > 2 && parts.length % 2 === 0) {
-            const row: any[] = [];
-            for (let i = 0; i < parts.length; i += 2) {
-              row.push({ romaji: parts[i], char: parts[i+1] });
-            }
-            grid.push(row);
-            continue;
-          }
-        } else if (line.includes('|')) {
+        if (line.includes('|')) {
           parts = line.split('|').map(p => p.trim());
-        } else if (line.includes(';')) {
-          parts = line.split(';').map(p => p.trim());
+        } else if (line.includes('\t')) {
+          parts = line.split('\t').map(p => p.trim());
         } else if (line.includes(',')) {
           parts = line.split(',').map(p => p.trim());
         } else {
@@ -475,15 +1088,10 @@ import { defaultLanguageTables } from '../data/languages';
 
         const row: any[] = [];
         for (const part of parts) {
-          if (!part || part === '-' || part.toLowerCase() === 'null') {
+          if (!part || part === '-' || part === 'null') {
             row.push(null);
-            continue;
-          }
-          if (part.includes('=')) {
+          } else if (part.includes('=')) {
             const [romaji, char] = part.split('=').map(s => s.trim());
-            row.push({ romaji: romaji || '', char: char || '' });
-          } else if (part.includes(':')) {
-            const [romaji, char] = part.split(':').map(s => s.trim());
             row.push({ romaji: romaji || '', char: char || '' });
           } else {
             row.push({ romaji: '', char: part });
@@ -494,8 +1102,8 @@ import { defaultLanguageTables } from '../data/languages';
       return grid;
     }
 
-    // Excel file input handler
-    if (formExcelInput && formText) {
+    // Excel upload handler
+    if (formExcelInput) {
       formExcelInput.addEventListener('change', (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (!file) return;
@@ -530,9 +1138,11 @@ import { defaultLanguageTables } from '../data/languages';
                 }
               }
 
-              formText.value = formattedLines.join('\n');
-              renderCreatorPreview();
-              showToast(`✓ Berhasil memuat ${formattedLines.length} baris dari Excel!`);
+              if (formText) {
+                formText.value = formattedLines.join('\n');
+                renderCreatorPreview();
+                showToast(`✓ Berhasil memuat ${formattedLines.length} baris dari Excel!`);
+              }
             } catch {
               showToast('Gagal memproses file Excel.');
             }
@@ -541,9 +1151,11 @@ import { defaultLanguageTables } from '../data/languages';
         } else {
           const reader = new FileReader();
           reader.onload = (evt) => {
-            formText.value = evt.target?.result as string;
-            renderCreatorPreview();
-            showToast(`✓ File teks/CSV dimuat!`);
+            if (formText) {
+              formText.value = evt.target?.result as string;
+              renderCreatorPreview();
+              showToast('✓ File teks/CSV dimuat!');
+            }
           };
           reader.readAsText(file);
         }
@@ -554,7 +1166,7 @@ import { defaultLanguageTables } from '../data/languages';
       if (!creatorPreview || !formText) return;
       const grid = parseTextToGrid(formText.value);
       if (grid.length === 0) {
-        creatorPreview.innerHTML = '<span class="text-smoke italic font-mono">Ketik atau paste dari Excel di kotak atas untuk melihat pratinjau tabel...</span>';
+        creatorPreview.innerHTML = '<span class="text-smoke italic font-mono text-[12px]">Ketik atau paste dari Excel di kotak atas untuk melihat pratinjau tabel...</span>';
         return;
       }
 
@@ -579,13 +1191,12 @@ import { defaultLanguageTables } from '../data/languages';
 
     formText?.addEventListener('input', renderCreatorPreview);
 
-    // Render Language Tabs (Perbaikan Image 1)
+    // Render Language Tabs
     function renderTabs() {
       if (!tabBar) return;
       tabBar.innerHTML = '';
       const allTables = getAllTables();
 
-      // Jika dalam status belum ditambahkan, tampilkan tab khusus aktif di posisi paling depan
       if (isUnaddedState) {
         const unaddedBtn = document.createElement('button');
         unaddedBtn.type = 'button';
@@ -634,6 +1245,9 @@ import { defaultLanguageTables } from '../data/languages';
           if (searchInput) searchInput.value = '';
           renderTabs();
           renderCurrentTable();
+          updateProgressUI();
+          if (currentViewMode === 'flashcard') initFlashcard();
+          if (currentViewMode === 'phrases') renderPhrases();
         });
         tabBar.appendChild(btn);
       });
@@ -660,20 +1274,13 @@ import { defaultLanguageTables } from '../data/languages';
 
     // Render Table Grid
     function renderCurrentTable() {
-      // JIKA DALAM STATUS BELUM DITAMBAHKAN, TAMPILKAN EMPTY STATE KHUSUS (JANGAN KE HIRAGANA / AKSARA LAIN)
       if (isUnaddedState) {
-        if (customActions) {
-          customActions.classList.add('hidden');
-          customActions.classList.remove('flex');
-        }
-
+        if (customActions) customActions.classList.add('hidden');
         if (tableBadge) {
           tableBadge.textContent = `${unaddedInfo.flag} ${unaddedInfo.country} · BELUM TERSEDIA`;
           tableBadge.className = 'px-2.5 py-1 text-[11px] font-mono border border-badge text-badge bg-badge/10 uppercase tracking-wider font-bold';
         }
-        if (tableTitle) {
-          tableTitle.textContent = `Aksara ${unaddedInfo.country} Belum Ditambahkan`;
-        }
+        if (tableTitle) tableTitle.textContent = `Aksara ${unaddedInfo.country} Belum Ditambahkan`;
         if (tableDescription) {
           tableDescription.textContent = `Aksara atau materi kosakata untuk bahasa ${unaddedInfo.language ? unaddedInfo.language + ' (' + unaddedInfo.country + ')' : unaddedInfo.country} belum tersedia di database bawaan.`;
         }
@@ -709,18 +1316,10 @@ import { defaultLanguageTables } from '../data/languages';
                 >
                   ← Kembali ke Katalog Negara
                 </a>
-                <button 
-                  type="button" 
-                  id="btn-see-existing-languages" 
-                  class="btn btn-ghost font-mono text-[13px] px-4 py-2.5 text-steel hover:text-ink cursor-pointer"
-                >
-                  Lihat Aksara yang Sudah Tersedia (Jepang, Arab, dll.) →
-                </button>
               </div>
             </div>
           `;
 
-          // Event listener untuk tombol buat tabel dari state unadded
           document.getElementById('btn-trigger-create-unadded')?.addEventListener('click', () => {
             openCreator();
             const formName = document.getElementById('form-name') as HTMLInputElement | null;
@@ -729,14 +1328,6 @@ import { defaultLanguageTables } from '../data/languages';
             if (formName) formName.value = unaddedInfo.country;
             if (formTitle) formTitle.value = `Tabel Aksara / Kosakata ${unaddedInfo.country}`;
             if (formVoice && unaddedInfo.voice) formVoice.value = unaddedInfo.voice;
-          });
-
-          // Pindah ke aksara pertama yang tersedia
-          document.getElementById('btn-see-existing-languages')?.addEventListener('click', () => {
-            isUnaddedState = false;
-            currentTableId = defaultTables[0]?.id || '';
-            renderTabs();
-            renderCurrentTable();
           });
         }
         return;
@@ -752,18 +1343,15 @@ import { defaultLanguageTables } from '../data/languages';
 
       const isCustom = customTables.some(c => c.id === currentTable.id);
       if (customActions) {
-        if (isCustom) {
-          customActions.classList.remove('hidden');
-          customActions.classList.add('flex');
-        } else {
-          customActions.classList.add('hidden');
-          customActions.classList.remove('flex');
-        }
+        customActions.classList.toggle('hidden', !isCustom);
+        customActions.classList.toggle('flex', isCustom);
       }
 
       if (tableTitle) tableTitle.textContent = currentTable.title;
       if (tableBadge) tableBadge.textContent = `${currentTable.flag ? currentTable.flag + ' ' : ''}${currentTable.badge || currentTable.name}`;
       if (tableDescription) tableDescription.textContent = currentTable.description || '';
+
+      const memorizedList = userProgressMap[currentTable.id] || [];
 
       let html = '<table class="w-full border-collapse border border-ink text-center bg-canvas select-text font-mono">';
       html += '<tbody>';
@@ -784,14 +1372,20 @@ import { defaultLanguageTables } from '../data/languages';
 
           const highlightClass = filter && matches ? 'bg-badge/20 font-bold ring-2 ring-badge' : '';
           const dimClass = filter && !matches ? 'opacity-25' : '';
+          const isMemorized = memorizedList.includes(cell.char);
 
           html += `<td 
-            class="border border-ink p-2 sm:p-4 hover:bg-tint cursor-pointer transition-colors min-w-[70px] sm:min-w-[100px] h-16 sm:h-20 ${highlightClass} ${dimClass}"
+            class="border border-ink p-2 sm:p-4 hover:bg-tint cursor-pointer transition-colors min-w-[70px] sm:min-w-[100px] h-16 sm:h-20 relative select-none ${highlightClass} ${dimClass} ${isMemorized ? 'bg-ok/5 ring-1 ring-ok/40' : ''}"
             data-char="${cell.char}"
             data-romaji="${cell.romaji}"
             data-lang="${currentTable.voiceLang || ''}"
             title="Klik untuk dengar suara atau salin '${cell.char}'"
           >`;
+          
+          if (isMemorized) {
+            html += `<span class="absolute top-1 right-1 text-[10px] font-bold text-ok select-none" title="Sudah Hafal">✓</span>`;
+          }
+
           html += `<div class="flex items-center justify-center gap-1.5 sm:gap-2 text-[15px] sm:text-[18px]">`;
           if (cell.romaji) {
             html += `<span class="text-steel font-normal">${cell.romaji}</span>`;
@@ -864,7 +1458,6 @@ import { defaultLanguageTables } from '../data/languages';
       creatorModal?.classList.remove('hidden');
       document.getElementById('buat-tabel')?.scrollIntoView({ behavior: 'smooth' });
     }
-
     function closeCreator() {
       creatorModal?.classList.add('hidden');
     }
@@ -874,7 +1467,6 @@ import { defaultLanguageTables } from '../data/languages';
     closeCreatorBtn?.addEventListener('click', closeCreator);
     cancelCreatorBtn?.addEventListener('click', closeCreator);
 
-    // Pre-fill creator if URL has create params
     if (createTarget) {
       const formName = document.getElementById('form-name') as HTMLInputElement | null;
       const formTitle = document.getElementById('form-title') as HTMLInputElement | null;
@@ -884,7 +1476,6 @@ import { defaultLanguageTables } from '../data/languages';
       if (formVoice && voiceTarget) formVoice.value = voiceTarget;
     }
 
-    // Load Sample Data
     loadSampleBtn?.addEventListener('click', () => {
       const sample = `A = あ | I = い | U = う | E = え | O = お
 Ka = か | Ki = き | Ku = く | Ke = け | Ko = こ
@@ -894,7 +1485,6 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       renderCreatorPreview();
     });
 
-    // Creator Form Submit
     creatorForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = (document.getElementById('form-name') as HTMLInputElement)?.value.trim();
@@ -904,10 +1494,9 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       const text = formText?.value.trim() || '';
 
       if (!name || !title || !text) return;
-
       const grid = parseTextToGrid(text);
       if (grid.length === 0) {
-        showToast('Format teks atau file Excel tidak menghasilkan data tabel!');
+        showToast('Format teks tidak menghasilkan data tabel!');
         return;
       }
 
@@ -927,13 +1516,10 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       customTables.push(newTable);
       saveCustomTablesToStorage();
 
-      // Cloud sync jika login
       if (currentUser) {
         try {
           await saveCustomTableToCloud(currentUser.id, newTable);
-        } catch (err) {
-          console.warn('Gagal simpan tabel ke Supabase:', err);
-        }
+        } catch {}
       }
 
       currentTableId = newId;
@@ -941,11 +1527,11 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       closeCreator();
       renderTabs();
       renderCurrentTable();
+      updateProgressUI();
       showToast(`✓ Tabel "${name}" berhasil dibuat dan disimpan!`);
       document.getElementById('area-belajar')?.scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Delete Custom Table
     deleteTableBtn?.addEventListener('click', async () => {
       const isCustom = customTables.some(c => c.id === currentTableId);
       if (!isCustom) return;
@@ -958,23 +1544,23 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
         if (currentUser) {
           try {
             await deleteCustomTableFromCloud(currentUser.id, deletedId);
-          } catch (err) {
-            console.warn('Gagal hapus tabel dari Supabase:', err);
-          }
+          } catch {}
         }
 
         currentTableId = defaultTables[0]?.id || '';
         renderTabs();
         renderCurrentTable();
+        updateProgressUI();
         showToast('Tabel kustom berhasil dihapus.');
       }
     });
 
-    // Check auth on load to fetch user's cloud tables
-    async function initUserCustomTables() {
+    // Cloud initialization
+    async function initUserCloudData() {
       try {
         currentUser = await getCurrentUser();
         if (currentUser) {
+          // 1. Fetch user custom tables
           const cloudTables = await fetchUserCustomTablesFromCloud(currentUser.id);
           if (cloudTables && cloudTables.length > 0) {
             const existingIds = new Set(customTables.map(t => t.id));
@@ -1001,15 +1587,35 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
               renderCurrentTable();
             }
           }
+
+          // 2. Fetch user study progress from Supabase
+          const cloudProgress = await fetchUserProgressFromCloud(currentUser.id);
+          if (cloudProgress && Object.keys(cloudProgress).length > 0) {
+            Object.assign(userProgressMap, cloudProgress);
+            localStorage.setItem('user_study_progress_map', JSON.stringify(userProgressMap));
+            updateProgressUI();
+            renderCurrentTable();
+          }
         }
       } catch (err) {
-        console.warn('Init user custom tables error:', err);
+        console.warn('Init user cloud data error:', err);
       }
     }
+
+    window.addEventListener('supabase-data-loaded', () => {
+      initUserCloudData();
+    });
 
     // Initial render
     renderTabs();
     renderCurrentTable();
-    initUserCustomTables();
+    updateProgressUI();
+    initUserCloudData();
+
+    if (initialMode === 'phrases') {
+      switchViewMode('phrases');
+    } else if (initialMode === 'flashcard') {
+      switchViewMode('flashcard');
+    }
   }
 </script>

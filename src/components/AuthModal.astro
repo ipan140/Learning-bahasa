@@ -212,6 +212,7 @@
     removeTargetFromCloud,
     batchSyncTargetsToCloud,
     fetchUserCustomTablesFromCloud,
+    fetchUserProgressFromCloud,
     saveCustomTableToCloud,
     deleteCustomTableFromCloud
   } from '../lib/supabase';
@@ -246,6 +247,7 @@
 
   const syncTargetCount = document.getElementById('sync-target-count');
   const syncTableCount = document.getElementById('sync-table-count');
+  const syncCharCount = document.getElementById('sync-char-count');
 
   function showAlert(msg: string, type: 'error' | 'success' | 'info' = 'info') {
     if (!alertBox) return;

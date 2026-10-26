@@ -1,0 +1,232 @@
+---
+// CommandPalette.astro - Pencarian Cepat Global (Ctrl + K)
+import { defaultLanguageTables } from '../data/languages';
+import { worldCountries } from '../data/countries';
+
+const searchData = [
+  // Actions
+  { type: 'action', title: '🎴 Mode Flashcard & Latihan Aksara', subtitle: 'Latihan hafalan bolak-balik & kuis pilihan ganda', href: '/belajar?mode=flashcard' },
+  { type: 'action', title: '💬 Frasa Dasar Sehari-hari', subtitle: 'Salam, ucapan terima kasih, dan angka 1-10 dengan audio', href: '/belajar?mode=phrases' },
+  { type: 'action', title: '🎮 Kuis Trivia 250 Negara', subtitle: 'Uji pengetahuan bahasa resmi & ibukota dunia', href: '/katalog' },
+  { type: 'action', title: '+ Buat Tabel Aksara Sendiri', subtitle: 'Tambah materi kustom atau impor dari file Excel', href: '/belajar#buat-tabel' },
+  
+  // Language Tables
+  ...defaultLanguageTables.map(t => ({
+    type: 'language',
+    title: `${t.flag || '🌐'} ${t.name}`,
+    subtitle: `${t.title} (${t.category || 'Aksara'})`,
+    href: `/belajar?lang=${t.id}`
+  })),
+
+  // Top/All Countries (120 countries for fast autocomplete)
+  ...worldCountries.slice(0, 120).map(c => ({
+    type: 'country',
+    title: `${c.flag} ${c.name}`,
+    subtitle: `Bahasa: ${c.language} · Ibukota: ${c.capital || '-'}`,
+    href: `/katalog?country=${encodeURIComponent(c.name)}`
+  }))
+];
+---
+
+<dialog id="command-palette-dialog" class="m-auto backdrop:bg-black/70 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-[560px] shadow-2xl font-mono">
+  <div class="flex flex-col max-h-[80vh]">
+    <!-- Search Bar Input Header -->
+    <div class="flex items-center gap-3 p-4 border-b border-rule bg-tint/30">
+      <span class="text-steel text-[16px]">🔍</span>
+      <input 
+        type="text" 
+        id="cp-search-input" 
+        placeholder="Ketik aksara, bahasa, atau negara..." 
+        class="flex-1 bg-transparent text-[14px] text-ink placeholder:text-smoke/70 outline-none font-mono"
+        autocomplete="off"
+      />
+      <button type="button" id="cp-close-btn" class="text-xs font-mono px-2 py-1 border border-rule hover:bg-smoke/10 text-smoke hover:text-ink shrink-0 ml-1 cursor-pointer">
+        [x]
+      </button>
+      <kbd class="hidden sm:inline-block text-[11px] px-1.5 py-0.5 border border-rule text-smoke uppercase font-mono">ESC</kbd>
+    </div>
+
+    <!-- Results List Container -->
+    <div id="cp-results-container" class="overflow-y-auto max-h-[50vh] p-2 divide-y divide-rule/40">
+      <!-- Items dynamically populated -->
+    </div>
+
+    <!-- Footer Bar Hints -->
+    <div class="p-3 border-t border-rule bg-tint/20 text-[11px] text-smoke flex items-center justify-between select-none">
+      <div class="flex items-center gap-3">
+        <span><kbd class="px-1 border border-rule bg-canvas">↑</kbd> <kbd class="px-1 border border-rule bg-canvas">↓</kbd> Pilih</span>
+        <span><kbd class="px-1 border border-rule bg-canvas">↵</kbd> Buka</span>
+      </div>
+      <span>Shortcut: <kbd class="px-1 border border-rule bg-canvas">Ctrl+K</kbd></span>
+    </div>
+  </div>
+</dialog>
+
+<script is:inline define:vars={{ searchData }}>
+  const cpDialog = document.getElementById('command-palette-dialog');
+  const cpInput = document.getElementById('cp-search-input');
+  const cpResults = document.getElementById('cp-results-container');
+  const cpCloseBtn = document.getElementById('cp-close-btn');
+  let selectedIndex = 0;
+  let filteredItems = [];
+
+  function openCommandPalette() {
+    if (!cpDialog) return;
+    if (typeof cpDialog.showModal === 'function') {
+      try {
+        if (!cpDialog.open) cpDialog.showModal();
+      } catch (e) {
+        cpDialog.setAttribute('open', '');
+      }
+    } else {
+      cpDialog.setAttribute('open', '');
+    }
+
+    if (cpInput) {
+      cpInput.value = '';
+      renderPaletteResults('');
+      setTimeout(() => {
+        cpInput.focus();
+      }, 50);
+    }
+  }
+
+  function closeCommandPalette() {
+    if (!cpDialog) return;
+    if (typeof cpDialog.close === 'function') {
+      try {
+        cpDialog.close();
+      } catch (e) {
+        cpDialog.removeAttribute('open');
+      }
+    } else {
+      cpDialog.removeAttribute('open');
+    }
+  }
+
+  function renderPaletteResults(query) {
+    if (!cpResults) return;
+    const q = (query || '').trim().toLowerCase();
+    
+    filteredItems = searchData.filter(item => {
+      if (!q) return true;
+      return item.title.toLowerCase().includes(q) || item.subtitle.toLowerCase().includes(q);
+    }).slice(0, 15);
+
+    if (filteredItems.length === 0) {
+      cpResults.innerHTML = '<div class="py-8 text-center text-smoke text-xs font-mono">Tidak ada hasil yang cocok dengan kata kunci tersebut.</div>';
+      return;
+    }
+
+    selectedIndex = 0;
+    let html = '';
+    filteredItems.forEach((item, idx) => {
+      const typeBadge = item.type === 'action' ? 'FITUR' : (item.type === 'language' ? 'AKSARA' : 'NEGARA');
+      const badgeClass = item.type === 'action' ? 'border-cta text-cta bg-cta/10' : (item.type === 'language' ? 'border-ink text-ink bg-tint' : 'border-rule text-smoke');
+
+      html += `
+        <a 
+          href="${item.href}" 
+          class="cp-item flex items-center justify-between gap-3 p-3 text-left transition-colors cursor-pointer select-none ${idx === 0 ? 'bg-tint/70' : 'hover:bg-tint/40'}"
+          data-idx="${idx}"
+        >
+          <div class="min-w-0 flex-1">
+            <div class="text-[14px] font-bold text-ink truncate">${item.title}</div>
+            <div class="text-[12px] text-steel truncate mt-0.5">${item.subtitle}</div>
+          </div>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 border ${badgeClass} uppercase font-bold shrink-0">${typeBadge}</span>
+        </a>
+      `;
+    });
+
+    cpResults.innerHTML = html;
+  }
+
+  function updateItemHighlight() {
+    const items = cpResults?.querySelectorAll('.cp-item');
+    items?.forEach((el, idx) => {
+      if (idx === selectedIndex) {
+        el.classList.add('bg-tint/70');
+        el.scrollIntoView({ block: 'nearest' });
+      } else {
+        el.classList.remove('bg-tint/70');
+      }
+    });
+  }
+
+  cpInput?.addEventListener('input', (e) => {
+    renderPaletteResults(e.target.value);
+  });
+
+  cpInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (filteredItems.length > 0) {
+        selectedIndex = (selectedIndex + 1) % filteredItems.length;
+        updateItemHighlight();
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (filteredItems.length > 0) {
+        selectedIndex = (selectedIndex - 1 + filteredItems.length) % filteredItems.length;
+        updateItemHighlight();
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const target = filteredItems[selectedIndex];
+      if (target) {
+        window.location.href = target.href;
+      }
+    }
+  });
+
+  cpCloseBtn?.addEventListener('click', closeCommandPalette);
+
+  // Global Ctrl + K / Cmd + K listener
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (cpDialog?.open) {
+        closeCommandPalette();
+      } else {
+        openCommandPalette();
+      }
+    }
+  });
+
+  // Close on backdrop click
+  cpDialog?.addEventListener('click', (e) => {
+    const rect = cpDialog.getBoundingClientRect();
+    if (
+      e.clientX < rect.left ||
+      e.clientX > rect.right ||
+      e.clientY < rect.top ||
+      e.clientY > rect.bottom
+    ) {
+      closeCommandPalette();
+    }
+  });
+
+  // Attach directly to trigger buttons
+  function attachTriggerListeners() {
+    document.getElementById('btn-trigger-search')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      openCommandPalette();
+    });
+    document.getElementById('btn-trigger-search-mobile')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const mobileMenu = document.querySelector('dialog.mobile-menu');
+      mobileMenu?.close();
+      setTimeout(() => openCommandPalette(), 60);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachTriggerListeners);
+  } else {
+    attachTriggerListeners();
+  }
+
+  // Export globally
+  window.openCommandPalette = openCommandPalette;
+</script>

@@ -3,6 +3,7 @@ import { site } from '../data/site';
 import ThemeSwitcher from './ThemeSwitcher.astro';
 import Logo from './Logo.astro';
 import AuthModal from './AuthModal.astro';
+import CommandPalette from './CommandPalette.astro';
 const path = Astro.url.pathname;
 ---
 
@@ -16,11 +17,23 @@ const path = Astro.url.pathname;
     <Logo />
     <ul class="hidden md:flex gap-7 text-[14px]">
       {site.nav.map((l) => (
-        <li><a href={l.href} class:list={['hover:text-ink', path.startsWith(l.href) && l.href !== '/' ? 'text-ink' : 'text-steel']}>{l.label}</a></li>
+        <li><a href={l.href} class:list={['hover:text-ink', path.startsWith(l.href) && (l.href as string) !== '/' ? 'text-ink' : 'text-steel']}>{l.label}</a></li>
       ))}
     </ul>
     <div class="ml-auto flex items-center gap-3">
       <div class="hidden md:block"><ThemeSwitcher /></div>
+
+            <!-- Quick Search Trigger Button -->
+      <button 
+        type="button" 
+        id="btn-trigger-search" 
+        class="text-[12px] font-mono px-2.5 py-1.5 border border-rule hover:border-ink transition-colors flex items-center gap-1.5 bg-canvas text-smoke hover:text-ink cursor-pointer"
+        title="Buka Pencarian Cepat (Ctrl + K)"
+      >
+        <span>🔍</span>
+        <span class="hidden lg:inline text-steel">Cari</span>
+        <kbd class="hidden sm:inline-block text-[10px] px-1 border border-rule bg-tint text-smoke uppercase font-mono">Ctrl+K</kbd>
+      </button>
 
       <!-- User Login Button -->
       <button 
@@ -58,6 +71,9 @@ const path = Astro.url.pathname;
       ))}
     </ul>
     <div class="mt-auto px-5 pt-5 pb-7 border-t border-rule flex flex-col gap-4">
+            <button type="button" id="btn-trigger-search-mobile" class="btn btn-secondary w-full justify-center text-center font-mono text-[13px]">
+        🔍 Cari Cepat (Aksara &amp; Negara)
+      </button>
       <button type="button" id="auth-trigger-btn-mobile" class="btn btn-secondary w-full justify-center text-center">
         Masuk ke Akun
       </button>
@@ -70,6 +86,7 @@ const path = Astro.url.pathname;
 
 <!-- Modal Otentikasi Supabase -->
 <AuthModal />
+<CommandPalette />
 
 <style>
   .site-header { transition: background-color 150ms ease-out, border-color 150ms ease-out; }
@@ -93,4 +110,16 @@ const path = Astro.url.pathname;
   document.querySelector('[data-menu-open]')?.addEventListener('click', () => menu.showModal());
   document.querySelector('[data-menu-close]')?.addEventListener('click', () => menu.close());
   menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.close()));
+
+  // Search button listeners
+  document.getElementById('btn-trigger-search')?.addEventListener('click', () => {
+    (window as any).openCommandPalette?.();
+  });
+
+  document.getElementById('btn-trigger-search-mobile')?.addEventListener('click', () => {
+    menu.close();
+    setTimeout(() => {
+      (window as any).openCommandPalette?.();
+    }, 60);
+  });
 </script>
