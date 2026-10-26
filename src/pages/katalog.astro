@@ -195,7 +195,8 @@ import { worldCountries } from '../data/countries';
     addTargetToCloud,
     removeTargetFromCloud,
     saveTargetNoteToCloud,
-    fetchUserTargetsWithNotesFromCloud
+    fetchUserTargetsWithNotesFromCloud,
+    saveUserQuizScoreToCloud
   } from '../lib/supabase';
 
   const container = document.getElementById('countries-app');
@@ -545,11 +546,15 @@ import { worldCountries } from '../data/countries';
       });
     });
 
-    // Search Handler
+    // Search Handler (debounced for smooth 250-country filtering)
+    let countrySearchDebounceTimer: any = null;
     searchInput?.addEventListener('input', (e) => {
-      countrySearchQuery = (e.target as HTMLInputElement).value;
-      countryDisplayLimit = 36;
-      renderCountries();
+      clearTimeout(countrySearchDebounceTimer);
+      countrySearchDebounceTimer = setTimeout(() => {
+        countrySearchQuery = (e.target as HTMLInputElement).value;
+        countryDisplayLimit = 36;
+        renderCountries();
+      }, 120);
     });
 
     // Load More Handler
@@ -632,10 +637,20 @@ import { worldCountries } from '../data/countries';
 
     let triviaScore = 0;
     let triviaStreak = 0;
+    let triviaHighScore = parseInt(localStorage.getItem('trivia_countries_high_score') || '0', 10);
     let triviaCorrectAnswer = '';
+
+    function updateTriviaScoreDisplay() {
+      if (triviaScoreLabel) {
+        triviaScoreLabel.textContent = triviaHighScore > 0 
+          ? `Skor: ${triviaScore} (Rekor: ${triviaHighScore})`
+          : `Skor: ${triviaScore}`;
+      }
+    }
 
     btnOpenTrivia?.addEventListener('click', () => {
       triviaModal?.showModal();
+      updateTriviaScoreDisplay();
       nextTriviaQuestion();
     });
 
@@ -699,6 +714,13 @@ import { worldCountries } from '../data/countries';
             }
             triviaScore += 10;
             triviaStreak += 1;
+            if (triviaScore > triviaHighScore) {
+              triviaHighScore = triviaScore;
+              localStorage.setItem('trivia_countries_high_score', String(triviaHighScore));
+              if (currentUser) {
+                saveUserQuizScoreToCloud(currentUser.id, 'trivia-countries', triviaHighScore).catch(() => {});
+              }
+            }
           } else {
             btn.classList.remove('border-rule', 'bg-canvas');
             btn.classList.add('border-red-500', 'bg-red-500/10', 'text-red-500');
@@ -715,7 +737,7 @@ import { worldCountries } from '../data/countries';
             triviaStreak = 0;
           }
 
-          if (triviaScoreLabel) triviaScoreLabel.textContent = `Skor: ${triviaScore}`;
+          updateTriviaScoreDisplay();
           if (triviaStreakLabel) triviaStreakLabel.textContent = `🔥 Streak: ${triviaStreak}`;
           if (btnNextTrivia) btnNextTrivia.classList.remove('hidden');
         });

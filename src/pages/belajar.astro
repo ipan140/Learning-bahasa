@@ -1035,6 +1035,7 @@ import { languagePhrasesData } from '../data/phrases';
       try {
         const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(text)}`;
         const audio = new Audio(audioUrl);
+        audio.playbackRate = currentAudioRate;
         audio.play().catch(() => {});
       } catch {}
     }
@@ -2618,15 +2619,19 @@ import { languagePhrasesData } from '../data/phrases';
       showToast(`Teks tabel "${currentTable.name}" disalin ke clipboard!`);
     });
 
-    // Search input
+    // Search input (debounced for fluid performance)
+    let searchDebounceTimer: any = null;
     searchInput?.addEventListener('input', (e) => {
-      tableSearchQuery = (e.target as HTMLInputElement).value;
-      if (isUnaddedState && tableSearchQuery) {
-        isUnaddedState = false;
-        currentTableId = defaultTables[0]?.id || '';
-        renderTabs();
-      }
-      renderCurrentTable();
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        tableSearchQuery = (e.target as HTMLInputElement).value;
+        if (isUnaddedState && tableSearchQuery) {
+          isUnaddedState = false;
+          currentTableId = defaultTables[0]?.id || '';
+          renderTabs();
+        }
+        renderCurrentTable();
+      }, 100);
     });
 
     // Creator Modal triggers
