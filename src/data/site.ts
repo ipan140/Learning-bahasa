@@ -7,42 +7,42 @@ export const site = {
   secondary: { label: 'Katalog 250 Negara', href: '/katalog' },
   pro: '/belajar',
   nav: [
-    { label: 'Panduan', href: '/#panduan' },
+    { label: 'Panduan & FAQ', href: '/panduan' },
     { label: 'Tabel Aksara', href: '/belajar' },
     { label: 'Katalog 250 Negara', href: '/katalog' },
   ],
   menu: [
-    { label: 'Panduan', href: '/#panduan' },
+    { label: 'Panduan & FAQ', href: '/panduan' },
     { label: 'Tabel Aksara', href: '/belajar' },
     { label: 'Katalog 250 Negara', href: '/katalog' },
-    { label: '+ Buat Tabel', href: '/belajar#buat-tabel' },
+    { label: '+ Buat Tabel Kustom', href: '/belajar#buat-tabel' },
   ],
   footer: [
     { 
-      title: 'Aksara Pilihan', 
+      title: 'Aksara & Kustom', 
       links: [
-        ['Jepang (Hiragana & Katakana)', '/belajar?lang=jepang-hiragana'], 
-        ['Jerman (Umlaut)', '/belajar?lang=jerman-dasar'], 
-        ['Korea (Hangul)', '/belajar?lang=korea-hangul'], 
-        ['Arab (Hijaiyah)', '/belajar?lang=arab-hijaiyah']
+        ['Aksara Bawaan Populer', '/belajar'], 
+        ['+ Buat Tabel Kustom Bebas', '/belajar#buat-tabel'], 
+        ['Mode Flashcard & Kuis', '/belajar?mode=flashcard'], 
+        ['Koleksi Frasa Harian', '/belajar?mode=phrases']
       ] 
     },
     { 
       title: 'Katalog 250 Negara', 
       links: [
-        ['Semua 250 Negara Terintegrasi', '/katalog'], 
-        ['Kawasan Asia & Oseania', '/katalog?region=Asia'], 
-        ['Kawasan Eropa', '/katalog?region=Eropa'], 
-        ['Kawasan Timur Tengah & Afrika', '/katalog?region=Timur+Tengah'],
-        ['Target Belajar Saya', '/katalog?filter=targets']
+        ['Jelajahi 250 Negara', '/katalog'], 
+        ['Target Belajar Pribadi', '/katalog?filter=targets'], 
+        ['Kuis Trivia Dunia', '/katalog?action=trivia'], 
+        ['Ekspor / Impor Data Excel', '/katalog']
       ] 
     },
     { 
-      title: 'Fitur Sistem', 
+      title: 'Panduan & FAQ', 
       links: [
-        ['Studio Belajar Aksara', '/belajar'], 
-        ['Katalog 250 Negara Lengkap', '/katalog'], 
-        ['Integrasi Cloud Otomatis', '/#panduan']
+        ['Tata Cara Lengkap Fitur', '/panduan'], 
+        ['Format Spreadsheet Excel', '/panduan#excel'], 
+        ['Pengaturan Suara TTS Global', '/panduan#audio'],
+        ['Sinkronisasi Cloud Akun', '/panduan#cloud']
       ] 
     },
   ],

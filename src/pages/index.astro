@@ -5,7 +5,24 @@ import MediaWindow from '../components/MediaWindow.astro';
 import GuideWindow from '../components/GuideWindow.astro';
 import { defaultLanguageTables } from '../data/languages';
 import { worldCountries } from '../data/countries';
-import { Volume2, FileSpreadsheet, Cloud, Star, BookOpen } from 'lucide-astro';
+import { 
+  Volume2, 
+  FileSpreadsheet, 
+  Cloud, 
+  Star, 
+  BookOpen, 
+  HelpCircle, 
+  ChevronDown, 
+  Sparkles, 
+  Layers, 
+  Flame, 
+  Upload, 
+  Download, 
+  Plus, 
+  Edit3, 
+  CheckCircle2, 
+  Globe 
+} from 'lucide-astro';
 
 const sampleTable = defaultLanguageTables[0]; // Jepang Hiragana
 const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES', 'FR'].includes(c.code));
@@ -239,10 +256,232 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
     </div>
   </Section>
 
-  <!-- [04] CTA BANNER -->
+  <!-- [04] FAQ: TATA CARA PENGGUNAAN FITUR & BANTUAN SISTEM -->
+  <Section id="faq" top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
+    <div class="w-full">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-rule">
+        <div>
+          <p class="label"><b>[04]</b> panduan fitur &amp; bantuan</p>
+          <h2 class="mt-3 text-[clamp(26px,3.5vw,40px)] leading-[1.1] font-bold tracking-[-0.035em] text-ink">
+            Pertanyaan Umum (FAQ) &amp; Tata Cara Penggunaan
+          </h2>
+          <p class="mt-2 text-[15px] text-steel max-w-[65ch]">
+            Panduan komprehensif mengoperasikan seluruh fitur platform - mulai dari impor/ekspor file Excel, pembuatan materi tabel kustom bahasa global, hingga sinkronisasi data cloud.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 flex-wrap">
+          <a href="/panduan" class="btn btn-primary btn-s font-mono text-[12px] inline-flex items-center gap-1.5">
+            <HelpCircle class="size-3.5 inline" /> Buka Panduan Lengkap &amp; Template →
+          </a>
+          <a href="/belajar#buat-tabel" class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5">
+            <Plus class="size-3.5 inline" /> Buat Tabel
+          </a>
+        </div>
+      </div>
+
+      <!-- FAQ Accordion List -->
+      <div class="mt-8 space-y-3.5 max-w-4xl">
+        <!-- FAQ Item 1: Excel Import & Export -->
+        <details id="faq-excel" class="group border border-rule bg-canvas open:border-ink transition-colors shadow-xs">
+          <summary class="p-4 sm:p-5 cursor-pointer list-none flex items-center justify-between gap-3 select-none font-bold text-[15px] sm:text-[16px] text-ink hover:bg-tint/40">
+            <span class="flex items-center gap-2.5">
+              <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-cta shrink-0 font-mono text-xs">
+                <FileSpreadsheet class="size-4" />
+              </span>
+              <span>1. Bagaimana format file dan tata cara Impor / Ekspor Excel (.xlsx, .csv)?</span>
+            </span>
+            <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3.5 leading-relaxed font-sans">
+            <p>
+              Platform mendukung manipulasi spreadsheet dua arah (impor massal dan ekspor data) untuk tabel aksara, kamus frasa, maupun target katalog 250 negara:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono text-xs text-ink">
+              <div class="p-3 border border-rule bg-tint/30">
+                <span class="font-bold text-badge block mb-1">A. Format Tabel Aksara (2 Kolom):</span>
+                <span class="text-steel block mb-1">Kolom A: Cara Baca / Romaji<br/>Kolom B: Aksara / Simbol Asli</span>
+                <code class="text-[11px] bg-canvas px-1.5 py-0.5 border border-rule block">Contoh: Ka | か atau Alif | ا</code>
+              </div>
+              <div class="p-3 border border-rule bg-tint/30">
+                <span class="font-bold text-badge block mb-1">B. Format Kumpulan Frasa (3 Kolom):</span>
+                <span class="text-steel block mb-1">Kolom A: Frasa Asli<br/>Kolom B: Cara Baca<br/>Kolom C: Terjemahan Indonesia</span>
+                <code class="text-[11px] bg-canvas px-1.5 py-0.5 border border-rule block">Arigatou | Arigatou | Terima kasih</code>
+              </div>
+            </div>
+            <ul class="list-disc pl-5 space-y-1.5 text-steel">
+              <li><strong>Cara Impor Tabel Aksara:</strong> Buka formulir <em>"+ Buat Tabel Kustom"</em> di Studio Belajar, klik <strong>"Pilih File Excel / CSV"</strong>, dan sistem akan langsung membaca seluruh baris menjadi grid aksara interaktif.</li>
+              <li><strong>Cara Impor Frasa:</strong> Pada tab Frasa Sehari-hari, klik tombol <strong>"Impor Excel"</strong> untuk memasukkan ratusan frasa sekaligus ke dalam kategori pilihan.</li>
+              <li><strong>Cara Ekspor Data:</strong> Di halaman Katalog 250 Negara atau Studio Belajar, klik tombol <strong>"Ekspor (.xlsx)"</strong> untuk mengunduh salinan data lengkap ke komputer atau smartphone Anda.</li>
+            </ul>
+          </div>
+        </details>
+
+        <!-- FAQ Item 2: Custom Table Creation & Global Languages -->
+        <details class="group border border-rule bg-canvas open:border-ink transition-colors shadow-xs">
+          <summary class="p-4 sm:p-5 cursor-pointer list-none flex items-center justify-between gap-3 select-none font-bold text-[15px] sm:text-[16px] text-ink hover:bg-tint/40">
+            <span class="flex items-center gap-2.5">
+              <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-ink shrink-0 font-mono text-xs">
+                <Plus class="size-4" />
+              </span>
+              <span>2. Bagaimana cara membuat tabel materi kustom untuk bahasa dunia apa saja?</span>
+            </span>
+            <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3 leading-relaxed">
+            <p>
+              Anda tidak terbatas pada aksara bawaan. Anda dapat menambahkan materi bahasa apa saja di dunia (misal: Aksara Jawa Hanacaraka, Sunda, Batak, Sanskerta/Hindi, Cyrillic Rusia, Yunani, Ibrani, dll.):
+            </p>
+            <ol class="list-decimal pl-5 space-y-1.5 text-steel">
+              <li>Klik tombol <strong>"+ Buat Tabel Kustom"</strong> di navigasi utama atau di halaman Studio Belajar.</li>
+              <li>Isi nama bahasa dan judul tabel (misal: <em>"Aksara Jawa - Sandhangan Swara"</em>).</li>
+              <li>Pilih bahasa suara TTS dari 35+ bahasa dunia atau masukkan kode bahasa kustom (BCP-47) seperti <code>jv-ID</code> (Jawa) atau <code>su-ID</code> (Sunda). Anda dapat menguji lafalnya dengan tombol <strong>"Coba Dengar"</strong>.</li>
+              <li>Ketik data materi dengan format <code>Romaji = Karakter</code> dipisahkan tanda garis lurus (<code>|</code>) atau unggah file spreadsheet Excel Anda.</li>
+              <li>Klik <strong>"Simpan &amp; Tampilkan Tabel"</strong>. Tabel kustom baru Anda akan langsung tampil dan dapat dipelajari dengan suara asli!</li>
+            </ol>
+          </div>
+        </details>
+
+        <!-- FAQ Item 3: Audio TTS & Pronunciation -->
+        <details id="faq-audio" class="group border border-rule bg-canvas open:border-ink transition-colors shadow-xs">
+          <summary class="p-4 sm:p-5 cursor-pointer list-none flex items-center justify-between gap-3 select-none font-bold text-[15px] sm:text-[16px] text-ink hover:bg-tint/40">
+            <span class="flex items-center gap-2.5">
+              <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-ok shrink-0 font-mono text-xs">
+                <Volume2 class="size-4" />
+              </span>
+              <span>3. Bagaimana cara mendengarkan audio pengucapan asli dan mengatur kecepatan suara?</span>
+            </span>
+            <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3 leading-relaxed">
+            <p>
+              Studio Belajar dilengkapi integrasi suara sintesis standar web (Web Speech API) yang memprioritaskan suara resmi Google TTS dan mesin suara bawaan perangkat Anda:
+            </p>
+            <ul class="list-disc pl-5 space-y-1.5 text-steel">
+              <li><strong>Mendengar Huruf:</strong> Cukup klik atau ketuk kotak aksara mana saja di tabel untuk mendengar suara pengucapan audio aslinya secara instan.</li>
+              <li><strong>Pengatur Kecepatan (Speed):</strong> Klik tombol <em>"Speed"</em> di toolbar atas untuk mengubah tempo suara antara <code>0.5x</code> (sangat lambat untuk melatih telinga pemula), <code>0.75x</code>, <code>1.0x</code> (normal), hingga <code>2.0x</code>.</li>
+              <li><strong>Fitur Putar Urut Otomatis:</strong> Klik tombol <em>"Putar Urut"</em> untuk mendengarkan seluruh abjad dalam tabel diputar berurutan dari awal sampai akhir tanpa harus Anda klik satu per satu.</li>
+            </ul>
+          </div>
+        </details>
+
+        <!-- FAQ Item 4: Flashcard & Quiz -->
+        <details class="group border border-rule bg-canvas open:border-ink transition-colors shadow-xs">
+          <summary class="p-4 sm:p-5 cursor-pointer list-none flex items-center justify-between gap-3 select-none font-bold text-[15px] sm:text-[16px] text-ink hover:bg-tint/40">
+            <span class="flex items-center gap-2.5">
+              <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-badge shrink-0 font-mono text-xs">
+                <Layers class="size-4" />
+              </span>
+              <span>4. Bagaimana cara menggunakan Mode Latihan Flashcard &amp; Kuis Pilihan Ganda?</span>
+            </span>
+            <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3 leading-relaxed">
+            <p>
+              Untuk mempercepat daya ingat otak terhadap aksara baru, Anda dapat memanfaatkan tab <strong>"Latihan &amp; Kuis"</strong> di halaman Studio Belajar:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs text-ink pt-1">
+              <div class="p-3 border border-rule bg-tint/30">
+                <span class="font-bold text-ink block mb-1">Mode Flashcard:</span>
+                <span class="text-steel">Kartu digital dua sisi. Klik kartu untuk membalik karakter dan memeriksa transliterasi romaji serta mendengar audio aslinya.</span>
+              </div>
+              <div class="p-3 border border-rule bg-tint/30">
+                <span class="font-bold text-ink block mb-1">Mode Kuis Pilihan Ganda:</span>
+                <span class="text-steel">Sistem menampilkan aksara acak dan 4 opsi jawaban. Uji kecepatan respon Anda dengan pelacakan skor jawaban benar.</span>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- FAQ Item 5: Edit Mode & Duplicate Cleaner -->
+        <details class="group border border-rule bg-canvas open:border-ink transition-colors shadow-xs">
+          <summary class="p-4 sm:p-5 cursor-pointer list-none flex items-center justify-between gap-3 select-none font-bold text-[15px] sm:text-[16px] text-ink hover:bg-tint/40">
+            <span class="flex items-center gap-2.5">
+              <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-cta shrink-0 font-mono text-xs">
+                <Edit3 class="size-4" />
+              </span>
+              <span>5. Bagaimana cara mengedit tabel dan membersihkan huruf dobel otomatis?</span>
+            </span>
+            <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3 leading-relaxed">
+            <p>
+              Studio dilengkapi alat manajemen tabel fleksibel untuk memastikan kebersihan materi pembelajaran Anda:
+            </p>
+            <ul class="list-disc pl-5 space-y-1.5 text-steel">
+              <li><strong>Mode Edit Aksara:</strong> Klik tombol <em>"Mode Edit Aksara"</em>. Setiap kotak huruf akan menampilkan icon pensil untuk mengedit teks dan tanda silang [✕] untuk menghapus huruf.</li>
+              <li><strong>Hapus Huruf Dobel Otomatis:</strong> Saat mengimpor daftar kosakata panjang dari luar, kemungkinan ada karakter yang kembar/duplikat. Cukup klik tombol <strong>"Hapus Huruf Dobel Otomatis"</strong> (<Sparkles class="size-3.5 inline text-badge" />), dan sistem akan menyaring serta menghapus aksara duplikat secara instan.</li>
+              <li><strong>Duplikat &amp; Edit:</strong> Ingin memodifikasi tabel bawaan (seperti Hiragana)? Klik tombol <em>"Duplikat &amp; Edit"</em> untuk menyalinnya menjadi tabel kustom milik Anda sendiri.</li>
+            </ul>
+          </div>
+        </details>
+
+        <!-- FAQ Item 6: 250 Countries Catalog & Trivia -->
+        <details class="group border border-rule bg-canvas open:border-ink transition-colors shadow-xs">
+          <summary class="p-4 sm:p-5 cursor-pointer list-none flex items-center justify-between gap-3 select-none font-bold text-[15px] sm:text-[16px] text-ink hover:bg-tint/40">
+            <span class="flex items-center gap-2.5">
+              <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-badge shrink-0 font-mono text-xs">
+                <Globe class="size-4" />
+              </span>
+              <span>6. Apa fungsi Katalog 250 Negara, Target Belajar, &amp; Kuis Trivia Dunia?</span>
+            </span>
+            <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3 leading-relaxed">
+            <p>
+              Halaman <strong>Katalog 250 Negara</strong> menyajikan ensiklopedia geografi linguistik seluruh negara di dunia:
+            </p>
+            <ul class="list-disc pl-5 space-y-1.5 text-steel">
+              <li><strong>Menandai Target Belajar (⭐):</strong> Klik icon bintang pada negara tujuan Anda (misal: Jepang, Korea, Arab Saudi, Jerman). Anda dapat memfilter katalog hanya menampilkan negara target Anda.</li>
+              <li><strong>Catatan Rencana Pribadi (📝):</strong> Tulis target waktu belajar, kosakata yang ingin dikuasai, atau alasan impian Anda pergi ke negara tersebut.</li>
+              <li><strong>Kuis Trivia 250 Negara:</strong> Klik tombol <em>"Mulai Kuis Trivia"</em> untuk menguji wawasan mengenai ibukota dan bahasa resmi negara di dunia dengan sistem rekor kemenangan beruntun (<em>Streak</em>).</li>
+            </ul>
+          </div>
+        </details>
+
+        <!-- FAQ Item 7: Cloud Synchronization -->
+        <details id="faq-cloud" class="group border border-rule bg-canvas open:border-ink transition-colors shadow-xs">
+          <summary class="p-4 sm:p-5 cursor-pointer list-none flex items-center justify-between gap-3 select-none font-bold text-[15px] sm:text-[16px] text-ink hover:bg-tint/40">
+            <span class="flex items-center gap-2.5">
+              <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-ok shrink-0 font-mono text-xs">
+                <Cloud class="size-4" />
+              </span>
+              <span>7. Bagaimana cara menyinkronkan data antar-perangkat dengan Akun Cloud (Supabase)?</span>
+            </span>
+            <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3 leading-relaxed">
+            <p>
+              Platform mendukung sinkronisasi cloud real-time tanpa biaya:
+            </p>
+            <ol class="list-decimal pl-5 space-y-1.5 text-steel">
+              <li>Klik tombol <strong>"Masuk / Akun"</strong> di pojok kanan atas header aplikasi.</li>
+              <li>Daftar akun gratis menggunakan alamat email Anda.</li>
+              <li>Setelah berhasil masuk, seluruh tabel kustom yang Anda buat, daftar negara target berbintang, serta catatan pribadi Anda akan otomatis dicadangkan ke cloud Supabase.</li>
+              <li>Saat Anda membuka website di perangkat lain (laptop, iPad, atau HP), cukup login ke akun yang sama maka semua data Anda langsung tersinkronisasi secara otomatis!</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+
+      <!-- Quick Support Contact / Action Banner -->
+      <div class="mt-8 p-4 sm:p-5 border border-dashed border-rule bg-tint/20 text-xs font-mono text-steel flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <span class="flex items-center gap-2">
+          <HelpCircle class="size-4 text-badge shrink-0" />
+          <span>Butuh format template Excel atau ingin langsung mencoba membuat tabel aksara kustom?</span>
+        </span>
+        <div class="flex items-center gap-2 shrink-0">
+          <a href="/belajar#buat-tabel" class="text-ink font-bold underline hover:text-cta">
+            Buka Pembuat Tabel →
+          </a>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- [05] CTA BANNER -->
   <Section top={true} inner="px-6 py-16 lg:py-20 max-md:px-5">
     <div class="max-w-3xl mx-auto text-center border-2 border-ink p-8 sm:p-12 bg-canvas shadow-xl space-y-6">
-      <p class="label"><b>[04]</b> mulai langkah pertama</p>
+      <p class="label"><b>[05]</b> mulai langkah pertama</p>
       <h2 class="text-[clamp(28px,4vw,44px)] font-bold tracking-tight text-ink leading-tight">
         Siap Menguasai Aksara &amp; Bahasa Baru?
       </h2>

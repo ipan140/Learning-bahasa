@@ -24,24 +24,24 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
           </p>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap shrink-0">
-          <button type="button" id="btn-open-trivia" class="btn btn-primary btn-s text-[12px] font-mono flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full md:w-auto mt-2 md:mt-0">
+          <button type="button" id="btn-open-trivia" class="btn btn-primary btn-s text-[11px] sm:text-[12px] font-mono flex items-center gap-1.5">
             <Gamepad2 class="size-3.5 inline" /> Kuis 250 Negara
           </button>
-          <button type="button" id="btn-cloud-sync-trigger" class="btn btn-secondary btn-s text-[12px] flex items-center gap-1.5" title="Masuk untuk sinkronisasi materi ke smartphone & laptop lain">
+          <button type="button" id="btn-cloud-sync-trigger" class="btn btn-secondary btn-s text-[11px] sm:text-[12px] flex items-center gap-1.5" title="Masuk untuk sinkronisasi materi ke smartphone & laptop lain">
             <Cloud class="size-3.5 inline" /> Sinkron Akun
           </button>
-          <button type="button" id="btn-export-excel" class="btn btn-secondary btn-s text-[12px] flex items-center gap-1.5" title="Ekspor daftar target dan data negara ke spreadsheet Excel (.xlsx)">
+          <button type="button" id="btn-export-excel" class="btn btn-secondary btn-s text-[11px] sm:text-[12px] flex items-center gap-1.5" title="Ekspor daftar target dan data negara ke spreadsheet Excel (.xlsx)">
             <FileSpreadsheet class="size-3.5 inline text-ok" /> Export Excel
           </button>
-          <label class="btn btn-secondary btn-s text-[12px] cursor-pointer inline-flex items-center gap-1.5" title="Impor daftar target belajar dari file Excel (.xlsx / .csv)">
+          <label class="btn btn-secondary btn-s text-[11px] sm:text-[12px] cursor-pointer inline-flex items-center gap-1.5" title="Impor daftar target belajar dari file Excel (.xlsx / .csv)">
             <Upload class="size-3.5 inline text-ok" /> Import Excel
             <input type="file" id="input-import-excel" accept=".xlsx, .xls, .csv" class="hidden" />
           </label>
-          <button type="button" id="btn-export-backup" class="btn btn-secondary btn-s text-[12px] flex items-center gap-1.5" title="Simpan file cadangan target belajar JSON">
+          <button type="button" id="btn-export-backup" class="btn btn-secondary btn-s text-[11px] sm:text-[12px] flex items-center gap-1.5" title="Simpan file cadangan target belajar JSON">
             <Download class="size-3.5 inline" /> Backup JSON
           </button>
-          <label class="btn btn-secondary btn-s text-[12px] cursor-pointer inline-flex items-center gap-1.5" title="Pulihkan cadangan dari file JSON">
+          <label class="btn btn-secondary btn-s text-[11px] sm:text-[12px] cursor-pointer inline-flex items-center gap-1.5" title="Pulihkan cadangan dari file JSON">
             <Upload class="size-3.5 inline" /> Import JSON
             <input type="file" id="input-import-file" accept=".json" class="hidden" />
           </label>
@@ -63,23 +63,26 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
       </div>
 
       <!-- Filter Pills & Search -->
-      <div class="p-5 border border-rule bg-canvas space-y-4 shadow-sm">
+      <div class="p-3.5 sm:p-5 border border-rule bg-canvas space-y-4 shadow-sm">
         <div class="flex flex-wrap items-center justify-between gap-4">
           
           <!-- Region Filter Pills -->
-          <div class="flex flex-wrap items-center gap-1.5 text-[13px]" id="country-region-filters">
-            <button type="button" data-filter="all" class="px-3.5 py-1.5 font-mono border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer">
+          <div class="flex flex-wrap items-center gap-1.5 text-[12px] sm:text-[13px]" id="country-region-filters">
+            <button type="button" data-filter="all" class="px-2.5 sm:px-3.5 py-1.5 font-mono border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer">
               Semua (<span id="total-country-count">250</span>)
             </button>
-            <button type="button" data-filter="targets" class="px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer inline-flex items-center gap-1.5">
+            <button type="button" data-filter="targets" class="px-2.5 sm:px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer inline-flex items-center gap-1.5">
               <Star class="size-3.5 fill-badge text-badge inline" /> Target Saya (<span id="filter-target-count">0</span>)
             </button>
-            <button type="button" data-filter="Asia" class="px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">Asia</button>
-            <button type="button" data-filter="Eropa" class="px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">Eropa</button>
-            <button type="button" data-filter="Timur Tengah" class="px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">Timur Tengah</button>
-            <button type="button" data-filter="Amerika" class="px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">Amerika</button>
-            <button type="button" data-filter="Afrika" class="px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">Afrika</button>
-            <button type="button" data-filter="Oseania" class="px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink">Oseania</button>
+            <button type="button" data-filter="has-table" class="px-2.5 sm:px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer inline-flex items-center gap-1.5" title="Hanya tampilkan negara yang sudah memiliki materi tabel belajar">
+              <BookOpen class="size-3.5 inline text-steel" /> Ada Tabel (<span id="has-table-count">0</span>)
+            </button>
+            <button type="button" data-filter="Asia" class="px-2.5 sm:px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer">Asia</button>
+            <button type="button" data-filter="Eropa" class="px-2.5 sm:px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer">Eropa</button>
+            <button type="button" data-filter="Timur Tengah" class="px-2.5 sm:px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer">Timur Tengah</button>
+            <button type="button" data-filter="Amerika" class="px-2.5 sm:px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer">Amerika</button>
+            <button type="button" data-filter="Afrika" class="px-2.5 sm:px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer">Afrika</button>
+            <button type="button" data-filter="Oseania" class="px-2.5 sm:px-3 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer">Oseania</button>
           </div>
 
           <!-- Search & Sort Controls -->
@@ -105,7 +108,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
             </div>
             <select 
               id="country-sort-select" 
-              class="px-2.5 py-2 text-[12px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono cursor-pointer"
+              class="w-full sm:w-auto px-2.5 py-2 text-[12px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono cursor-pointer"
               title="Urutkan daftar negara"
             >
               <option value="name-asc">Urut: Nama (A-Z)</option>
@@ -181,7 +184,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
   <!-- ============================================== -->
   <!-- MODAL KUIS TRIVIA 250 NEGARA                   -->
   <!-- ============================================== -->
-  <dialog id="trivia-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[480px] shadow-2xl">
+  <dialog id="trivia-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[480px] shadow-2xl max-h-[90dvh] overflow-y-auto">
     <div class="p-6 max-sm:p-5 flex flex-col gap-4">
       <div class="flex items-start justify-between pb-3 border-b border-rule">
         <div>
@@ -222,7 +225,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
   <!-- ============================================== -->
   <!-- MODAL CATATAN TARGET PRIBADI                   -->
   <!-- ============================================== -->
-  <dialog id="target-note-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[440px] shadow-2xl">
+  <dialog id="target-note-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[440px] shadow-2xl max-h-[90dvh] overflow-y-auto">
     <div class="p-6 max-sm:p-5 flex flex-col gap-4">
       <div class="flex items-start justify-between pb-3 border-b border-rule">
         <div>

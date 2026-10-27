@@ -148,17 +148,17 @@ import {
         </div>
 
         <!-- Action & Search Toolbar -->
-        <div class="flex flex-wrap items-center justify-between gap-4 p-4 border border-rule bg-canvas">
-          <div class="flex items-center gap-3 flex-1 min-w-0 w-full sm:w-auto sm:min-w-[240px]">
-            <span class="text-smoke text-[13px] font-mono select-none">CARI:</span>
+        <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 border border-rule bg-canvas">
+          <div class="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0 w-full sm:w-auto sm:min-w-[240px]">
+            <span class="text-smoke text-xs sm:text-[13px] font-mono select-none">CARI:</span>
             <input 
               type="text" 
               id="search-input" 
               placeholder="Cari huruf atau romaji (misal: Ka, あ, Ä, ㄱ)..." 
-              class="w-full max-w-sm px-3.5 py-2 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+              class="w-full max-w-sm px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
             />
           </div>
-          <div class="flex items-center gap-2 flex-wrap text-[13px]">
+          <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-[11px] sm:text-[13px]">
             <button 
               type="button" 
               id="toggle-audio-btn" 
@@ -496,8 +496,8 @@ import {
   <!-- ========================================== -->
   <!-- CUSTOM TABLE CREATOR MODAL                 -->
   <!-- ========================================== -->
-  <div id="buat-tabel" class="frame px-6 max-md:px-5">
-    <div id="creator-modal" class="hidden my-8 p-5 sm:p-8 border-2 border-ink bg-canvas shadow-2xl">
+  <div id="buat-tabel" class="frame px-4 sm:px-6">
+    <div id="creator-modal" class="hidden my-4 sm:my-8 p-4 sm:p-8 border-2 border-ink bg-canvas shadow-2xl">
       <div class="flex items-start justify-between gap-3 border-b border-rule pb-4 mb-6">
         <div>
           <h3 id="creator-modal-title" class="text-[22px] font-bold text-ink">Buat Tabel / Materi Bahasa Baru</h3>
@@ -543,22 +543,105 @@ import {
             />
           </div>
           <div>
-            <label for="form-voice" class="block text-[13px] font-mono text-steel mb-1.5">Suara Pengucapan (Speech Voice)</label>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="form-voice" class="block text-[13px] font-mono text-steel">Suara Pengucapan (Speech Voice)</label>
+              <button 
+                type="button" 
+                id="btn-test-creator-voice" 
+                class="text-[11px] font-mono text-smoke hover:text-ink cursor-pointer inline-flex items-center gap-1 hover:underline" 
+                title="Dengarkan sampel suara pengucapan bahasa yang dipilih"
+              >
+                <Volume2 class="size-3 inline text-ink" /> Coba Dengar
+              </button>
+            </div>
             <select 
               id="form-voice" 
-              class="w-full px-3.5 py-2.5 text-[14px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+              class="w-full px-3 py-2 text-[13px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
             >
-              <option value="ja-JP">Jepang (ja-JP)</option>
-              <option value="de-DE">Jerman (de-DE)</option>
-              <option value="ko-KR">Korea (ko-KR)</option>
-              <option value="ar-SA">Arab (ar-SA)</option>
-              <option value="zh-CN">Mandarin (zh-CN)</option>
-              <option value="th-TH">Thailand (th-TH)</option>
-              <option value="es-ES">Spanyol (es-ES)</option>
-              <option value="fr-FR">Prancis (fr-FR)</option>
-              <option value="ru-RU">Rusia (ru-RU)</option>
-              <option value="en-US">Inggris (en-US)</option>
+              <optgroup label="── Bahasa Populer & Indonesia ──">
+                <option value="id-ID">Indonesia (id-ID)</option>
+                <option value="ja-JP">Jepang (ja-JP)</option>
+                <option value="ko-KR">Korea (ko-KR)</option>
+                <option value="ar-SA">Arab Saudi (ar-SA)</option>
+                <option value="zh-CN">Mandarin China (zh-CN)</option>
+                <option value="en-US">Inggris US (en-US)</option>
+                <option value="de-DE">Jerman (de-DE)</option>
+                <option value="fr-FR">Prancis (fr-FR)</option>
+                <option value="es-ES">Spanyol (es-ES)</option>
+                <option value="ru-RU">Rusia (ru-RU)</option>
+              </optgroup>
+              <optgroup label="── Asia & Pasifik ──">
+                <option value="ms-MY">Melayu (ms-MY)</option>
+                <option value="th-TH">Thailand (th-TH)</option>
+                <option value="vi-VN">Vietnam (vi-VN)</option>
+                <option value="zh-TW">Mandarin Taiwan (zh-TW)</option>
+                <option value="zh-HK">Kanton Hong Kong (zh-HK)</option>
+                <option value="fil-PH">Filipina / Tagalog (fil-PH)</option>
+                <option value="hi-IN">Hindi India (hi-IN)</option>
+                <option value="ta-IN">Tamil (ta-IN)</option>
+                <option value="bn-IN">Bengali (bn-IN)</option>
+              </optgroup>
+              <optgroup label="── Timur Tengah & Afrika ──">
+                <option value="ar-EG">Arab Mesir (ar-EG)</option>
+                <option value="tr-TR">Turki (tr-TR)</option>
+                <option value="fa-IR">Persia / Farsi (fa-IR)</option>
+                <option value="he-IL">Ibrani / Hebrew (he-IL)</option>
+                <option value="sw-KE">Swahili (sw-KE)</option>
+              </optgroup>
+              <optgroup label="── Eropa Barat, Utara & Selatan ──">
+                <option value="en-GB">Inggris UK (en-GB)</option>
+                <option value="it-IT">Italia (it-IT)</option>
+                <option value="nl-NL">Belanda (nl-NL)</option>
+                <option value="pt-PT">Portugis Eropa (pt-PT)</option>
+                <option value="pt-BR">Portugis Brasil (pt-BR)</option>
+                <option value="sv-SE">Swedia (sv-SE)</option>
+                <option value="da-DK">Denmark (da-DK)</option>
+                <option value="fi-FI">Finlandia (fi-FI)</option>
+                <option value="no-NO">Norwegia (no-NO)</option>
+                <option value="el-GR">Yunani / Greek (el-GR)</option>
+                <option value="pl-PL">Polandia (pl-PL)</option>
+                <option value="uk-UA">Ukraina (uk-UA)</option>
+                <option value="cs-CZ">Ceko (cs-CZ)</option>
+                <option value="hu-HU">Hungaria (hu-HU)</option>
+                <option value="ro-RO">Rumania (ro-RO)</option>
+              </optgroup>
+              <optgroup label="── Suara Sistem di Perangkat Anda ──" id="form-voice-system-optgroup">
+                <!-- Dynamically populated from window.speechSynthesis.getVoices() -->
+              </optgroup>
+              <optgroup label="── Preset Kustom Tersimpan ──" id="form-voice-custom-optgroup">
+                <!-- Dynamically populated from user's custom presets -->
+              </optgroup>
+              <option value="__custom__">+ Ketik &amp; Simpan Bahasa Kustom Baru...</option>
             </select>
+
+            <!-- Custom Voice Code Input Panel -->
+            <div id="form-voice-custom-panel" class="hidden mt-2 p-2.5 border border-rule bg-tint/40 space-y-2">
+              <div class="text-[11px] font-mono text-smoke">Ketik kode standar bahasa (BCP-47) &amp; nama tampilan:</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input 
+                  type="text" 
+                  id="input-custom-voice-code" 
+                  placeholder="Kode: misal jv-ID, su-ID, es-MX" 
+                  class="px-2.5 py-1.5 text-xs bg-canvas border border-rule text-ink outline-none focus:border-ink font-mono" 
+                />
+                <input 
+                  type="text" 
+                  id="input-custom-voice-label" 
+                  placeholder="Label: misal Jawa (jv-ID)" 
+                  class="px-2.5 py-1.5 text-xs bg-canvas border border-rule text-ink outline-none focus:border-ink font-mono" 
+                />
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-1 text-xs font-mono">
+                <span class="text-[10px] text-smoke">Preset kustom akan tersimpan otomatis.</span>
+                <button 
+                  type="button" 
+                  id="btn-save-custom-voice-preset" 
+                  class="btn btn-secondary btn-s text-[11px] py-1 px-2.5 cursor-pointer font-mono"
+                >
+                  + Simpan Preset
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -597,14 +680,14 @@ import {
           </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-rule">
-          <button type="button" id="load-sample-btn" class="btn btn-secondary btn-s font-mono text-[12px]">
+        <div class="flex flex-wrap items-center justify-end gap-2 sm:gap-3 pt-4 border-t border-rule">
+          <button type="button" id="load-sample-btn" class="btn btn-secondary btn-s font-mono text-[11px] sm:text-[12px]">
             Muat Contoh Data
           </button>
-          <button type="button" id="cancel-creator-btn" class="btn btn-secondary btn-s font-mono text-[12px]">
+          <button type="button" id="cancel-creator-btn" class="btn btn-secondary btn-s font-mono text-[11px] sm:text-[12px]">
             Batal
           </button>
-          <button type="submit" id="creator-submit-btn" class="btn btn-primary btn-s font-mono text-[12px]">
+          <button type="submit" id="creator-submit-btn" class="btn btn-primary btn-s font-mono text-[11px] sm:text-[12px]">
             Simpan &amp; Tampilkan Tabel
           </button>
         </div>
@@ -614,7 +697,7 @@ import {
   <!-- ========================================== -->
   <!-- SINGLE CHARACTER / AKSARA EDIT MODAL       -->
   <!-- ========================================== -->
-  <dialog id="char-edit-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-sm shadow-2xl">
+  <dialog id="char-edit-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-sm shadow-2xl max-h-[90dvh] overflow-y-auto">
     <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
         <h4 id="char-modal-title" class="text-base font-bold text-ink flex items-center gap-1.5"><Edit3 class="size-4 inline text-ink" /> Edit Karakter</h4>
@@ -661,7 +744,7 @@ import {
   <!-- ========================================== -->
   <!-- PHRASE CREATE & EDIT MODAL                 -->
   <!-- ========================================== -->
-  <dialog id="phrase-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-md shadow-2xl">
+  <dialog id="phrase-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto">
     <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
         <h4 id="phrase-modal-title" class="text-base font-bold text-ink flex items-center gap-1.5"><Plus class="size-4 inline text-ink" /> Tambah Frasa Baru</h4>
@@ -756,7 +839,7 @@ import {
   <!-- ========================================== -->
   <!-- PHRASE IMPORT MODAL (EXCEL / CSV / TEXT)   -->
   <!-- ========================================== -->
-  <dialog id="phrase-import-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-lg shadow-2xl">
+  <dialog id="phrase-import-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-lg shadow-2xl max-h-[90dvh] overflow-y-auto">
     <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
         <div>
@@ -829,9 +912,9 @@ import {
   <!-- ============================================== -->
   <dialog 
     id="retro-confirm-dialog" 
-    class="m-auto backdrop:bg-black/75 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-[440px] shadow-2xl"
+    class="m-auto backdrop:bg-black/75 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-[440px] shadow-2xl max-h-[90dvh] overflow-y-auto"
   >
-    <div class="p-6">
+    <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between pb-3 border-b border-rule mb-4 text-[11px] font-mono text-smoke">
         <span class="flex items-center gap-1.5 uppercase font-bold tracking-wider">
           <span class="size-2 bg-cta inline-block"></span>
@@ -3234,6 +3317,111 @@ import {
     });
 
     // Creator Modal triggers
+    // DYNAMIC SPEECH VOICE MANAGER & SYSTEM VOICE DETECTOR
+    const formVoiceSelect = document.getElementById('form-voice') as HTMLSelectElement | null;
+    const formVoiceSystemOptgroup = document.getElementById('form-voice-system-optgroup');
+    const formVoiceCustomOptgroup = document.getElementById('form-voice-custom-optgroup');
+    const formVoiceCustomPanel = document.getElementById('form-voice-custom-panel');
+    const inputCustomVoiceCode = document.getElementById('input-custom-voice-code') as HTMLInputElement | null;
+    const inputCustomVoiceLabel = document.getElementById('input-custom-voice-label') as HTMLInputElement | null;
+    const btnSaveCustomVoicePreset = document.getElementById('btn-save-custom-voice-preset');
+    const btnTestCreatorVoice = document.getElementById('btn-test-creator-voice');
+
+    let userCustomVoicePresets: Array<{ code: string, label: string }> = JSON.parse(localStorage.getItem('user_custom_voice_presets') || '[]');
+
+    function renderCustomVoicePresets() {
+      if (!formVoiceCustomOptgroup) return;
+      formVoiceCustomOptgroup.innerHTML = userCustomVoicePresets.map(p => 
+        `<option value="${p.code}">★ ${p.label || p.code} (${p.code})</option>`
+      ).join('');
+    }
+
+    function populateSystemVoices() {
+      if (!formVoiceSystemOptgroup || !('speechSynthesis' in window)) return;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return;
+
+      const seen = new Set<string>();
+      const optionsHtml: string[] = [];
+
+      voices.forEach(v => {
+        const key = `${v.lang}-${v.name}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        optionsHtml.push(`<option value="${v.lang}">[Perangkat] ${v.name} (${v.lang})</option>`);
+      });
+
+      formVoiceSystemOptgroup.innerHTML = optionsHtml.slice(0, 40).join('');
+    }
+
+    populateSystemVoices();
+    renderCustomVoicePresets();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        loadVoices();
+        populateSystemVoices();
+      };
+    }
+
+    formVoiceSelect?.addEventListener('change', () => {
+      if (formVoiceSelect.value === '__custom__') {
+        formVoiceCustomPanel?.classList.remove('hidden');
+        inputCustomVoiceCode?.focus();
+      } else {
+        formVoiceCustomPanel?.classList.add('hidden');
+      }
+    });
+
+    btnSaveCustomVoicePreset?.addEventListener('click', () => {
+      const code = inputCustomVoiceCode?.value.trim();
+      const label = inputCustomVoiceLabel?.value.trim() || code;
+      if (!code) {
+        showToast('Ketik kode bahasa standar (misal: jv-ID, su-ID, es-MX)!');
+        return;
+      }
+
+      userCustomVoicePresets = userCustomVoicePresets.filter(p => p.code !== code);
+      userCustomVoicePresets.push({ code, label: label || code });
+      localStorage.setItem('user_custom_voice_presets', JSON.stringify(userCustomVoicePresets));
+
+      renderCustomVoicePresets();
+      if (formVoiceSelect) {
+        formVoiceSelect.value = code;
+      }
+      formVoiceCustomPanel?.classList.add('hidden');
+      showToast(`✓ Preset suara "${label}" berhasil disimpan!`);
+    });
+
+    btnTestCreatorVoice?.addEventListener('click', () => {
+      let voiceCode = formVoiceSelect?.value || 'id-ID';
+      if (voiceCode === '__custom__') {
+        voiceCode = inputCustomVoiceCode?.value.trim() || 'id-ID';
+      }
+
+      const samplePhrases: Record<string, string> = {
+        'id': 'Halo! Selamat datang di studio belajar aksara.',
+        'ja': 'こんにちは！日本語の音声テストです。',
+        'ko': '안녕하세요! 한국어 음성 테스트입니다.',
+        'ar': 'مرحباً! هذا اختبار الصوت العربي.',
+        'zh': '你好！这是中文语音测试。',
+        'en': 'Hello! This is an audio speech test.',
+        'de': 'Hallo! Dies ist ein deutscher Sprachtest.',
+        'fr': 'Bonjour! Ceci est un test vocal en français.',
+        'es': '¡Hola! Esta es una prueba de voz en español.',
+        'ru': 'Привет! Это проверка русской речи.',
+        'it': 'Ciao! Questo è un test vocale in italiano.',
+        'nl': 'Hallo! Dit is een Nederlandse spraaktest.',
+        'th': 'สวัสดี! นี่คือการทดสอบเสียงภาษาไทย',
+        'vi': 'Xin chào! Đây là bài kiểm tra giọng nói tiếng Việt.'
+      };
+
+      const prefix = voiceCode.split('-')[0].toLowerCase();
+      const sampleText = samplePhrases[prefix] || `Tes suara untuk bahasa ${voiceCode}.`;
+
+      speakText(sampleText, voiceCode);
+      showToast(`🔊 Memutar sampel suara (${voiceCode})...`);
+    });
+
     function openCreator(isEdit = false) {
       if (!isEdit) {
         editingTableId = null;
@@ -3270,7 +3458,16 @@ import {
       if (formName) formName.value = currentTable.name;
       if (formTitle) formTitle.value = currentTable.title;
       if (formDesc) formDesc.value = currentTable.description || '';
-      if (formVoice && currentTable.voiceLang) formVoice.value = currentTable.voiceLang;
+      if (formVoice && currentTable.voiceLang) {
+        const exists = Array.from(formVoice.options).some(o => o.value === currentTable.voiceLang);
+        if (!exists) {
+          const opt = document.createElement('option');
+          opt.value = currentTable.voiceLang;
+          opt.textContent = `★ ${currentTable.voiceLang} (Preset)`;
+          formVoiceCustomOptgroup?.appendChild(opt);
+        }
+        formVoice.value = currentTable.voiceLang;
+      }
 
       if (formText) {
         formText.value = currentTable.grid.map((row: any[]) => {
@@ -3305,7 +3502,10 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       const name = (document.getElementById('form-name') as HTMLInputElement)?.value.trim();
       const title = (document.getElementById('form-title') as HTMLInputElement)?.value.trim();
       const desc = (document.getElementById('form-desc') as HTMLInputElement)?.value.trim();
-      const voice = (document.getElementById('form-voice') as HTMLSelectElement)?.value;
+      let voice = (document.getElementById('form-voice') as HTMLSelectElement)?.value || 'id-ID';
+      if (voice === '__custom__') {
+        voice = (document.getElementById('input-custom-voice-code') as HTMLInputElement)?.value.trim() || 'id-ID';
+      }
       const text = formText?.value.trim() || '';
 
       if (!name || !title || !text) return;
