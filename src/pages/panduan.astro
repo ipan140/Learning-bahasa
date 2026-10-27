@@ -25,7 +25,7 @@ import {
 ---
 
 <Base 
-  title="Panduan Lengkap & FAQ - Belajar Bahasa & 250 Negara" 
+  title="Panduan Lengkap & FAQ - Belajar Bahasa & Katalog Negara" 
   description="Dokumentasi resmi dan panduan penggunaan seluruh fitur: format impor/ekspor Excel, pembuatan tabel kustom bahasa dunia, audio Google Speech, flashcard, dan sinkronisasi cloud."
 >
   <Section top={false} inner="px-6 pt-12 pb-18 lg:pt-16 lg:pb-24 max-md:px-5">
@@ -48,7 +48,7 @@ import {
             <BookOpen class="size-3.5 inline" /> Buka Studio Aksara
           </a>
           <a href="/katalog" class="btn btn-secondary btn-s font-mono text-[13px] inline-flex items-center gap-1.5">
-            <Globe class="size-3.5 inline text-steel" /> Katalog 250 Negara
+            <Globe class="size-3.5 inline text-steel" /> Katalog Semua Negara
           </a>
         </div>
       </div>
@@ -105,7 +105,7 @@ import {
             </div>
           </button>
 
-          <!-- Template 3: 250 Negara -->
+          <!-- Template 3: Sampel Negara -->
           <button 
             type="button" 
             id="btn-dl-template-negara" 
@@ -113,7 +113,7 @@ import {
           >
             <div>
               <div class="flex items-center justify-between text-xs font-mono font-bold text-ink mb-1">
-                <span class="flex items-center gap-1.5"><Globe class="size-3.5 text-badge" /> Sampel 250 Negara</span>
+                <span class="flex items-center gap-1.5"><Globe class="size-3.5 text-badge" /> Sampel Data Negara</span>
                 <span class="text-[10px] text-smoke uppercase">Lengkap</span>
               </div>
               <p class="text-[11.5px] text-steel">Data sampel negara dengan kode, bendera, bahasa, ibukota, kawasan, dan catatan.</p>
@@ -168,7 +168,7 @@ import {
             🎴 Flashcard &amp; Kuis
           </button>
           <button type="button" class="faq-chip px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer shrink-0" data-cat="katalog">
-            🗺️ Katalog 250 Negara
+            🗺️ Katalog Semua Negara
           </button>
           <button type="button" class="faq-chip px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer shrink-0" data-cat="cloud">
             ☁️ Sinkronisasi Cloud
@@ -177,7 +177,7 @@ import {
       </div>
 
       <!-- FAQ Articles & Guides List -->
-      <div class="mt-6 space-y-4 max-w-4xl" id="faq-items-wrapper">
+      <div class="mt-6 space-y-4 w-full" id="faq-items-wrapper">
         
         <!-- PANDUAN 1: EXCEL IMPORT EXPORT -->
         <details id="excel" class="faq-card group border border-rule bg-canvas open:border-ink transition-colors shadow-xs" data-category="excel" open>
@@ -264,7 +264,7 @@ import {
                 <span class="size-2 bg-cta inline-block"></span> C. Ekspor Data ke Excel
               </h4>
               <p class="text-xs text-steel">
-                Di halaman <a href="/katalog" class="text-ink font-bold underline">Katalog 250 Negara</a>, klik tombol <strong>"Ekspor (.xlsx)"</strong> pada toolbar atas untuk mengunduh database 250 negara lengkap beserta data target belajar dan catatan motivasi Anda.
+                Di halaman <a href="/katalog" class="text-ink font-bold underline">Katalog Negara</a>, klik tombol <strong>"Ekspor (.xlsx)"</strong> pada toolbar atas untuk mengunduh database negara lengkap beserta data target belajar dan catatan motivasi Anda.
               </p>
             </div>
           </div>
@@ -393,13 +393,13 @@ import {
               <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-badge shrink-0 font-mono text-xs">
                 <Globe class="size-4" />
               </span>
-              <span>6. Katalog 250 Negara, Penanda Target Belajar, &amp; Kuis Trivia</span>
+              <span>6. Katalog Negara Dunia, Penanda Target Belajar, &amp; Kuis Trivia</span>
             </span>
             <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
           </summary>
           <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3.5 leading-relaxed">
             <p>
-              Halaman <a href="/katalog" class="text-ink font-bold underline">Katalog 250 Negara</a> menyediakan database geografi bahasa di seluruh penjuru dunia:
+              Halaman <a href="/katalog" class="text-ink font-bold underline">Katalog Negara</a> menyediakan database geografi bahasa di seluruh penjuru dunia:
             </p>
             <ul class="list-disc pl-5 space-y-2 text-steel text-xs sm:text-[13px]">
               <li>
@@ -409,7 +409,7 @@ import {
                 <strong>Catatan Motivasi &amp; Rencana (📝):</strong> Tulis target waktu belajar atau catatan impian Anda pada negara tersebut. Data ini akan tersinkron ke cloud Supabase.
               </li>
               <li>
-                <strong>Kuis Trivia 250 Negara:</strong> Klik tombol <em>"Mulai Kuis Trivia"</em> untuk menguji wawasan seputar bendera, ibukota, dan bahasa resmi negara di dunia dengan penghitung skor kemenangan beruntun (<em>Streak</em>).
+                <strong>Kuis Trivia Negara Dunia:</strong> Klik tombol <em>"Mulai Kuis Trivia"</em> untuk menguji wawasan seputar bendera, ibukota, dan bahasa resmi negara di dunia dengan penghitung skor kemenangan beruntun (<em>Streak</em>).
               </li>
             </ul>
           </div>
@@ -587,7 +587,7 @@ import {
     exportExcelFile('template-kumpulan-frasa.xlsx', dummyFrasa, 'Kumpulan Frasa');
   });
 
-  // 3. Sampel 250 Negara
+  // 3. Sampel Data Negara
   document.getElementById('btn-dl-template-negara')?.addEventListener('click', () => {
     const dummyNegara = [
       { 'Kode': 'JP', 'Bendera': '🇯🇵', 'Nama Negara': 'Jepang', 'Bahasa Resmi': 'Jepang', 'Ibukota': 'Tokyo', 'Kawasan': 'Asia', 'Target Belajar': 'YA', 'Catatan': 'Target JLPT N4 tahun ini' },
@@ -596,6 +596,6 @@ import {
       { 'Kode': 'SA', 'Bendera': '🇸🇦', 'Nama Negara': 'Arab Saudi', 'Bahasa Resmi': 'Arab', 'Ibukota': 'Riyadh', 'Kawasan': 'Timur Tengah', 'Target Belajar': 'YA', 'Catatan': 'Belajar qawaid & hijaiyah' },
       { 'Kode': 'FR', 'Bendera': '🇫🇷', 'Nama Negara': 'Prancis', 'Bahasa Resmi': 'Prancis', 'Ibukota': 'Paris', 'Kawasan': 'Eropa', 'Target Belajar': 'TIDAK', 'Catatan': '' }
     ];
-    exportExcelFile('sampel-target-250-negara.xlsx', dummyNegara, 'Target 250 Negara');
+    exportExcelFile('sampel-target-negara.xlsx', dummyNegara, 'Target Negara Dunia');
   });
 </script>

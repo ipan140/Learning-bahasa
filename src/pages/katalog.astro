@@ -6,8 +6,8 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
 ---
 
 <Base 
-  title="Katalog 250 Negara di Dunia - Belajar Bahasa" 
-  description="Katalog lengkap 250 negara di dunia dengan informasi bahasa, aksara, ibukota, dan fitur target belajar mandiri yang tersinkron ke cloud."
+  title="Katalog Negara di Dunia - Belajar Bahasa" 
+  description="Katalog lengkap semua negara di dunia dengan informasi bahasa, aksara, ibukota, dan fitur target belajar mandiri yang tersinkron ke cloud."
 >
   <Section top={false} inner="px-6 pt-12 pb-18 lg:pt-16 lg:pb-24 max-md:px-5">
     
@@ -15,9 +15,9 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
     <div class="w-full">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-rule">
         <div>
-          <p class="label"><b>[02]</b> katalog 250 negara &amp; target belajar</p>
+          <p class="label"><b>[02]</b> katalog negara &amp; target belajar</p>
           <h1 class="mt-3 text-[clamp(28px,3.8vw,46px)] leading-[1.08] font-bold tracking-[-0.035em] text-ink">
-            Katalog 250 Negara di Dunia
+            Katalog Semua Negara di Dunia
           </h1>
           <p class="mt-3 max-w-[65ch] text-[15px] leading-[1.6] text-steel">
             Tandai target pada negara yang ingin Anda pelajari atau klik "Buka Tabel Aksara" untuk belajar langsung di ruang belajar. Seluruh target Anda tersimpan aman dan dapat disinkronkan ke cloud.
@@ -26,7 +26,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
 
         <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full md:w-auto mt-2 md:mt-0">
           <button type="button" id="btn-open-trivia" class="btn btn-primary btn-s text-[11px] sm:text-[12px] font-mono flex items-center gap-1.5">
-            <Gamepad2 class="size-3.5 inline" /> Kuis 250 Negara
+            <Gamepad2 class="size-3.5 inline" /> Kuis Trivia Negara
           </button>
           <button type="button" id="btn-cloud-sync-trigger" class="btn btn-secondary btn-s text-[11px] sm:text-[12px] flex items-center gap-1.5" title="Masuk untuk sinkronisasi materi ke smartphone & laptop lain">
             <Cloud class="size-3.5 inline" /> Sinkron Akun
@@ -69,7 +69,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
           <!-- Region Filter Pills -->
           <div class="flex flex-wrap items-center gap-1.5 text-[12px] sm:text-[13px]" id="country-region-filters">
             <button type="button" data-filter="all" class="px-2.5 sm:px-3.5 py-1.5 font-mono border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer">
-              Semua (<span id="total-country-count">250</span>)
+              Semua Negara (<span id="total-country-count">250</span>)
             </button>
             <button type="button" data-filter="targets" class="px-2.5 sm:px-3.5 py-1.5 font-mono border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer inline-flex items-center gap-1.5">
               <Star class="size-3.5 fill-badge text-badge inline" /> Target Saya (<span id="filter-target-count">0</span>)
@@ -182,13 +182,13 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
   </Section>
 
   <!-- ============================================== -->
-  <!-- MODAL KUIS TRIVIA 250 NEGARA                   -->
+  <!-- MODAL KUIS TRIVIA NEGARA DUNIA                 -->
   <!-- ============================================== -->
   <dialog id="trivia-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border border-rule w-[92vw] max-w-[480px] shadow-2xl max-h-[90dvh] overflow-y-auto">
     <div class="p-6 max-sm:p-5 flex flex-col gap-4">
       <div class="flex items-start justify-between pb-3 border-b border-rule">
         <div>
-          <h2 class="text-[18px] font-bold tracking-tight text-ink flex items-center gap-2"><Gamepad2 class="size-4.5 inline text-ink" /> Kuis Trivia 250 Negara</h2>
+          <h2 class="text-[18px] font-bold tracking-tight text-ink flex items-center gap-2"><Gamepad2 class="size-4.5 inline text-ink" /> Kuis Trivia Negara Dunia</h2>
           <p class="text-[12px] text-steel mt-0.5">Uji pengetahuan Anda tentang bahasa resmi &amp; ibukota negara di dunia.</p>
         </div>
         <button type="button" id="close-trivia-btn" class="text-xs font-mono p-1 border border-rule hover:bg-smoke/10 text-smoke hover:text-ink shrink-0 ml-3 cursor-pointer" aria-label="Tutup">
@@ -480,7 +480,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
                 Anda belum menandai negara target belajar. Klik icon bintang pada kartu negara mana saja untuk menjadikannya target belajar Anda!
               </p>
               <button type="button" id="btn-empty-see-all" class="mt-5 btn btn-primary btn-s font-mono text-xs">
-                ← Jelajahi Semua 250 Negara
+                ← Jelajahi Semua Negara
               </button>
             </div>
           `;
@@ -795,7 +795,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
       ]);
       XLSX.utils.book_append_sheet(wb, wsTargets, 'Target Belajar Saya');
 
-      // Sheet 2: Seluruh 250 Negara
+      // Sheet 2: Seluruh Negara di Dunia
       const allRows = allCountries.map((c, idx) => ({
         'No': idx + 1,
         'Kode': c.code,
@@ -810,7 +810,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookO
         'Catatan': userNotesMap[c.id] || ''
       }));
       const wsAll = XLSX.utils.json_to_sheet(allRows);
-      XLSX.utils.book_append_sheet(wb, wsAll, '250 Negara di Dunia');
+      XLSX.utils.book_append_sheet(wb, wsAll, 'Semua Negara di Dunia');
 
       const dateStr = new Date().toISOString().split('T')[0];
       XLSX.writeFile(wb, `target-belajar-bahasa-${dateStr}.xlsx`);

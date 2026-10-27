@@ -3,7 +3,7 @@
 const guideSteps = [
   { step: '01', action: 'pilih', text: 'Pilih aksara bahasa (Hiragana, Katakana, Jerman, Korea, dll.)', ms: 550 },
   { step: '02', action: 'dengar', text: 'Klik kotak karakter untuk mendengar audio pelafalan asli', ms: 600 },
-  { step: '03', action: 'target', text: 'Tandai bintang ⭐ pada 250 negara yang ingin dipelajari', ms: 500 },
+  { step: '03', action: 'target', text: 'Tandai bintang ⭐ pada negara dunia yang ingin dipelajari', ms: 500 },
   { step: '04', action: 'buat', text: 'Buat tabel aksara/kosakata baru dengan format teks bebas', ms: 650 },
   { step: '05', action: 'simpan', text: 'Tersimpan otomatis di browser tanpa repot registrasi/login', ms: 550 },
   { step: '06', action: 'backup', text: 'Download / cadangkan data sewaktu-waktu via Backup JSON', ms: 500 },
@@ -45,7 +45,7 @@ const guideSteps = [
     </div>
     <div class="px-2 sm:px-4 py-2.5 sm:py-3 border-r border-rule">
       <span class="label block mb-1 text-[10px]">Katalog Negara</span>
-      <span class="text-ink font-bold tabular-nums" data-stat-countries>250 Dunia</span>
+      <span class="text-ink font-bold tabular-nums" data-stat-countries>Semua Negara</span>
     </div>
     <div class="px-2 sm:px-4 py-2.5 sm:py-3">
       <span class="label block mb-1 text-[10px]">Status Akun</span>
@@ -124,8 +124,7 @@ const guideSteps = [
           statTables.textContent = `${currentCount} Tabel`;
         }
         if (statCountries) {
-          const currentCountries = Math.round(((i + 1) / rows.length) * 250);
-          statCountries.textContent = `${currentCountries} Dunia`;
+          statCountries.textContent = 'Semua Negara';
         }
 
         await wait(ms);
@@ -141,7 +140,7 @@ const guideSteps = [
         statusDot.className = 'size-1.5 rounded-full bg-ok';
       }
       if (statTables) statTables.textContent = '12 Tabel';
-      if (statCountries) statCountries.textContent = '250 Dunia';
+      if (statCountries) statCountries.textContent = 'Semua Negara';
 
       // Wait 5 seconds before looping animation again
       await wait(5000);

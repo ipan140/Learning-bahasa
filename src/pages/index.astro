@@ -28,7 +28,7 @@ const sampleTable = defaultLanguageTables[0]; // Jepang Hiragana
 const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES', 'FR'].includes(c.code));
 ---
 
-<Base title="Belajar Bahasa - Tabel Aksara Interaktif & Katalog 250 Negara" description="Aplikasi tabel belajar aksara bahasa (Jepang, Jerman, Korea, Arab, dll.) dan katalog 250 negara dengan audio pengucapan asli dan integrasi cloud multi-perangkat.">
+<Base title="Belajar Bahasa - Tabel Aksara Interaktif & Katalog Negara Dunia" description="Aplikasi tabel belajar aksara bahasa (Jepang, Jerman, Korea, Arab, dll.) dan katalog negara dunia dengan audio pengucapan asli dan integrasi cloud multi-perangkat.">
   
   <!-- [00] HERO: Pengenalan & Panduan Menggunakan Website -->
   <Section id="panduan" top={false} inner="px-6 pt-14 pb-18 lg:pt-20 lg:pb-24 max-md:px-5 overflow-hidden" label="Pengenalan Website">
@@ -45,7 +45,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
         <rect x={x - 4} y={y - 4} width="8" height="8" fill={o ? 'var(--cta)' : 'var(--canvas)'} stroke="var(--ink)" />
       ))}
       <g fill="var(--smoke)" font-size="11" font-family="inherit">
-        <text x="534" y="615">tabel_aksara</text><text x="892" y="535">audio_speech</text><text x="1020" y="606">250_negara</text><text x="832" y="70">integrasi_cloud</text>
+        <text x="534" y="615">tabel_aksara</text><text x="892" y="535">audio_speech</text><text x="1020" y="606">semua_negara</text><text x="832" y="70">integrasi_cloud</text>
       </g>
       <g stroke="var(--ink)"><path d="M580.5 96h11M586 90.5v11M1230.5 537h11M1236 531.5v11M34.5 613h11M40 607.5v11" /></g>
     </svg>
@@ -58,7 +58,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
           Belajar Aksara Bahasa &amp; Catat Target Negaramu.
         </h1>
         <p class="mt-6 max-w-[50ch] text-[16px] leading-[1.6] text-steel max-md:text-[15px]">
-          Selamat datang di platform belajar bahasa mandiri. Pelajari tabel aksara fonetik (Jepang, Jerman, Korea, Arab, dll.) dengan audio lafal asli, jelajahi katalog 250 negara, dan integrasikan progres Anda ke cloud secara aman.
+          Selamat datang di platform belajar bahasa mandiri. Pelajari tabel aksara fonetik (Jepang, Jerman, Korea, Arab, dll.) dengan audio lafal asli, jelajahi katalog negara di dunia, dan integrasikan progres Anda ke cloud secara aman.
         </p>
 
         <div class="mt-8 flex flex-wrap items-center gap-4">
@@ -66,12 +66,12 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
             Mulai Belajar Aksara →
           </a>
           <a href="/katalog" class="btn btn-secondary max-md:w-full font-mono text-[14px]">
-            Jelajahi 250 Negara →
+            Jelajahi Semua Negara →
           </a>
         </div>
 
         <div class="mt-7 flex items-center w-fit max-w-full border border-rule bg-canvas text-[13px] font-mono shadow-sm">
-          <code class="min-w-0 flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-ink truncate text-xs sm:text-[13px]"><span class="text-smoke select-none">fitur: </span>audio native · 250 negara · integrasi cloud</code>
+          <code class="min-w-0 flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-ink truncate text-xs sm:text-[13px]"><span class="text-smoke select-none">fitur: </span>audio native · semua negara · integrasi cloud</code>
           <span class="shrink-0 px-3 sm:px-3.5 py-2 sm:py-2.5 border-l border-rule text-ok font-bold text-xs sm:text-[13px]">100% GRATIS</span>
         </div>
       </div>
@@ -153,21 +153,21 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
     </div>
   </Section>
 
-  <!-- [02] SHOWCASE: Katalog 250 Negara di Dunia -->
+  <!-- [02] SHOWCASE: Katalog Semua Negara di Dunia -->
   <Section top={true} inner="px-6 pt-14 pb-18 lg:pt-16 lg:pb-22 max-md:px-5">
     <div class="w-full">
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-rule">
         <div>
           <p class="label"><b>[02]</b> katalog target belajar</p>
           <h2 class="mt-3 text-[clamp(26px,3.5vw,40px)] leading-[1.1] font-bold tracking-[-0.035em] text-ink">
-            Katalog 250 Negara di Dunia
+            Katalog Semua Negara di Dunia
           </h2>
           <p class="mt-2 text-[15px] text-steel max-w-[60ch]">
             Pantau dan tandai bintang ⭐ pada negara tujuan belajar bahasa Anda. Dilengkapi data kawasan, ibukota, dan bahasa resmi.
           </p>
         </div>
         <a href="/katalog" class="btn btn-secondary btn-s shrink-0 font-mono text-[13px]">
-          Buka Katalog 250 Negara Lengkap →
+          Buka Katalog Negara Lengkap →
         </a>
       </div>
 
@@ -203,7 +203,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
 
       <div class="mt-8 text-center">
         <a href="/katalog" class="btn btn-secondary px-8 py-3 text-[14px] font-mono">
-          Lihat Semua 250 Negara di Halaman Katalog →
+          Lihat Semua Negara di Halaman Katalog →
         </a>
       </div>
     </div>
@@ -280,7 +280,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
       </div>
 
       <!-- FAQ Accordion List -->
-      <div class="mt-8 space-y-3.5 max-w-4xl">
+      <div class="mt-8 space-y-3.5 w-full">
         <!-- FAQ Item 1: Excel Import & Export -->
         <details id="faq-excel" class="group border border-rule bg-canvas open:border-ink transition-colors shadow-xs">
           <summary class="p-4 sm:p-5 cursor-pointer list-none flex items-center justify-between gap-3 select-none font-bold text-[15px] sm:text-[16px] text-ink hover:bg-tint/40">
@@ -294,7 +294,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
           </summary>
           <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3.5 leading-relaxed font-sans">
             <p>
-              Platform mendukung manipulasi spreadsheet dua arah (impor massal dan ekspor data) untuk tabel aksara, kamus frasa, maupun target katalog 250 negara:
+              Platform mendukung manipulasi spreadsheet dua arah (impor massal dan ekspor data) untuk tabel aksara, kamus frasa, maupun data katalog negara:
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono text-xs text-ink">
               <div class="p-3 border border-rule bg-tint/30">
@@ -311,7 +311,7 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
             <ul class="list-disc pl-5 space-y-1.5 text-steel">
               <li><strong>Cara Impor Tabel Aksara:</strong> Buka formulir <em>"+ Buat Tabel Kustom"</em> di Studio Belajar, klik <strong>"Pilih File Excel / CSV"</strong>, dan sistem akan langsung membaca seluruh baris menjadi grid aksara interaktif.</li>
               <li><strong>Cara Impor Frasa:</strong> Pada tab Frasa Sehari-hari, klik tombol <strong>"Impor Excel"</strong> untuk memasukkan ratusan frasa sekaligus ke dalam kategori pilihan.</li>
-              <li><strong>Cara Ekspor Data:</strong> Di halaman Katalog 250 Negara atau Studio Belajar, klik tombol <strong>"Ekspor (.xlsx)"</strong> untuk mengunduh salinan data lengkap ke komputer atau smartphone Anda.</li>
+              <li><strong>Cara Ekspor Data:</strong> Di halaman Katalog Negara atau Studio Belajar, klik tombol <strong>"Ekspor (.xlsx)"</strong> untuk mengunduh salinan data lengkap ke komputer atau smartphone Anda.</li>
             </ul>
           </div>
         </details>
@@ -422,18 +422,18 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
               <span class="size-7 rounded-none bg-tint border border-rule flex items-center justify-center text-badge shrink-0 font-mono text-xs">
                 <Globe class="size-4" />
               </span>
-              <span>6. Apa fungsi Katalog 250 Negara, Target Belajar, &amp; Kuis Trivia Dunia?</span>
+              <span>6. Apa fungsi Katalog Negara, Target Belajar, &amp; Kuis Trivia Dunia?</span>
             </span>
             <ChevronDown class="size-4 text-smoke shrink-0 transition-transform duration-200 group-open:rotate-180" />
           </summary>
           <div class="px-5 pb-5 pt-1 text-[13px] sm:text-[14px] text-steel border-t border-rule/50 space-y-3 leading-relaxed">
             <p>
-              Halaman <strong>Katalog 250 Negara</strong> menyajikan ensiklopedia geografi linguistik seluruh negara di dunia:
+              Halaman <strong>Katalog Negara</strong> menyajikan ensiklopedia geografi linguistik seluruh negara di dunia:
             </p>
             <ul class="list-disc pl-5 space-y-1.5 text-steel">
               <li><strong>Menandai Target Belajar (⭐):</strong> Klik icon bintang pada negara tujuan Anda (misal: Jepang, Korea, Arab Saudi, Jerman). Anda dapat memfilter katalog hanya menampilkan negara target Anda.</li>
               <li><strong>Catatan Rencana Pribadi (📝):</strong> Tulis target waktu belajar, kosakata yang ingin dikuasai, atau alasan impian Anda pergi ke negara tersebut.</li>
-              <li><strong>Kuis Trivia 250 Negara:</strong> Klik tombol <em>"Mulai Kuis Trivia"</em> untuk menguji wawasan mengenai ibukota dan bahasa resmi negara di dunia dengan sistem rekor kemenangan beruntun (<em>Streak</em>).</li>
+              <li><strong>Kuis Trivia Negara Dunia:</strong> Klik tombol <em>"Mulai Kuis Trivia"</em> untuk menguji wawasan mengenai ibukota dan bahasa resmi negara di dunia dengan sistem rekor kemenangan beruntun (<em>Streak</em>).</li>
             </ul>
           </div>
         </details>

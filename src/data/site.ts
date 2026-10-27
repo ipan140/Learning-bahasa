@@ -4,17 +4,17 @@ import settings from './site-settings.json';
 export const site = {
   ...settings,
   url: 'https://learning-bahasa-news.vercel.app',
-  secondary: { label: 'Katalog 250 Negara', href: '/katalog' },
+  secondary: { label: 'Katalog Negara', href: '/katalog' },
   pro: '/belajar',
   nav: [
-    { label: 'Panduan & FAQ', href: '/panduan' },
     { label: 'Tabel Aksara', href: '/belajar' },
-    { label: 'Katalog 250 Negara', href: '/katalog' },
+    { label: 'Katalog Negara', href: '/katalog' },
+    { label: 'Panduan & FAQ', href: '/panduan' },
   ],
   menu: [
-    { label: 'Panduan & FAQ', href: '/panduan' },
     { label: 'Tabel Aksara', href: '/belajar' },
-    { label: 'Katalog 250 Negara', href: '/katalog' },
+    { label: 'Katalog Negara', href: '/katalog' },
+    { label: 'Panduan & FAQ', href: '/panduan' },
     { label: '+ Buat Tabel Kustom', href: '/belajar#buat-tabel' },
   ],
   footer: [
@@ -28,9 +28,9 @@ export const site = {
       ] 
     },
     { 
-      title: 'Katalog 250 Negara', 
+      title: 'Katalog Negara', 
       links: [
-        ['Jelajahi 250 Negara', '/katalog'], 
+        ['Jelajahi Semua Negara', '/katalog'], 
         ['Target Belajar Pribadi', '/katalog?filter=targets'], 
         ['Kuis Trivia Dunia', '/katalog?action=trivia'], 
         ['Ekspor / Impor Data Excel', '/katalog']
