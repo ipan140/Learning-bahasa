@@ -14,21 +14,34 @@ const path = Astro.url.pathname;
 
 <!-- Fixed header: sticky once the announcement bar scrolls away; data-scrolled toggles the blurred state -->
 <header class="site-header sticky top-0 z-50 border-b border-rule bg-canvas">
-  <nav class="frame flex items-center gap-6 h-16 px-6 max-md:h-14 max-md:px-4" aria-label="Main">
-    <Logo />
-    <ul class="hidden md:flex gap-7 text-[14px]">
-      {site.nav.map((l) => (
-        <li><a href={l.href} class:list={['hover:text-ink', path.startsWith(l.href) && (l.href as string) !== '/' ? 'text-ink' : 'text-steel']}>{l.label}</a></li>
-      ))}
-    </ul>
-    <div class="ml-auto flex items-center gap-2 sm:gap-3">
-      <div class="hidden md:block"><ThemeSwitcher /></div>
+  <nav class="frame flex items-center justify-between gap-4 h-16 px-4 sm:px-6 max-md:h-14" aria-label="Main">
+    <div class="flex items-center gap-6 lg:gap-8 min-w-0 shrink-0">
+      <Logo />
+      <ul class="hidden md:flex items-center gap-5 lg:gap-7 text-[13.5px] font-mono whitespace-nowrap">
+        {site.nav.map((l) => (
+          <li>
+            <a 
+              href={l.href} 
+              class:list={[
+                'hover:text-ink whitespace-nowrap transition-colors py-1', 
+                path.startsWith(l.href) && (l.href as string) !== '/' ? 'text-ink font-bold border-b border-ink' : 'text-steel'
+              ]}
+            >
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
 
-            <!-- Quick Search Trigger Button -->
+    <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+      <div class="hidden md:block shrink-0"><ThemeSwitcher /></div>
+
+      <!-- Quick Search Trigger Button -->
       <button 
         type="button" 
         id="btn-trigger-search" 
-        class="text-[12px] font-mono px-2.5 py-1.5 border border-rule hover:border-ink transition-colors flex items-center gap-1.5 bg-canvas text-smoke hover:text-ink cursor-pointer"
+        class="text-[12px] font-mono px-2.5 py-1.5 border border-rule hover:border-ink transition-colors flex items-center gap-1.5 bg-canvas text-smoke hover:text-ink cursor-pointer shrink-0"
         title="Buka Pencarian Cepat (Ctrl + K)"
       >
         <Search class="size-3.5 text-steel" />
@@ -40,15 +53,15 @@ const path = Astro.url.pathname;
       <button 
         type="button" 
         id="auth-trigger-btn" 
-        class="text-[12px] font-mono px-2.5 py-1.5 border border-rule hover:border-ink transition-colors flex items-center gap-1.5 bg-canvas cursor-pointer"
+        class="text-[12px] font-mono px-2.5 py-1.5 border border-rule hover:border-ink transition-colors flex items-center gap-1.5 bg-canvas cursor-pointer shrink-0 max-w-[180px]"
         aria-label="Akun Pengguna"
       >
-        <span class="inline-block w-2 h-2 rounded-full bg-smoke" id="auth-status-dot"></span>
-        <span id="auth-trigger-label" class="hidden sm:inline">Masuk</span>
+        <span class="inline-block w-2 h-2 rounded-full bg-smoke shrink-0" id="auth-status-dot"></span>
+        <span id="auth-trigger-label" class="hidden sm:inline-block max-w-[110px] md:max-w-[130px] truncate align-middle">Masuk</span>
       </button>
       
-      <a href={site.cta.href} class="hidden sm:inline-flex btn btn-primary btn-s whitespace-nowrap">{site.cta.label}</a>
-      <button type="button" class="md:hidden text-[13px] font-mono px-2.5 py-1.5 border border-rule bg-canvas text-ink hover:border-ink transition-colors cursor-pointer" data-menu-open aria-haspopup="dialog">[menu]</button>
+      <a href={site.cta.href} class="hidden sm:inline-flex btn btn-primary btn-s whitespace-nowrap shrink-0">{site.cta.label}</a>
+      <button type="button" class="md:hidden text-[13px] font-mono px-2.5 py-1.5 border border-rule bg-canvas text-ink hover:border-ink transition-colors cursor-pointer shrink-0" data-menu-open aria-haspopup="dialog">[menu]</button>
     </div>
   </nav>
 </header>

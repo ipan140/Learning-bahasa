@@ -255,6 +255,7 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     fetchUserPhrasesFromCloud,
     saveUserPhrasesToCloud
   } from '../lib/supabase';
+  import { worldCountries } from '../data/countries';
 
   let currentAuthMode: 'login' | 'register' = 'login';
   let activeUser: any = null;
@@ -469,6 +470,50 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     }
   });
 
+  function resolveCanonicalCountryId(raw: any): string | null {
+    if (!raw) return null;
+    const str = String(raw).trim().toLowerCase();
+    const found = worldCountries.find(c => 
+      c.id.toLowerCase() === str || 
+      c.code.toLowerCase() === str || 
+      c.name.toLowerCase() === str || 
+      (c.nativeName && c.nativeName.toLowerCase() === str)
+    );
+    if (found) return found.id;
+
+    const aliases: Record<string, string> = {
+      'jerman': 'de',
+      'jepang': 'jp',
+      'korea': 'kr',
+      'korea selatan': 'kr',
+      'south korea': 'kr',
+      'arab': 'sa',
+      'arab saudi': 'sa',
+      'saudi arabia': 'sa',
+      'rusia': 'ru',
+      'russia': 'ru',
+      'prancis': 'fr',
+      'france': 'fr',
+      'spanyol': 'es',
+      'spain': 'es',
+      'inggris': 'gb',
+      'united kingdom': 'gb',
+      'china': 'cn',
+      'tiongkok': 'cn',
+      'belanda': 'nl',
+      'netherlands': 'nl',
+      'italia': 'it',
+      'italy': 'it',
+      'turki': 'tr',
+      'turkey': 'tr',
+      'mesir': 'eg',
+      'egypt': 'eg',
+      'yunani': 'gr',
+      'greece': 'gr'
+    };
+    return aliases[str] || null;
+  }
+
   async function updateSyncStats(userId: string) {
     try {
       const cloudTargets = await fetchUserTargetsFromCloud(userId);
@@ -476,7 +521,19 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
       const cloudProgress = await fetchUserProgressFromCloud(userId);
       const cloudPhrases = await fetchUserPhrasesFromCloud(userId);
 
-      if (syncTargetCount) syncTargetCount.textContent = String(cloudTargets.length);
+      // Merge and canonicalize target countries
+      const localTargets: any[] = JSON.parse(localStorage.getItem('target_countries') || '[]');
+      const canonicalSet = new Set<string>();
+
+      [...cloudTargets, ...localTargets].forEach(raw => {
+        const cid = resolveCanonicalCountryId(raw);
+        if (cid) canonicalSet.add(cid);
+      });
+
+      const unifiedTargets = Array.from(canonicalSet);
+      localStorage.setItem('target_countries', JSON.stringify(unifiedTargets));
+
+      if (syncTargetCount) syncTargetCount.textContent = String(unifiedTargets.length);
       if (syncTableCount) syncTableCount.textContent = String(cloudTables.length);
 
       // Hitung total huruf hafal (dari cloud atau localStorage)
@@ -540,7 +597,7 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
           svg: '<svg class="size-4.5 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>', 
           title: 'Penjelajah', 
           desc: '3+ target', 
-          unlocked: cloudTargets.length >= 3 
+          unlocked: unifiedTargets.length >= 3 
         },
         { 
           id: 'phrase_collector', 
@@ -578,7 +635,7 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
       }
 
       window.dispatchEvent(new CustomEvent('supabase-data-loaded', {
-        detail: { targets: cloudTargets, tables: cloudTables, progress: cloudProgress, phrases: cloudPhrases }
+        detail: { targets: unifiedTargets, tables: cloudTables, progress: cloudProgress, phrases: cloudPhrases }
       }));
     } catch (err) {
       console.error('Update sync stats failed:', err);
@@ -591,10 +648,21 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     showAlert('Mengintegrasikan data belajar Anda...', 'info');
 
     try {
-      // 1. Sinkronkan target negara
-      const localTargets: string[] = JSON.parse(localStorage.getItem('target_countries') || '[]');
-      if (localTargets.length > 0) {
-        await batchSyncTargetsToCloud(activeUser.id, localTargets);
+      // 1. Sinkronkan target negara: ambil dari cloud dan lokal, satukan, lalu simpan ke kedua tempat
+      const cloudTargets = await fetchUserTargetsFromCloud(activeUser.id);
+      const localTargets: any[] = JSON.parse(localStorage.getItem('target_countries') || '[]');
+      const canonicalSet = new Set<string>();
+
+      [...cloudTargets, ...localTargets].forEach(raw => {
+        const cid = resolveCanonicalCountryId(raw);
+        if (cid) canonicalSet.add(cid);
+      });
+
+      const unifiedTargets = Array.from(canonicalSet);
+      localStorage.setItem('target_countries', JSON.stringify(unifiedTargets));
+
+      if (unifiedTargets.length > 0) {
+        await batchSyncTargetsToCloud(activeUser.id, unifiedTargets);
       }
 
       // 2. Sinkronkan tabel custom
@@ -618,7 +686,7 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
         }
       }
 
-      showAlert('✓ Seluruh data & materi berhasil terintegrasi!', 'success');
+      showAlert('✓ Seluruh data & target negara berhasil terintegrasi!', 'success');
       await updateSyncStats(activeUser.id);
     } catch (err: any) {
       showAlert('Gagal sinkronisasi: ' + (err.message || 'Terjadi kesalahan'), 'error');

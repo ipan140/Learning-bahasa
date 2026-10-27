@@ -27,7 +27,8 @@ import {
   Search,
   X,
   Lightbulb,
-  AlertCircle
+  AlertCircle,
+  Upload
 } from 'lucide-astro';
 ---
 
@@ -666,6 +667,26 @@ import {
         <h4 id="phrase-modal-title" class="text-base font-bold text-ink flex items-center gap-1.5"><Plus class="size-4 inline text-ink" /> Tambah Frasa Baru</h4>
         <button type="button" id="close-phrase-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer p-1" aria-label="Tutup"><X class="size-4" /></button>
       </div>
+      <!-- Quick Excel / CSV Autofill or Switch to Batch Import -->
+      <div class="mb-4 p-3 border border-rule bg-tint/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2">
+          <FileSpreadsheet class="size-4 shrink-0 text-cta" />
+          <div>
+            <div class="text-[12px] font-bold text-ink leading-none">Impor dari File Excel / CSV</div>
+            <div class="text-[10px] text-smoke font-mono mt-0.5">Isi otomatis form (1 baris) atau beralih ke impor massal</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+          <label class="btn btn-secondary btn-s text-[11px] font-mono cursor-pointer inline-flex items-center gap-1 py-1 px-2.5" title="Pilih file Excel/CSV untuk mengisi formulir ini">
+            <Upload class="size-3 inline" /> Unggah File
+            <input type="file" id="phrase-quick-excel-input" accept=".xlsx, .xls, .csv" class="hidden" />
+          </label>
+          <button type="button" id="btn-switch-to-batch-import" class="btn btn-secondary btn-s text-[11px] font-mono text-steel hover:text-ink py-1 px-2" title="Buka dialog impor banyak frasa sekaligus">
+            Massal →
+          </button>
+        </div>
+      </div>
+
       <form id="phrase-form" class="space-y-4">
         <input type="hidden" id="phrase-edit-cat-idx" value="-1" />
         <input type="hidden" id="phrase-edit-item-idx" value="-1" />
@@ -800,6 +821,57 @@ import {
           </button>
         </div>
       </form>
+    </div>
+  </dialog>
+
+  <!-- ============================================== -->
+  <!-- RETRO-TECH CONFIRM & ALERT DIALOG (SWEETALERT) -->
+  <!-- ============================================== -->
+  <dialog 
+    id="retro-confirm-dialog" 
+    class="m-auto backdrop:bg-black/75 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-[440px] shadow-2xl"
+  >
+    <div class="p-6">
+      <div class="flex items-center justify-between pb-3 border-b border-rule mb-4 text-[11px] font-mono text-smoke">
+        <span class="flex items-center gap-1.5 uppercase font-bold tracking-wider">
+          <span class="size-2 bg-cta inline-block"></span>
+          KONFIRMASI SISTEM
+        </span>
+        <button type="button" id="retro-confirm-btn-close" class="hover:text-ink p-1 cursor-pointer" aria-label="Tutup">
+          <X class="size-3.5" />
+        </button>
+      </div>
+
+      <div class="flex items-start gap-4">
+        <div id="retro-confirm-icon-box" class="p-3 border border-rule bg-tint shrink-0 text-ink">
+          <HelpCircle class="size-5" />
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="retro-confirm-title" class="text-[16px] font-bold text-ink leading-snug">
+            Konfirmasi Tindakan
+          </h3>
+          <p id="retro-confirm-message" class="text-[13px] text-steel mt-1.5 leading-relaxed font-sans">
+            Apakah Anda yakin ingin melanjutkan tindakan ini?
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-5 mt-5 border-t border-rule flex items-center justify-end gap-2.5 font-mono text-xs">
+        <button 
+          type="button" 
+          id="retro-confirm-btn-cancel" 
+          class="px-4 py-2 border border-rule bg-canvas text-smoke hover:text-ink hover:border-ink cursor-pointer"
+        >
+          Batal
+        </button>
+        <button 
+          type="button" 
+          id="retro-confirm-btn-ok" 
+          class="px-5 py-2 border border-ink bg-ink text-canvas font-bold cursor-pointer hover:opacity-90"
+        >
+          Ya, Lanjutkan
+        </button>
+      </div>
     </div>
   </dialog>
 </Base>
@@ -1029,6 +1101,8 @@ import {
     const phraseDeleteBtn = document.getElementById('phrase-delete-btn');
     const phraseCancelBtn = document.getElementById('phrase-cancel-btn');
     const closePhraseModalBtn = document.getElementById('close-phrase-modal-btn');
+    const phraseQuickExcelInput = document.getElementById('phrase-quick-excel-input') as HTMLInputElement | null;
+    const btnSwitchToBatchImport = document.getElementById('btn-switch-to-batch-import');
 
     // Phrase Import Modal DOM Elements
     const phraseImportModal = document.getElementById('phrase-import-modal') as HTMLDialogElement | null;
@@ -1040,6 +1114,92 @@ import {
     const phraseExcelInput = document.getElementById('phrase-excel-input') as HTMLInputElement | null;
     const phraseImportText = document.getElementById('phrase-import-text') as HTMLTextAreaElement | null;
     const phraseImportPreview = document.getElementById('phrase-import-preview');
+
+    // Retro-Tech Confirm Dialog (SweetAlert replacement)
+    interface RetroConfirmOptions {
+      title?: string;
+      message: string;
+      confirmText?: string;
+      cancelText?: string;
+      danger?: boolean;
+    }
+
+    function showRetroConfirm(options: RetroConfirmOptions): Promise<boolean> {
+      return new Promise((resolve) => {
+        const dialog = document.getElementById('retro-confirm-dialog') as HTMLDialogElement | null;
+        const titleEl = document.getElementById('retro-confirm-title');
+        const msgEl = document.getElementById('retro-confirm-message');
+        const btnOk = document.getElementById('retro-confirm-btn-ok') as HTMLButtonElement | null;
+        const btnCancel = document.getElementById('retro-confirm-btn-cancel') as HTMLButtonElement | null;
+        const btnClose = document.getElementById('retro-confirm-btn-close') as HTMLButtonElement | null;
+        const iconBox = document.getElementById('retro-confirm-icon-box');
+
+        if (!dialog || !btnOk || !btnCancel) {
+          resolve(window.confirm(options.message));
+          return;
+        }
+
+        if (titleEl) titleEl.textContent = options.title || 'Konfirmasi Tindakan';
+        if (msgEl) msgEl.textContent = options.message;
+
+        if (btnOk) {
+          btnOk.textContent = options.confirmText || 'Ya, Lanjutkan';
+          if (options.danger) {
+            btnOk.className = 'px-5 py-2 border border-red-500 bg-red-600 text-white font-bold cursor-pointer hover:bg-red-700 font-mono text-xs shadow-xs';
+          } else {
+            btnOk.className = 'px-5 py-2 border border-ink bg-ink text-canvas font-bold cursor-pointer hover:opacity-90 font-mono text-xs';
+          }
+        }
+
+        if (btnCancel) {
+          btnCancel.textContent = options.cancelText || 'Batal';
+        }
+
+        if (iconBox) {
+          if (options.danger) {
+            iconBox.className = 'p-3 border border-red-500/40 bg-red-500/10 shrink-0 text-red-500';
+            iconBox.innerHTML = `<svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`;
+          } else {
+            iconBox.className = 'p-3 border border-rule bg-tint shrink-0 text-ink';
+            iconBox.innerHTML = `<svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+          }
+        }
+
+        let handled = false;
+        const cleanup = () => {
+          if (handled) return;
+          handled = true;
+          btnOk.removeEventListener('click', onOk);
+          btnCancel.removeEventListener('click', onCancel);
+          btnClose?.removeEventListener('click', onCancel);
+          dialog.removeEventListener('close', onClose);
+        };
+
+        const onOk = () => {
+          cleanup();
+          dialog.close();
+          resolve(true);
+        };
+
+        const onCancel = () => {
+          cleanup();
+          dialog.close();
+          resolve(false);
+        };
+
+        const onClose = () => {
+          cleanup();
+          resolve(false);
+        };
+
+        btnOk.addEventListener('click', onOk);
+        btnCancel.addEventListener('click', onCancel);
+        btnClose?.addEventListener('click', onCancel);
+        dialog.addEventListener('close', onClose);
+
+        dialog.showModal();
+      });
+    }
 
     // Phrases state: user custom phrases map
     let userPhrasesMap: Record<string, any> = JSON.parse(localStorage.getItem('user_custom_phrases_map') || '{}');
@@ -1254,8 +1414,14 @@ import {
     }
 
     // Reset Progress for current table
-    btnResetProgress?.addEventListener('click', () => {
-      if (confirm('Reset seluruh tanda hafalan untuk aksara bahasa ini?')) {
+    btnResetProgress?.addEventListener('click', async () => {
+      const ok = await showRetroConfirm({
+        title: 'Reset Hafalan Aksara',
+        message: 'Reset seluruh tanda hafalan untuk aksara bahasa ini? Seluruh progres hafalan Anda pada tabel ini akan kembali ke nol.',
+        danger: true,
+        confirmText: 'Reset Hafalan'
+      });
+      if (ok) {
         userProgressMap[currentTableId] = [];
         saveProgressMap();
         updateProgressUI();
@@ -1645,10 +1811,16 @@ import {
       showToast('✓ Selesai mengedit frasa.');
     });
 
-    btnResetPhrase?.addEventListener('click', () => {
+    btnResetPhrase?.addEventListener('click', async () => {
       const allTables = getAllTables();
       const currentTable = allTables.find(t => t.id === currentTableId);
-      if (confirm(`Kembalikan frasa bahasa "${currentTable?.name || 'ini'}" ke daftar bawaan awal? Semua frasa kustom bahasa ini akan di-reset.`)) {
+      const ok = await showRetroConfirm({
+        title: 'Kembalikan Frasa Bawaan',
+        message: `Kembalikan frasa bahasa "${currentTable?.name || 'ini'}" ke daftar bawaan awal? Semua frasa kustom bahasa ini akan di-reset.`,
+        danger: true,
+        confirmText: 'Reset ke Bawaan'
+      });
+      if (ok) {
         delete userPhrasesMap[currentTableId];
         localStorage.setItem('user_custom_phrases_map', JSON.stringify(userPhrasesMap));
         if (currentUser) {
@@ -1828,13 +2000,83 @@ import {
       renderPhrases();
     });
 
-    phraseDeleteBtn?.addEventListener('click', () => {
+    // Quick Excel Input & Batch Switch inside Phrase Modal
+    btnSwitchToBatchImport?.addEventListener('click', () => {
+      closePhraseModal();
+      openPhraseImportModal();
+    });
+
+    phraseQuickExcelInput?.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      showToast(`Membaca file "${file.name}"...`);
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const data = new Uint8Array(evt.target?.result as ArrayBuffer);
+          const workbook = (window as any).XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const jsonRows: any[][] = (window as any).XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          const validRows = jsonRows.filter(r => r && r.length > 0 && String(r[0] || '').trim().length > 0);
+
+          if (validRows.length === 0) {
+            showToast('File spreadsheet kosong atau format tidak sesuai.');
+            return;
+          }
+
+          const firstStr = String(validRows[0][0] || '').toLowerCase();
+          const isHeader = ['aksara', 'native', 'frasa', 'teks', 'karakter', 'kata'].some(h => firstStr.includes(h));
+          const dataRows = isHeader ? validRows.slice(1) : validRows;
+
+          if (dataRows.length <= 1) {
+            const row = dataRows[0] || validRows[0];
+            if (phraseNativeInput) phraseNativeInput.value = String(row[0] || '').trim();
+            if (phraseTranslitInput) phraseTranslitInput.value = String(row[1] || '').trim();
+            if (phraseMeaningInput) phraseMeaningInput.value = String(row[2] || row[1] || '').trim();
+            showToast(`✓ Formulir berhasil diisi dari Excel: "${row[0]}"`);
+          } else {
+            closePhraseModal();
+            openPhraseImportModal();
+            const lines: string[] = [];
+            for (const r of dataRows) {
+              if (r.length >= 3) {
+                lines.push(`${r[0]} = ${r[1]} = ${r[2]}`);
+              } else if (r.length === 2) {
+                lines.push(`${r[0]} = ${r[1]}`);
+              }
+            }
+            if (phraseImportText) {
+              phraseImportText.value = lines.join('\n');
+              updatePhraseImportPreview();
+            }
+            showToast(`✓ Terdeteksi ${lines.length} baris frasa! Siap diimpor massal.`);
+          }
+        } catch {
+          showToast('Gagal memproses file spreadsheet frasa.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+      (e.target as HTMLInputElement).value = '';
+    });
+
+    phraseDeleteBtn?.addEventListener('click', async () => {
       const catIdx = parseInt(phraseEditCatIdx?.value || '-1');
       const itemIdx = parseInt(phraseEditItemIdx?.value || '-1');
       if (catIdx >= 0 && itemIdx >= 0) {
         const phrasesDataObj = ensureCustomPhrases(currentTableId);
         const cat = phrasesDataObj.categories[catIdx];
         if (cat) {
+          const item = cat.items[itemIdx];
+          const ok = await showRetroConfirm({
+            title: 'Hapus Frasa',
+            message: `Yakin ingin menghapus frasa "${item?.native || ''}"? Tindakan ini tidak dapat dibatalkan.`,
+            danger: true,
+            confirmText: 'Hapus Frasa'
+          });
+          if (!ok) return;
+
           const removed = cat.items.splice(itemIdx, 1)[0];
           if (cat.items.length === 0) {
             phrasesDataObj.categories.splice(catIdx, 1);
@@ -2224,10 +2466,18 @@ import {
         });
 
         phrasesContentWrapper.querySelectorAll('.btn-delete-phrase').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.addEventListener('click', async () => {
             const catIdx = parseInt(btn.getAttribute('data-cat') || '-1');
             const itemIdx = parseInt(btn.getAttribute('data-item') || '-1');
             const native = btn.getAttribute('data-native') || '';
+            const ok = await showRetroConfirm({
+              title: 'Hapus Frasa',
+              message: `Yakin ingin menghapus frasa "${native}"? Tindakan ini tidak dapat dibatalkan.`,
+              danger: true,
+              confirmText: 'Hapus Frasa'
+            });
+            if (!ok) return;
+
             if (catIdx >= 0 && itemIdx >= 0) {
               const phrasesDataObj = ensureCustomPhrases(currentTableId);
               const cat = phrasesDataObj.categories[catIdx];
@@ -2252,10 +2502,16 @@ import {
         });
 
         phrasesContentWrapper.querySelectorAll('.btn-cat-delete').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.addEventListener('click', async () => {
             const catIdx = parseInt(btn.getAttribute('data-cat-idx') || '-1');
             const catName = btn.getAttribute('data-cat-name') || '';
-            if (confirm(`Yakin ingin menghapus seluruh kategori "${catName}" beserta semua frasa di dalamnya?`)) {
+            const ok = await showRetroConfirm({
+              title: 'Hapus Kategori Frasa',
+              message: `Yakin ingin menghapus seluruh kategori "${catName}" beserta semua frasa di dalamnya?`,
+              danger: true,
+              confirmText: 'Hapus Kategori'
+            });
+            if (ok) {
               const phrasesDataObj = ensureCustomPhrases(currentTableId);
               phrasesDataObj.categories.splice(catIdx, 1);
               saveUserPhrases(currentTableId);
@@ -2453,7 +2709,7 @@ import {
     });
 
     // Auto Deduplication: cleans all characters appearing > 1 time
-    btnAutoDedup?.addEventListener('click', () => {
+    btnAutoDedup?.addEventListener('click', async () => {
       const allTables = getAllTables();
       const curr = allTables.find(t => t.id === currentTableId);
       if (!curr) return;
@@ -2473,7 +2729,14 @@ import {
         return;
       }
 
-      if (confirm(`Ditemukan ${duplicateChars.length} aksara kembar/dobel (${duplicateChars.slice(0, 5).join(', ')}...). Hapus semua kemunculan duplikatnya secara otomatis?`)) {
+      const ok = await showRetroConfirm({
+        title: 'Bersihkan Duplikat Aksara',
+        message: `Ditemukan ${duplicateChars.length} aksara kembar/dobel (${duplicateChars.slice(0, 5).join(', ')}...). Hapus semua kemunculan duplikatnya secara otomatis?`,
+        danger: false,
+        confirmText: 'Bersihkan Duplikat'
+      });
+
+      if (ok) {
         const table = ensureCustomTableForEditing();
         const seen = new Set<string>();
         let removedCount = 0;
@@ -3115,7 +3378,14 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       const isCustom = customTables.some(c => c.id === currentTableId);
       if (!isCustom) return;
 
-      if (confirm('Yakin ingin menghapus tabel aksara kustom ini?')) {
+      const ok = await showRetroConfirm({
+        title: 'Hapus Tabel Aksara Kustom',
+        message: 'Yakin ingin menghapus tabel aksara kustom ini? Seluruh data karakter dan riwayat belajar di tabel ini akan dihapus permanen.',
+        danger: true,
+        confirmText: 'Hapus Tabel'
+      });
+
+      if (ok) {
         const deletedId = currentTableId;
         customTables = customTables.filter(c => c.id !== deletedId);
         saveCustomTablesToStorage();

@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 import { worldCountries } from '../data/countries';
-import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide-astro';
+import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X, Search, BookOpen, FileSpreadsheet } from 'lucide-astro';
 ---
 
 <Base 
@@ -31,7 +31,14 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
           <button type="button" id="btn-cloud-sync-trigger" class="btn btn-secondary btn-s text-[12px] flex items-center gap-1.5" title="Masuk untuk sinkronisasi materi ke smartphone & laptop lain">
             <Cloud class="size-3.5 inline" /> Sinkron Akun
           </button>
-          <button type="button" id="btn-export-backup" class="btn btn-secondary btn-s text-[12px] flex items-center gap-1.5" title="Simpan file cadangan target belajar">
+          <button type="button" id="btn-export-excel" class="btn btn-secondary btn-s text-[12px] flex items-center gap-1.5" title="Ekspor daftar target dan data negara ke spreadsheet Excel (.xlsx)">
+            <FileSpreadsheet class="size-3.5 inline text-ok" /> Export Excel
+          </button>
+          <label class="btn btn-secondary btn-s text-[12px] cursor-pointer inline-flex items-center gap-1.5" title="Impor daftar target belajar dari file Excel (.xlsx / .csv)">
+            <Upload class="size-3.5 inline text-ok" /> Import Excel
+            <input type="file" id="input-import-excel" accept=".xlsx, .xls, .csv" class="hidden" />
+          </label>
+          <button type="button" id="btn-export-backup" class="btn btn-secondary btn-s text-[12px] flex items-center gap-1.5" title="Simpan file cadangan target belajar JSON">
             <Download class="size-3.5 inline" /> Backup JSON
           </button>
           <label class="btn btn-secondary btn-s text-[12px] cursor-pointer inline-flex items-center gap-1.5" title="Pulihkan cadangan dari file JSON">
@@ -77,13 +84,24 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
 
           <!-- Search & Sort Controls -->
           <div class="w-full sm:w-auto flex items-center gap-2 flex-wrap">
-            <div class="w-full sm:w-64">
+            <div class="relative w-full sm:w-72">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-steel pointer-events-none">
+                <Search class="size-3.5 inline" />
+              </span>
               <input 
                 type="text" 
                 id="country-search-input" 
                 placeholder="Cari negara / bahasa / ibukota..." 
-                class="w-full px-3.5 py-2 text-[13px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
+                class="w-full pl-8 pr-8 py-2 text-[13px] bg-tint border border-rule text-ink outline-none focus:border-ink font-mono"
               />
+              <button 
+                type="button" 
+                id="btn-clear-country-search" 
+                class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-smoke hover:text-ink cursor-pointer p-0.5" 
+                title="Hapus pencarian"
+              >
+                <X class="size-3.5" />
+              </button>
             </div>
             <select 
               id="country-sort-select" 
@@ -94,6 +112,44 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
               <option value="name-desc">Urut: Nama (Z-A)</option>
               <option value="region">Urut: Kawasan Benua</option>
             </select>
+          </div>
+        </div>
+
+        <!-- Quick Tags & Alphabet Jump Bar -->
+        <div class="pt-3 border-t border-rule space-y-2.5">
+          <!-- Popular Quick Search Tags -->
+          <div class="flex items-center gap-1.5 flex-wrap text-xs font-mono">
+            <span class="text-[11px] text-smoke uppercase tracking-wider shrink-0 mr-1">Cepat:</span>
+            {['Indonesia', 'Jepang', 'Korea', 'Arab', 'Jerman', 'Rusia', 'Prancis', 'Spanyol', 'Inggris', 'China', 'Thailand'].map((tag) => (
+              <button 
+                type="button" 
+                class="btn-quick-tag px-2.5 py-1 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint text-[11px] cursor-pointer" 
+                data-tag={tag}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+
+          <!-- Alphabet A-Z bar -->
+          <div class="flex items-center gap-1 flex-wrap text-xs font-mono" id="alphabet-filter-bar">
+            <span class="text-[11px] text-smoke uppercase tracking-wider shrink-0 mr-1">Abjad:</span>
+            <button 
+              type="button" 
+              data-letter="all" 
+              class="letter-btn active px-2 py-0.5 border border-ink bg-ink text-canvas font-bold cursor-pointer text-[11px]"
+            >
+              Semua
+            </button>
+            {Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ').map((letter) => (
+              <button 
+                type="button" 
+                data-letter={letter} 
+                class="letter-btn px-1.5 py-0.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer text-[11px]"
+              >
+                {letter}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -109,10 +165,13 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
         <!-- Rendered dynamically by client script -->
       </div>
 
-      <!-- Load More Button -->
-      <div id="load-more-wrapper" class="hidden text-center pt-4">
-        <button type="button" id="btn-load-more" class="btn btn-secondary px-8 py-2.5 text-[13px] font-mono">
-          Tampilkan Lebih Banyak Negara (+36) ↓
+      <!-- Load More & Load All Buttons -->
+      <div id="load-more-wrapper" class="hidden text-center pt-4 flex flex-wrap items-center justify-center gap-3">
+        <button type="button" id="btn-load-more" class="btn btn-secondary px-6 py-2.5 text-[13px] font-mono">
+          Tampilkan Lebih Banyak (+36) ↓
+        </button>
+        <button type="button" id="btn-load-all" class="btn btn-secondary px-5 py-2.5 text-[13px] font-mono text-steel hover:text-ink">
+          Tampilkan Semua Sekaligus
         </button>
       </div>
 
@@ -200,6 +259,9 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
 
 </Base>
 
+<!-- Load SheetJS for Excel Reading & Writing -->
+<script is:inline src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <script>
   import {
     getCurrentUser,
@@ -208,7 +270,8 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
     removeTargetFromCloud,
     saveTargetNoteToCloud,
     fetchUserTargetsWithNotesFromCloud,
-    saveUserQuizScoreToCloud
+    saveUserQuizScoreToCloud,
+    batchSyncTargetsToCloud
   } from '../lib/supabase';
 
   const container = document.getElementById('countries-app');
@@ -216,15 +279,55 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
     const rawCountries = container.getAttribute('data-countries');
     const allCountries: any[] = rawCountries ? JSON.parse(rawCountries) : [];
 
+    function resolveCanonicalCountryId(raw: any): string | null {
+      if (!raw) return null;
+      const str = String(raw).trim().toLowerCase();
+      const found = allCountries.find(c => 
+        c.id.toLowerCase() === str || 
+        c.code.toLowerCase() === str || 
+        c.name.toLowerCase() === str || 
+        (c.nativeName && c.nativeName.toLowerCase() === str)
+      );
+      if (found) return found.id;
+
+      const aliases: Record<string, string> = {
+        'jerman': 'de',
+        'jepang': 'jp',
+        'korea': 'kr',
+        'korea selatan': 'kr',
+        'south korea': 'kr',
+        'arab': 'sa',
+        'arab saudi': 'sa',
+        'saudi arabia': 'sa',
+        'rusia': 'ru',
+        'russia': 'ru',
+        'prancis': 'fr',
+        'france': 'fr',
+        'spanyol': 'es',
+        'spain': 'es',
+        'inggris': 'gb',
+        'united kingdom': 'gb',
+        'china': 'cn',
+        'tiongkok': 'cn',
+        'belanda': 'nl',
+        'netherlands': 'nl',
+        'italia': 'it',
+        'italy': 'it',
+        'turki': 'tr',
+        'turkey': 'tr',
+        'mesir': 'eg',
+        'egypt': 'eg',
+        'yunani': 'gr',
+        'greece': 'gr'
+      };
+      return aliases[str] || null;
+    }
+
     // Local Storage target countries (Default kosong [], dinamis)
     let rawTargetIds: any[] = JSON.parse(localStorage.getItem('target_countries') || '[]');
-    let targetCountryIds: string[] = rawTargetIds
-      .map(id => {
-        const found = allCountries.find(c => c.id.toLowerCase() === String(id).toLowerCase() || c.code.toUpperCase() === String(id).toUpperCase());
-        return found ? found.id : null;
-      })
-      .filter(Boolean) as string[];
-    targetCountryIds = Array.from(new Set(targetCountryIds));
+    let targetCountryIds: string[] = Array.from(new Set(
+      rawTargetIds.map(id => resolveCanonicalCountryId(id)).filter(Boolean) as string[]
+    ));
 
     let userNotesMap: Record<string, string> = JSON.parse(localStorage.getItem('user_target_notes') || '{}');
     let activeEditingCountryId = '';
@@ -251,17 +354,23 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
     let countrySearchQuery = '';
     let countryDisplayLimit = 36;
     let countrySortMode = 'name-asc';
+    let selectedLetter = 'all';
     let currentUser: any = null;
 
     const countriesGrid = document.getElementById('countries-grid');
     const searchInput = document.getElementById('country-search-input') as HTMLInputElement | null;
+    const btnClearSearch = document.getElementById('btn-clear-country-search');
     const sortSelect = document.getElementById('country-sort-select') as HTMLSelectElement | null;
     const filterButtons = document.querySelectorAll('#country-region-filters button');
+    const letterButtons = document.querySelectorAll('#alphabet-filter-bar button');
+    const quickTags = document.querySelectorAll('.btn-quick-tag');
     const resultsInfo = document.getElementById('country-results-info');
     const loadMoreWrapper = document.getElementById('load-more-wrapper');
     const loadMoreBtn = document.getElementById('btn-load-more');
+    const btnLoadAll = document.getElementById('btn-load-all');
     const targetCountSpan = document.getElementById('filter-target-count');
     const totalCountSpan = document.getElementById('total-country-count');
+    const hasTableCountSpan = document.getElementById('has-table-count');
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
     const toastClose = document.getElementById('toast-close');
@@ -277,27 +386,33 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
     function isCountryTargeted(c: any): boolean {
       if (!c) return false;
       const cid = (c.id || '').toLowerCase();
-      const ccode = (c.code || '').toUpperCase();
       return targetCountryIds.some(t => {
-        const val = String(t).trim();
-        return val.toLowerCase() === cid || val.toUpperCase() === ccode;
+        const val = resolveCanonicalCountryId(t);
+        return val === cid;
       });
     }
 
     function saveTargetsToStorage() {
       localStorage.setItem('target_countries', JSON.stringify(targetCountryIds));
       updateBadges();
+      window.dispatchEvent(new CustomEvent('target-countries-updated', { detail: { targets: targetCountryIds } }));
     }
 
     function updateBadges() {
       const count = allCountries.filter(c => isCountryTargeted(c)).length;
       if (targetCountSpan) targetCountSpan.textContent = String(count);
       if (totalCountSpan) totalCountSpan.textContent = String(allCountries.length);
+      const hasTableCount = allCountries.filter(c => Boolean(c.tableId)).length;
+      if (hasTableCountSpan) hasTableCountSpan.textContent = String(hasTableCount);
     }
 
     function renderCountries() {
       if (!countriesGrid) return;
       updateBadges();
+
+      if (btnClearSearch) {
+        btnClearSearch.classList.toggle('hidden', !countrySearchQuery);
+      }
 
       const query = countrySearchQuery.trim().toLowerCase();
 
@@ -305,8 +420,15 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
         let matchesFilter = true;
         if (countryFilter === 'targets') {
           matchesFilter = isCountryTargeted(c);
+        } else if (countryFilter === 'has-table') {
+          matchesFilter = Boolean(c.tableId);
         } else if (countryFilter !== 'all') {
           matchesFilter = c.region === countryFilter || (c.subregion && c.subregion.includes(countryFilter));
+        }
+
+        let matchesLetter = true;
+        if (selectedLetter !== 'all') {
+          matchesLetter = (c.name || '').toUpperCase().startsWith(selectedLetter);
         }
 
         const matchesQuery = !query || 
@@ -316,7 +438,7 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
           (c.capital && c.capital.toLowerCase().includes(query)) ||
           c.code.toLowerCase().includes(query);
 
-        return matchesFilter && matchesQuery;
+        return matchesFilter && matchesLetter && matchesQuery;
       });
 
       filtered.sort((a, b) => {
@@ -584,6 +706,42 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
       }, 120);
     });
 
+    // Clear Search Button
+    btnClearSearch?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      countrySearchQuery = '';
+      countryDisplayLimit = 36;
+      renderCountries();
+      searchInput?.focus();
+    });
+
+    // Quick Search Tags
+    quickTags.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.getAttribute('data-tag') || '';
+        if (searchInput) searchInput.value = tag;
+        countrySearchQuery = tag;
+        countryDisplayLimit = 36;
+        renderCountries();
+      });
+    });
+
+    // Alphabet A-Z Bar Handler
+    letterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const letter = btn.getAttribute('data-letter') || 'all';
+        selectedLetter = letter;
+        countryDisplayLimit = 36;
+
+        letterButtons.forEach(b => {
+          b.className = 'letter-btn px-1.5 py-0.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink cursor-pointer text-[11px]';
+        });
+        btn.className = 'letter-btn active px-2 py-0.5 border border-ink bg-ink text-canvas font-bold cursor-pointer text-[11px]';
+
+        renderCountries();
+      });
+    });
+
     // Sort Handler
     sortSelect?.addEventListener('change', (e) => {
       countrySortMode = (e.target as HTMLSelectElement).value;
@@ -594,6 +752,165 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
     loadMoreBtn?.addEventListener('click', () => {
       countryDisplayLimit += 36;
       renderCountries();
+    });
+
+    // Load All Handler
+    btnLoadAll?.addEventListener('click', () => {
+      countryDisplayLimit = allCountries.length + 50;
+      renderCountries();
+    });
+
+    // Export Excel
+    document.getElementById('btn-export-excel')?.addEventListener('click', () => {
+      const XLSX = (window as any).XLSX;
+      if (!XLSX) {
+        showToast('Library spreadsheet sedang dimuat...');
+        return;
+      }
+
+      showToast('Membuat file Excel...');
+      const wb = XLSX.utils.book_new();
+
+      // Sheet 1: Target Belajar Saya
+      const targetCountriesList = allCountries.filter(c => isCountryTargeted(c));
+      const targetRows = targetCountriesList.map((c, idx) => ({
+        'No': idx + 1,
+        'Kode': c.code,
+        'Nama Negara': c.name,
+        'Nama Asli': c.nativeName || c.name,
+        'Bendera': c.flag || '',
+        'Kawasan': c.region,
+        'Subwilayah': c.subregion || '',
+        'Bahasa Resmi': c.language,
+        'Ibukota': c.capital || '-',
+        'Catatan Target': userNotesMap[c.id] || '',
+        'Tabel Aksara': c.tableId ? 'Tersedia' : 'Belum Ditambahkan'
+      }));
+
+      const wsTargets = XLSX.utils.json_to_sheet(targetRows.length > 0 ? targetRows : [
+        { 'Info': 'Belum ada negara yang ditandai sebagai target belajar. Klik bintang pada kartu negara.' }
+      ]);
+      XLSX.utils.book_append_sheet(wb, wsTargets, 'Target Belajar Saya');
+
+      // Sheet 2: Seluruh 250 Negara
+      const allRows = allCountries.map((c, idx) => ({
+        'No': idx + 1,
+        'Kode': c.code,
+        'Nama Negara': c.name,
+        'Nama Asli': c.nativeName || c.name,
+        'Bendera': c.flag || '',
+        'Kawasan': c.region,
+        'Subwilayah': c.subregion || '',
+        'Bahasa Resmi': c.language,
+        'Ibukota': c.capital || '-',
+        'Target Belajar': isCountryTargeted(c) ? 'YA' : 'TIDAK',
+        'Catatan': userNotesMap[c.id] || ''
+      }));
+      const wsAll = XLSX.utils.json_to_sheet(allRows);
+      XLSX.utils.book_append_sheet(wb, wsAll, '250 Negara di Dunia');
+
+      const dateStr = new Date().toISOString().split('T')[0];
+      XLSX.writeFile(wb, `target-belajar-bahasa-${dateStr}.xlsx`);
+      showToast('✓ File Excel target belajar berhasil diunduh!');
+    });
+
+    // Import Excel
+    const inputImportExcel = document.getElementById('input-import-excel') as HTMLInputElement | null;
+    inputImportExcel?.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const XLSX = (window as any).XLSX;
+      if (!XLSX) {
+        showToast('Library spreadsheet sedang dimuat...');
+        return;
+      }
+
+      showToast(`Membaca file "${file.name}"...`);
+      const reader = new FileReader();
+
+      reader.onload = async (evt) => {
+        try {
+          const data = new Uint8Array(evt.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonRows: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+          if (!jsonRows || jsonRows.length === 0) {
+            showToast('File spreadsheet kosong.');
+            return;
+          }
+
+          let importedCount = 0;
+          const newTargetSet = new Set<string>(targetCountryIds);
+
+          const header = jsonRows[0].map((h: any) => String(h || '').trim().toLowerCase());
+          const codeIdx = header.findIndex((h: string) => h.includes('kode') || h === 'code' || h === 'id' || h === 'iso');
+          const nameIdx = header.findIndex((h: string) => h.includes('negara') || h.includes('country') || h === 'name');
+          const noteIdx = header.findIndex((h: string) => h.includes('catatan') || h.includes('note') || h.includes('target'));
+
+          const startRow = (codeIdx >= 0 || nameIdx >= 0) ? 1 : 0;
+
+          for (let i = startRow; i < jsonRows.length; i++) {
+            const row = jsonRows[i];
+            if (!row || row.length === 0) continue;
+
+            let resolvedCid: string | null = null;
+            if (codeIdx >= 0 && row[codeIdx]) {
+              resolvedCid = resolveCanonicalCountryId(row[codeIdx]);
+            }
+            if (!resolvedCid && nameIdx >= 0 && row[nameIdx]) {
+              resolvedCid = resolveCanonicalCountryId(row[nameIdx]);
+            }
+            if (!resolvedCid) {
+              for (const cell of row) {
+                if (cell && typeof cell === 'string') {
+                  const testCid = resolveCanonicalCountryId(cell);
+                  if (testCid) {
+                    resolvedCid = testCid;
+                    break;
+                  }
+                }
+              }
+            }
+
+            if (resolvedCid) {
+              if (!newTargetSet.has(resolvedCid)) {
+                newTargetSet.add(resolvedCid);
+                importedCount++;
+              }
+              if (noteIdx >= 0 && row[noteIdx]) {
+                const noteVal = String(row[noteIdx]).trim();
+                if (noteVal && noteVal.toUpperCase() !== 'YA' && noteVal.toUpperCase() !== 'TIDAK') {
+                  userNotesMap[resolvedCid] = noteVal;
+                }
+              }
+            }
+          }
+
+          targetCountryIds = Array.from(newTargetSet);
+          saveTargetsToStorage();
+          localStorage.setItem('user_target_notes', JSON.stringify(userNotesMap));
+          renderCountries();
+
+          if (currentUser) {
+            try {
+              await batchSyncTargetsToCloud(currentUser.id, targetCountryIds);
+            } catch (err) {
+              console.warn('Sync imported targets error:', err);
+            }
+          }
+
+          showToast(`✓ Berhasil mengimpor ${importedCount} negara target dari Excel!`);
+        } catch (err) {
+          console.error(err);
+          showToast('Gagal memproses file Excel.');
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+      (e.target as HTMLInputElement).value = '';
     });
 
     // Backup JSON
@@ -787,10 +1104,16 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
         currentUser = await getCurrentUser();
         if (currentUser) {
           const cloudTargets = await fetchUserTargetsFromCloud(currentUser.id);
-          if (cloudTargets && cloudTargets.length > 0) {
-            targetCountryIds = Array.from(new Set([...targetCountryIds, ...cloudTargets]));
-            saveTargetsToStorage();
-          }
+          const localTargets: any[] = JSON.parse(localStorage.getItem('target_countries') || '[]');
+
+          const unifiedSet = new Set<string>();
+          [...cloudTargets, ...localTargets, ...targetCountryIds].forEach(raw => {
+            const cid = resolveCanonicalCountryId(raw);
+            if (cid) unifiedSet.add(cid);
+          });
+
+          targetCountryIds = Array.from(unifiedSet);
+          saveTargetsToStorage();
 
           const cloudNotes = await fetchUserTargetsWithNotesFromCloud(currentUser.id);
           if (cloudNotes && Object.keys(cloudNotes).length > 0) {
@@ -804,6 +1127,29 @@ import { Gamepad2, Cloud, Download, Upload, Star, Edit3, Flame, X } from 'lucide
         console.warn('Init user targets error:', err);
       }
     }
+
+    // Listener sync otomatis dari AuthModal
+    window.addEventListener('supabase-data-loaded', (e: any) => {
+      const incomingTargets = e.detail?.targets;
+      if (Array.isArray(incomingTargets)) {
+        const unifiedSet = new Set<string>();
+        incomingTargets.forEach(raw => {
+          const cid = resolveCanonicalCountryId(raw);
+          if (cid) unifiedSet.add(cid);
+        });
+        targetCountryIds = Array.from(unifiedSet);
+        saveTargetsToStorage();
+        renderCountries();
+      }
+    });
+
+    window.addEventListener('target-countries-updated', (e: any) => {
+      const incomingTargets = e.detail?.targets;
+      if (Array.isArray(incomingTargets)) {
+        targetCountryIds = Array.from(new Set(incomingTargets.map(raw => resolveCanonicalCountryId(raw)).filter(Boolean) as string[]));
+        renderCountries();
+      }
+    });
 
     // Sync button highlight with initial URL filter
     if (countryFilter !== 'all') {

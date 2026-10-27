@@ -10,7 +10,6 @@ export const site = {
     { label: 'Panduan', href: '/#panduan' },
     { label: 'Tabel Aksara', href: '/belajar' },
     { label: 'Katalog 250 Negara', href: '/katalog' },
-    { label: '+ Buat Tabel', href: '/belajar#buat-tabel' },
   ],
   menu: [
     { label: 'Panduan', href: '/#panduan' },
