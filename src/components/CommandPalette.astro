@@ -2,12 +2,13 @@
 // CommandPalette.astro - Pencarian Cepat Global (Ctrl + K)
 import { defaultLanguageTables } from '../data/languages';
 import { worldCountries } from '../data/countries';
+import { Search } from 'lucide-astro';
 
 const searchData = [
   // Actions
-  { type: 'action', title: '🎴 Mode Flashcard & Latihan Aksara', subtitle: 'Latihan hafalan bolak-balik & kuis pilihan ganda', href: '/belajar?mode=flashcard' },
-  { type: 'action', title: '💬 Frasa Dasar Sehari-hari', subtitle: 'Salam, ucapan terima kasih, dan angka 1-10 dengan audio', href: '/belajar?mode=phrases' },
-  { type: 'action', title: '🎮 Kuis Trivia 250 Negara', subtitle: 'Uji pengetahuan bahasa resmi & ibukota dunia', href: '/katalog' },
+  { type: 'action', title: 'Mode Flashcard & Latihan Aksara', subtitle: 'Latihan hafalan bolak-balik & kuis pilihan ganda', href: '/belajar?mode=flashcard' },
+  { type: 'action', title: 'Frasa Dasar Sehari-hari', subtitle: 'Salam, ucapan terima kasih, dan angka 1-10 dengan audio', href: '/belajar?mode=phrases' },
+  { type: 'action', title: 'Kuis Trivia 250 Negara', subtitle: 'Uji pengetahuan bahasa resmi & ibukota dunia', href: '/katalog' },
   { type: 'action', title: '+ Buat Tabel Aksara Sendiri', subtitle: 'Tambah materi kustom atau impor dari file Excel', href: '/belajar#buat-tabel' },
   
   // Language Tables
@@ -32,7 +33,7 @@ const searchData = [
   <div class="flex flex-col max-h-[80vh]">
     <!-- Search Bar Input Header -->
     <div class="flex items-center gap-3 p-4 border-b border-rule bg-tint/30">
-      <span class="text-steel text-[16px]">🔍</span>
+      <Search class="size-4 text-steel shrink-0" />
       <input 
         type="text" 
         id="cp-search-input" 

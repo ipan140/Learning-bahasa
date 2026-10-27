@@ -3,6 +3,30 @@ import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 import { defaultLanguageTables } from '../data/languages';
 import { languagePhrasesData } from '../data/phrases';
+import { 
+  Globe, 
+  Plus, 
+  Layers, 
+  RotateCcw, 
+  MessageSquare, 
+  Volume2, 
+  VolumeX, 
+  Gauge, 
+  Play, 
+  Square, 
+  Copy, 
+  Printer, 
+  Edit3, 
+  Trash2, 
+  Sparkles, 
+  Check, 
+  Shuffle, 
+  HelpCircle, 
+  FileSpreadsheet, 
+  FileText,
+  Search,
+  X
+} from 'lucide-astro';
 ---
 
 <Base 
@@ -24,11 +48,11 @@ import { languagePhrasesData } from '../data/phrases';
           </p>
         </div>
         <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
-          <a href="/katalog" class="btn btn-secondary btn-s font-mono text-[13px]">
-            🌍 Katalog 250 Negara →
+          <a href="/katalog" class="btn btn-secondary btn-s font-mono text-[13px] inline-flex items-center gap-1.5">
+            <Globe class="size-3.5 inline text-steel" /> Katalog 250 Negara →
           </a>
-          <button type="button" id="open-creator-top-btn" class="btn btn-primary btn-s font-mono text-[13px]">
-            + Buat Tabel
+          <button type="button" id="open-creator-top-btn" class="btn btn-primary btn-s font-mono text-[13px] inline-flex items-center gap-1.5">
+            <Plus class="size-3.5 inline" /> Buat Tabel
           </button>
         </div>
       </div>
@@ -78,23 +102,23 @@ import { languagePhrasesData } from '../data/phrases';
           <button 
             type="button" 
             id="btn-mode-table" 
-            class="px-4 py-2 font-mono text-[13px] border-2 border-cta bg-cta/10 text-ink font-bold whitespace-nowrap transition-colors cursor-pointer shadow-xs"
+            class="px-4 py-2 font-mono text-[13px] border-2 border-cta bg-cta/10 text-ink font-bold whitespace-nowrap transition-colors cursor-pointer shadow-xs inline-flex items-center gap-1.5"
           >
-            📑 Mode Tabel Aksara
+            <Layers class="size-3.5 inline" /> Mode Tabel Aksara
           </button>
           <button 
             type="button" 
             id="btn-mode-flashcard" 
-            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap transition-colors cursor-pointer"
+            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5"
           >
-            🎴 Mode Flashcard &amp; Latihan
+            <RotateCcw class="size-3.5 inline" /> Mode Flashcard &amp; Latihan
           </button>
           <button 
             type="button" 
             id="btn-mode-phrases" 
-            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap transition-colors cursor-pointer"
+            class="px-4 py-2 font-mono text-[13px] border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 whitespace-nowrap transition-colors cursor-pointer inline-flex items-center gap-1.5"
           >
-            💬 Frasa Dasar Sehari-hari
+            <MessageSquare class="size-3.5 inline" /> Frasa Dasar Sehari-hari
           </button>
         </div>
 
@@ -135,41 +159,52 @@ import { languagePhrasesData } from '../data/phrases';
             <button 
               type="button" 
               id="toggle-audio-btn" 
-              class="btn btn-secondary btn-s"
+              class="btn btn-secondary btn-s inline-flex items-center gap-1.5"
               title="Aktifkan/Nonaktifkan Suara Pengucapan"
             >
-              🔊 Suara: <span id="audio-status-label" class="text-ok font-bold">AKTIF</span>
+              <Volume2 class="size-3.5 inline" id="icon-audio-toggle" />
+              <span>Suara: <span id="audio-status-label" class="text-ok font-bold">AKTIF</span></span>
             </button>
             <button 
               type="button" 
               id="toggle-speed-btn" 
-              class="btn btn-secondary btn-s font-mono"
+              class="btn btn-secondary btn-s font-mono inline-flex items-center gap-1.5"
               title="Atur Kecepatan Suara: 0.5x, 0.75x, 1x (default), 1.25x, 1.5x, 2x"
             >
-              🐢 Speed: <span id="speed-status-label" class="text-ink font-bold">1.0x</span>
+              <Gauge class="size-3.5 inline text-steel" />
+              <span>Speed: <span id="speed-status-label" class="text-ink font-bold">1.0x</span></span>
             </button>
             <button 
               type="button" 
               id="btn-play-all" 
-              class="btn btn-secondary btn-s font-mono cursor-pointer"
+              class="btn btn-secondary btn-s font-mono cursor-pointer inline-flex items-center gap-1.5"
               title="Dengarkan seluruh aksara dalam tabel ini secara berurutan otomatis"
             >
-              ▶ Putar Urut
+              <Play class="size-3.5 inline text-steel" id="icon-play-all" />
+              <span id="label-play-all">Putar Urut</span>
             </button>
             <button 
               type="button" 
               id="copy-all-btn" 
-              class="btn btn-secondary btn-s"
+              class="btn btn-secondary btn-s inline-flex items-center gap-1.5"
               title="Salin seluruh isi tabel ke clipboard"
             >
-              📋 Salin Teks
+              <Copy class="size-3.5 inline text-steel" /> Salin Teks
+            </button>
+            <button 
+              type="button" 
+              id="print-table-btn" 
+              class="btn btn-secondary btn-s font-mono cursor-pointer inline-flex items-center gap-1.5"
+              title="Cetak tabel aksara ini ke kertas atau simpan sebagai dokumen PDF"
+            >
+              <Printer class="size-3.5 inline text-steel" /> Cetak / PDF
             </button>
             <button 
               type="button" 
               id="open-creator-btn" 
-              class="btn btn-primary btn-s"
+              class="btn btn-primary btn-s inline-flex items-center gap-1.5"
             >
-              + Buat Tabel Sendiri
+              <Plus class="size-3.5 inline" /> Buat Tabel Sendiri
             </button>
           </div>
         </div>
@@ -192,20 +227,20 @@ import { languagePhrasesData } from '../data/phrases';
               </p>
             </div>
             <div id="table-toolbar-actions" class="flex items-center gap-2 flex-wrap shrink-0">
-              <button type="button" id="btn-top-add-char" class="btn btn-primary btn-s font-mono text-[12px]" title="Tambah aksara baru ke tabel ini">
-                + Tambah Aksara
+              <button type="button" id="btn-top-add-char" class="btn btn-primary btn-s font-mono text-[12px] inline-flex items-center gap-1.5" title="Tambah aksara baru ke tabel ini">
+                <Plus class="size-3.5 inline" /> Tambah Aksara
               </button>
-              <button type="button" id="duplicate-table-btn" class="btn btn-secondary btn-s font-mono text-[12px]" title="Duplikat tabel ini ke tabel kustom agar dapat diedit bebas">
-                📋 Duplikat &amp; Edit
+              <button type="button" id="duplicate-table-btn" class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5" title="Duplikat tabel ini ke tabel kustom agar dapat diedit bebas">
+                <Copy class="size-3.5 inline text-steel" /> Duplikat &amp; Edit
               </button>
-              <button type="button" id="toggle-edit-mode-btn" class="btn btn-secondary btn-s font-mono text-[12px]" title="Aktifkan mode edit untuk mengubah atau menghapus huruf dobel">
-                ✏️ Mode Edit Aksara
+              <button type="button" id="toggle-edit-mode-btn" class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5" title="Aktifkan mode edit untuk mengubah atau menghapus huruf dobel">
+                <Edit3 class="size-3.5 inline text-steel" /> Mode Edit Aksara
               </button>
-              <button type="button" id="edit-custom-table-btn" class="hidden btn btn-secondary btn-s font-mono text-[12px]" title="Edit seluruh isi tabel (teks/spreadsheet)">
-                📝 Edit Teks
+              <button type="button" id="edit-custom-table-btn" class="hidden btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5" title="Edit seluruh isi tabel (teks/spreadsheet)">
+                <FileText class="size-3.5 inline text-steel" /> Edit Teks
               </button>
-              <button type="button" id="delete-table-btn" class="hidden px-3 py-1.5 text-[12px] font-mono border border-rule text-smoke hover:text-red-500 hover:border-red-500 transition-colors">
-                ✕ Hapus Tabel
+              <button type="button" id="delete-table-btn" class="hidden px-3 py-1.5 text-[12px] font-mono border border-rule text-smoke hover:text-red-500 hover:border-red-500 transition-colors inline-flex items-center gap-1.5">
+                <Trash2 class="size-3.5 inline" /> Hapus Tabel
               </button>
             </div>
           </div>
@@ -214,18 +249,18 @@ import { languagePhrasesData } from '../data/phrases';
           <!-- Edit Mode Toolbar (muncul saat Mode Edit aktif) -->
           <div id="table-edit-toolbar" class="hidden mb-4 p-3.5 border-2 border-badge bg-badge/10 font-mono text-[13px] flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
             <div class="flex items-center gap-2">
-              <span class="text-badge font-bold">✏️ MODE EDIT AKTIF:</span>
+              <span class="text-badge font-bold flex items-center gap-1.5"><Edit3 class="size-3.5 inline text-badge" /> MODE EDIT AKTIF:</span>
               <span class="text-ink text-xs sm:text-sm">Klik <span class="text-red-500 font-bold">✕</span> pada kotak untuk menghapus huruf dobel, atau <span class="font-bold">✏️</span> untuk mengedit romaji &amp; aksara.</span>
             </div>
             <div class="flex items-center gap-2 flex-wrap shrink-0">
-              <button type="button" id="btn-auto-dedup" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer" title="Cari huruf yang kembar/dobel di tabel ini dan hapus otomatis">
-                🧹 Hapus Huruf Dobel Otomatis
+              <button type="button" id="btn-auto-dedup" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer inline-flex items-center gap-1" title="Cari huruf yang kembar/dobel di tabel ini dan hapus otomatis">
+                <Sparkles class="size-3.5 inline text-steel" /> Hapus Huruf Dobel Otomatis
               </button>
-              <button type="button" id="btn-add-char-table" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer">
-                + Tambah Huruf
+              <button type="button" id="btn-add-char-table" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer inline-flex items-center gap-1">
+                <Plus class="size-3.5 inline text-steel" /> Tambah Huruf
               </button>
-              <button type="button" id="btn-finish-edit-mode" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer">
-                ✓ Selesai Edit
+              <button type="button" id="btn-finish-edit-mode" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer inline-flex items-center gap-1">
+                <Check class="size-3.5 inline" /> Selesai Edit
               </button>
             </div>
           </div>
@@ -260,11 +295,11 @@ import { languagePhrasesData } from '../data/phrases';
 
             <!-- Toggle Flashcard vs Kuis -->
             <div class="flex items-center gap-1.5 text-[12px] font-mono shrink-0">
-              <button type="button" id="btn-fc-type-card" class="px-3 py-1.5 border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer">
-                🎴 Flashcard
+              <button type="button" id="btn-fc-type-card" class="px-3 py-1.5 border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer inline-flex items-center gap-1.5">
+                <Layers class="size-3.5 inline" /> Flashcard
               </button>
-              <button type="button" id="btn-fc-type-quiz" class="px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer">
-                🎯 Kuis Pilihan Ganda
+              <button type="button" id="btn-fc-type-quiz" class="px-3 py-1.5 border border-rule bg-canvas text-steel hover:text-ink hover:border-ink hover:bg-tint/40 cursor-pointer inline-flex items-center gap-1.5">
+                <HelpCircle class="size-3.5 inline text-steel" /> Kuis Pilihan Ganda
               </button>
             </div>
           </div>
@@ -282,7 +317,9 @@ import { languagePhrasesData } from '../data/phrases';
               class="w-full min-h-[260px] p-8 border-2 border-ink bg-canvas hover:bg-smoke/5 cursor-pointer flex flex-col items-center justify-center text-center transition-all select-none shadow-md relative"
               title="Klik untuk membalik kartu"
             >
-              <span class="absolute top-3 right-3 text-[11px] font-mono text-smoke">🔄 Klik untuk balik</span>
+              <span class="absolute top-3 right-3 text-[11px] font-mono text-smoke inline-flex items-center gap-1">
+                <RotateCcw class="size-3 inline text-smoke" /> Klik untuk balik
+              </span>
               
               <!-- Front Side (Karakter Besar) -->
               <div id="fc-card-front" class="flex flex-col items-center justify-center">
@@ -294,8 +331,8 @@ import { languagePhrasesData } from '../data/phrases';
               <div id="fc-card-back" class="hidden flex flex-col items-center justify-center">
                 <span id="fc-romaji-display" class="text-[32px] sm:text-[40px] font-bold text-ink leading-tight">A</span>
                 <span id="fc-char-subdisplay" class="text-[20px] text-steel font-mono mt-1">あ</span>
-                <button type="button" id="btn-fc-speak" class="mt-4 btn btn-secondary btn-s font-mono text-xs">
-                  🔊 Dengarkan Lafal
+                <button type="button" id="btn-fc-speak" class="mt-4 btn btn-secondary btn-s font-mono text-xs inline-flex items-center gap-1.5">
+                  <Volume2 class="size-3.5 inline text-steel" /> Dengarkan Lafal
                 </button>
               </div>
             </div>
@@ -305,16 +342,16 @@ import { languagePhrasesData } from '../data/phrases';
               <button 
                 type="button" 
                 id="btn-fc-unmemorized" 
-                class="py-3 px-4 border border-rule bg-canvas hover:border-red-500 hover:text-red-500 text-steel font-mono text-[13px] font-bold text-center transition-colors"
+                class="py-3 px-4 border border-rule bg-canvas hover:border-red-500 hover:text-red-500 text-steel font-mono text-[13px] font-bold text-center transition-colors inline-flex items-center justify-center gap-1.5"
               >
-                ↺ Belum Hafal
+                <RotateCcw class="size-3.5 inline" /> Belum Hafal
               </button>
               <button 
                 type="button" 
                 id="btn-fc-memorized" 
-                class="py-3 px-4 border border-ok bg-ok/10 hover:bg-ok text-ok hover:text-canvas font-mono text-[13px] font-bold text-center transition-colors shadow-sm"
+                class="py-3 px-4 border border-ok bg-ok/10 hover:bg-ok text-ok hover:text-canvas font-mono text-[13px] font-bold text-center transition-colors shadow-sm inline-flex items-center justify-center gap-1.5"
               >
-                ✓ Sudah Hafal!
+                <Check class="size-3.5 inline" /> Sudah Hafal!
               </button>
             </div>
 
@@ -323,8 +360,8 @@ import { languagePhrasesData } from '../data/phrases';
               <button type="button" id="btn-fc-prev" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink">
                 ← Sebelumnya
               </button>
-              <button type="button" id="btn-fc-random" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink">
-                🎲 Acak Huruf
+              <button type="button" id="btn-fc-random" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink inline-flex items-center gap-1">
+                <Shuffle class="size-3 inline text-steel" /> Acak Huruf
               </button>
               <button type="button" id="btn-fc-next" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink">
                 Selanjutnya →
@@ -385,34 +422,34 @@ import { languagePhrasesData } from '../data/phrases';
               <button 
                 type="button" 
                 id="btn-open-phrase-modal" 
-                class="btn btn-primary btn-s font-mono text-[12px]"
+                class="btn btn-primary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
                 title="Tambah frasa baru ke koleksi bahasa ini"
               >
-                + Tambah Frasa
+                <Plus class="size-3.5 inline" /> Tambah Frasa
               </button>
               <button 
                 type="button" 
                 id="btn-open-phrase-import" 
-                class="btn btn-secondary btn-s font-mono text-[12px]"
+                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
                 title="Impor kumpulan frasa dari file Excel atau teks"
               >
-                📁 Impor Excel / CSV
+                <FileSpreadsheet class="size-3.5 inline text-steel" /> Impor Excel / CSV
               </button>
               <button 
                 type="button" 
                 id="btn-toggle-phrase-edit" 
-                class="btn btn-secondary btn-s font-mono text-[12px]"
+                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
                 title="Aktifkan mode edit/hapus untuk frasa"
               >
-                ✏️ Mode Edit Frasa
+                <Edit3 class="size-3.5 inline text-steel" /> Mode Edit Frasa
               </button>
               <button 
                 type="button" 
                 id="btn-reset-phrase" 
-                class="px-2.5 py-1.5 text-[11px] font-mono border border-rule text-smoke hover:text-ink hover:border-ink transition-colors"
+                class="px-2.5 py-1.5 text-[11px] font-mono border border-rule text-smoke hover:text-ink hover:border-ink transition-colors inline-flex items-center gap-1"
                 title="Kembalikan frasa ke bawaan awal"
               >
-                ↺ Reset
+                <RotateCcw class="size-3 inline text-smoke" /> Reset
               </button>
             </div>
           </div>
@@ -420,11 +457,11 @@ import { languagePhrasesData } from '../data/phrases';
           <!-- Edit Mode Notice Banner -->
           <div id="phrase-edit-toolbar" class="hidden p-3 border-2 border-badge bg-badge/10 font-mono text-xs text-ink flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm">
             <div class="flex items-center gap-2">
-              <span class="text-badge font-bold">✏️ MODE EDIT FRASA:</span>
+              <span class="text-badge font-bold flex items-center gap-1"><Edit3 class="size-3.5 inline text-badge" /> MODE EDIT FRASA:</span>
               <span>Klik <span class="font-bold">✏️</span> pada kartu frasa untuk mengedit teks/arti, atau tombol merah <span class="text-red-500 font-bold">✕</span> untuk menghapus frasa.</span>
             </div>
-            <button type="button" id="btn-finish-phrase-edit" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer shrink-0">
-              ✓ Selesai Edit
+            <button type="button" id="btn-finish-phrase-edit" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer shrink-0 inline-flex items-center gap-1">
+              <Check class="size-3.5 inline" /> Selesai Edit
             </button>
           </div>
 
@@ -543,8 +580,9 @@ import { languagePhrasesData } from '../data/phrases';
             <span class="font-bold text-[13px] text-ink block">Punya file Spreadsheet / Excel?</span>
             <span class="text-[12px] text-smoke">Unggah file .xlsx atau .csv untuk dikonversi otomatis menjadi tabel.</span>
           </div>
-          <label class="btn btn-secondary btn-s shrink-0 cursor-pointer text-[12px]">
-            📁 Pilih File Excel / CSV
+          <label class="btn btn-secondary btn-s shrink-0 cursor-pointer text-[12px] inline-flex items-center gap-1.5">
+            <FileSpreadsheet class="size-3.5 inline text-steel" />
+            Pilih File Excel / CSV
             <input type="file" id="form-excel-input" accept=".xlsx, .xls, .csv" class="hidden" />
           </label>
         </div>
@@ -576,7 +614,7 @@ import { languagePhrasesData } from '../data/phrases';
   <dialog id="char-edit-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-sm shadow-2xl">
     <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
-        <h4 id="char-modal-title" class="text-base font-bold text-ink">✏️ Edit Karakter</h4>
+        <h4 id="char-modal-title" class="text-base font-bold text-ink flex items-center gap-1.5"><Edit3 class="size-4 inline text-ink" /> Edit Karakter</h4>
         <button type="button" id="close-char-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
       </div>
       <form id="char-edit-form" class="space-y-4">
@@ -602,8 +640,8 @@ import { languagePhrasesData } from '../data/phrases';
           />
         </div>
         <div class="flex items-center justify-between gap-2 pt-3 border-t border-rule">
-          <button type="button" id="char-edit-delete-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-red-500 hover:border-red-500 hover:bg-red-500/10 cursor-pointer">
-            🗑️ Hapus Huruf
+          <button type="button" id="char-edit-delete-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-red-500 hover:border-red-500 hover:bg-red-500/10 cursor-pointer inline-flex items-center gap-1">
+            <Trash2 class="size-3.5 inline" /> Hapus Huruf
           </button>
           <div class="flex items-center gap-2">
             <button type="button" id="char-edit-cancel-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-smoke hover:text-ink cursor-pointer">
@@ -623,7 +661,7 @@ import { languagePhrasesData } from '../data/phrases';
   <dialog id="phrase-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-md shadow-2xl">
     <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
-        <h4 id="phrase-modal-title" class="text-base font-bold text-ink">➕ Tambah Frasa Baru</h4>
+        <h4 id="phrase-modal-title" class="text-base font-bold text-ink flex items-center gap-1.5"><Plus class="size-4 inline text-ink" /> Tambah Frasa Baru</h4>
         <button type="button" id="close-phrase-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
       </div>
       <form id="phrase-form" class="space-y-4">
@@ -676,8 +714,8 @@ import { languagePhrasesData } from '../data/phrases';
         </div>
 
         <div class="flex items-center justify-between gap-2 pt-3 border-t border-rule">
-          <button type="button" id="phrase-delete-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-red-500 hover:border-red-500 hover:bg-red-500/10 cursor-pointer hidden">
-            🗑️ Hapus Frasa
+          <button type="button" id="phrase-delete-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-red-500 hover:border-red-500 hover:bg-red-500/10 cursor-pointer hidden inline-flex items-center gap-1">
+            <Trash2 class="size-3.5 inline" /> Hapus Frasa
           </button>
           <div class="flex items-center gap-2 ml-auto">
             <button type="button" id="phrase-cancel-btn" class="px-3 py-1.5 text-xs font-mono border border-rule text-smoke hover:text-ink cursor-pointer">
@@ -699,7 +737,7 @@ import { languagePhrasesData } from '../data/phrases';
     <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
         <div>
-          <h4 class="text-base font-bold text-ink">📁 Impor Kumpulan Frasa</h4>
+          <h4 class="text-base font-bold text-ink flex items-center gap-1.5"><FileSpreadsheet class="size-4 inline text-ink" /> Impor Kumpulan Frasa</h4>
           <p class="text-xs text-steel mt-0.5">Unggah spreadsheet atau salin teks banyak frasa sekaligus.</p>
         </div>
         <button type="button" id="close-phrase-import-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
@@ -724,8 +762,9 @@ import { languagePhrasesData } from '../data/phrases';
             <span class="font-bold text-xs text-ink block">Impor File Excel / CSV</span>
             <span class="text-[11px] text-smoke">3 Kolom: [Teks Asli] [Cara Baca] [Arti]</span>
           </div>
-          <label class="btn btn-secondary btn-s shrink-0 cursor-pointer text-xs font-mono">
-            📁 Pilih File Excel
+          <label class="btn btn-secondary btn-s shrink-0 cursor-pointer text-xs font-mono inline-flex items-center gap-1.5">
+            <FileSpreadsheet class="size-3.5 inline text-steel" />
+            Pilih File Excel
             <input type="file" id="phrase-excel-input" accept=".xlsx, .xls, .csv" class="hidden" />
           </label>
         </div>
@@ -1064,6 +1103,15 @@ import { languagePhrasesData } from '../data/phrases';
           else if (naturalVoice) utter.voice = naturalVoice;
           else if (matchedVoice) utter.voice = matchedVoice;
 
+          utter.onerror = () => {
+            try {
+              const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${langCode}&q=${encodeURIComponent(text)}`;
+              const audio = new Audio(audioUrl);
+              audio.playbackRate = currentAudioRate;
+              audio.play().catch(() => {});
+            } catch {}
+          };
+
           window.speechSynthesis.speak(utter);
           return;
         } catch {}
@@ -1117,8 +1165,8 @@ import { languagePhrasesData } from '../data/phrases';
         currentPlayCellEl = null;
       }
       if (btnPlayAll) {
-        btnPlayAll.textContent = '▶ Putar Urut';
-        btnPlayAll.className = 'btn btn-secondary btn-s font-mono cursor-pointer';
+        btnPlayAll.innerHTML = `<svg class="size-3.5 inline text-steel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg> <span>Putar Urut</span>`;
+        btnPlayAll.className = 'btn btn-secondary btn-s font-mono cursor-pointer inline-flex items-center gap-1.5';
       }
     }
 
@@ -1131,8 +1179,8 @@ import { languagePhrasesData } from '../data/phrases';
 
       isPlayingAll = true;
       if (btnPlayAll) {
-        btnPlayAll.textContent = '⏹ Hentikan';
-        btnPlayAll.className = 'btn btn-primary btn-s font-mono cursor-pointer shadow-md';
+        btnPlayAll.innerHTML = `<svg class="size-3.5 inline text-canvas" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg> <span>Hentikan</span>`;
+        btnPlayAll.className = 'btn btn-primary btn-s font-mono cursor-pointer shadow-md inline-flex items-center gap-1.5';
       }
 
       let idx = 0;
@@ -1990,17 +2038,19 @@ import { languagePhrasesData } from '../data/phrases';
         if (phraseCategoryFilterChips) phraseCategoryFilterChips.innerHTML = '';
         phrasesContentWrapper.innerHTML = `
           <div class="py-12 px-4 text-center border-2 border-dashed border-rule bg-canvas text-smoke font-mono space-y-3">
-            <div class="text-3xl">💬</div>
+            <div class="size-12 mx-auto rounded-none bg-tint flex items-center justify-center border border-rule text-ink">
+              <svg class="size-6 text-steel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
             <div class="text-sm font-bold text-ink">Belum Ada Frasa untuk Bahasa "${currentTable?.name || ''}"</div>
             <p class="text-xs text-steel max-w-md mx-auto font-sans">
               Mulai koleksi frasa penting Anda sendiri sekarang. Anda bisa menambahkan satu per satu atau langsung impor dari file Excel/CSV!
             </p>
             <div class="flex items-center justify-center gap-2 pt-2">
-              <button type="button" id="btn-empty-add-phrase" class="btn btn-primary btn-s font-mono text-xs cursor-pointer">
-                + Tambah Frasa Pertama
+              <button type="button" id="btn-empty-add-phrase" class="btn btn-primary btn-s font-mono text-xs cursor-pointer inline-flex items-center gap-1">
+                <svg class="size-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Tambah Frasa Pertama
               </button>
-              <button type="button" id="btn-empty-import-phrase" class="btn btn-secondary btn-s font-mono text-xs cursor-pointer">
-                📁 Impor dari Excel
+              <button type="button" id="btn-empty-import-phrase" class="btn btn-secondary btn-s font-mono text-xs cursor-pointer inline-flex items-center gap-1">
+                <svg class="size-3.5 inline text-steel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg> Impor dari Excel
               </button>
             </div>
           </div>
@@ -2038,7 +2088,9 @@ import { languagePhrasesData } from '../data/phrases';
       if (filteredCategories.length === 0) {
         phrasesContentWrapper.innerHTML = `
           <div class="py-12 px-4 text-center border-2 border-dashed border-rule bg-canvas text-smoke font-mono space-y-2">
-            <div class="text-2xl">🔍</div>
+            <div class="size-10 mx-auto rounded-none bg-tint flex items-center justify-center border border-rule text-smoke">
+              <svg class="size-5 text-steel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
             <div class="text-sm font-bold text-ink">Tidak ada frasa yang cocok</div>
             <p class="text-xs text-steel font-sans">
               Tidak ditemukan frasa untuk pencarian "<b>${phraseSearchQuery}</b>"${selectedPhraseCategory !== 'all' ? ` pada kategori <b>${selectedPhraseCategory}</b>` : ''}.
@@ -2107,32 +2159,32 @@ import { languagePhrasesData } from '../data/phrases';
                 ${isPhraseEditModeActive ? `
                   <button 
                     type="button" 
-                    class="btn-edit-phrase px-2 py-1.5 border border-rule hover:border-ink bg-canvas text-ink text-xs cursor-pointer shadow-xs"
+                    class="btn-edit-phrase px-2 py-1.5 border border-rule hover:border-ink bg-canvas text-ink text-xs cursor-pointer shadow-xs inline-flex items-center justify-center"
                     data-cat="${catIdx}"
                     data-item="${item.originalItemIdx ?? itemIdx}"
                     title="Edit frasa ini"
                   >
-                    ✏️
+                    <svg class="size-3.5 text-steel hover:text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                   </button>
                   <button 
                     type="button" 
-                    class="btn-delete-phrase px-2 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs cursor-pointer shadow-xs font-bold"
+                    class="btn-delete-phrase px-2 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs cursor-pointer shadow-xs font-bold inline-flex items-center justify-center"
                     data-cat="${catIdx}"
                     data-item="${item.originalItemIdx ?? itemIdx}"
                     data-native="${item.native}"
                     title="Hapus frasa ini"
                   >
-                    ✕
+                    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                   </button>
                 ` : ''}
                 <button 
                   type="button" 
-                  class="btn-speak-phrase px-2.5 py-1.5 border border-rule hover:border-ink hover:bg-canvas text-ink text-xs select-none cursor-pointer"
+                  class="btn-speak-phrase px-2.5 py-1.5 border border-rule hover:border-ink hover:bg-canvas text-ink text-xs select-none cursor-pointer inline-flex items-center justify-center"
                   data-native="${item.native}"
                   data-lang="${data.voiceLang || currentTable?.voiceLang || 'en-US'}"
                   title="Dengarkan pengucapan audio"
                 >
-                  🔊
+                  <svg class="size-3.5 text-ink inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
                 </button>
               </div>
             </div>
@@ -2773,10 +2825,10 @@ import { languagePhrasesData } from '../data/phrases';
             if (isDuplicate) {
               html += `<span class="absolute top-1 left-7 text-[8px] font-bold text-red-500 bg-red-500/10 px-1 border border-red-500/40 select-none leading-tight" title="Huruf kembar/dobel di tabel">DOBEL</span>`;
             }
-            html += `<button type="button" class="btn-cell-edit absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] bg-canvas border border-rule hover:border-ink text-ink font-bold z-10 cursor-pointer shadow-sm" data-row="${rIdx}" data-col="${cIdx}" title="Edit karakter ini">✏️</button>`;
-            html += `<button type="button" class="btn-cell-delete absolute top-1 right-1 w-5 h-5 flex items-center justify-center text-[11px] bg-canvas border border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-bold z-10 cursor-pointer shadow-sm" data-row="${rIdx}" data-col="${cIdx}" data-char="${cell.char}" title="Hapus karakter ini">✕</button>`;
+            html += `<button type="button" class="btn-cell-edit absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] bg-canvas border border-rule hover:border-ink text-ink font-bold z-10 cursor-pointer shadow-sm" data-row="${rIdx}" data-col="${cIdx}" title="Edit karakter ini"><svg class="size-3 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>`;
+            html += `<button type="button" class="btn-cell-delete absolute top-1 right-1 w-5 h-5 flex items-center justify-center text-[11px] bg-canvas border border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-bold z-10 cursor-pointer shadow-sm" data-row="${rIdx}" data-col="${cIdx}" data-char="${cell.char}" title="Hapus karakter ini"><svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>`;
           } else if (isMemorized) {
-            html += `<span class="absolute top-1 right-1 text-[10px] font-bold text-ok select-none" title="Sudah Hafal">✓</span>`;
+            html += `<span class="absolute top-1 right-1 text-ok select-none flex items-center justify-center" title="Sudah Hafal"><svg class="size-3 text-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>`;
           }
 
           html += `<div class="flex items-center justify-center gap-1.5 sm:gap-2 text-[15px] sm:text-[18px] ${isEditModeActive ? 'pt-2' : ''}">`;
@@ -2845,7 +2897,7 @@ import { languagePhrasesData } from '../data/phrases';
           const lang = td.getAttribute('data-lang') || '';
           const romaji = td.getAttribute('data-romaji') || '';
           speakText(char, lang);
-          navigator.clipboard?.writeText(char);
+          navigator.clipboard?.writeText(char).catch(() => {});
           showToast(`Karakter "${char}" (${romaji}) disalin ke clipboard! 🔊`);
         });
       });
@@ -2858,7 +2910,13 @@ import { languagePhrasesData } from '../data/phrases';
         audioStatusLabel.textContent = isAudioEnabled ? 'AKTIF' : 'NONAKTIF';
         audioStatusLabel.className = isAudioEnabled ? 'text-ok font-bold' : 'text-smoke font-bold';
       }
-      showToast(isAudioEnabled ? '🔊 Suara pelafalan diaktifkan' : '🔇 Suara pelafalan dinonaktifkan');
+      const iconAudio = document.getElementById('icon-audio-toggle');
+      if (iconAudio) {
+        iconAudio.outerHTML = isAudioEnabled 
+          ? '<svg class="size-3.5 inline text-ok" id="icon-audio-toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'
+          : '<svg class="size-3.5 inline text-smoke" id="icon-audio-toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>';
+      }
+      showToast(isAudioEnabled ? 'Suara pelafalan diaktifkan' : 'Suara pelafalan dinonaktifkan');
       if (currentUser) {
         saveUserPreferencesToCloud(currentUser.id, { audioSpeed: currentAudioRate, isAudioEnabled: isAudioEnabled }).catch(() => {});
       }
@@ -2878,8 +2936,17 @@ import { languagePhrasesData } from '../data/phrases';
         return row.map(cell => cell ? (cell.romaji ? `${cell.romaji}=${cell.char}` : cell.char) : '-').join('\t');
       }).join('\n');
 
-      navigator.clipboard?.writeText(lines);
+      navigator.clipboard?.writeText(lines).catch(() => {});
       showToast(`Teks tabel "${currentTable.name}" disalin ke clipboard!`);
+    });
+
+    // Print / Export PDF
+    document.getElementById('print-table-btn')?.addEventListener('click', () => {
+      if (isUnaddedState) {
+        showToast('⚠️ Aksara ini belum ditambahkan, buat tabel terlebih dahulu.');
+        return;
+      }
+      window.print();
     });
 
     // Search input (debounced for fluid performance)
@@ -3137,3 +3204,53 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
     }
   }
 </script>
+
+<style>
+  @media print {
+    :global(.site-header), 
+    :global(footer), 
+    :global(#btn-mode-table), 
+    :global(#btn-mode-flashcard), 
+    :global(#btn-mode-phrases),
+    #category-filter-chips, 
+    #study-progress-box, 
+    #action-toolbar, 
+    #table-edit-toolbar, 
+    .btn, 
+    #tab-bar, 
+    #buat-tabel, 
+    :global(#toast) {
+      display: none !important;
+    }
+    :global(body), :global(html) {
+      background: #ffffff !important;
+      color: #000000 !important;
+      font-size: 11pt !important;
+    }
+    :global(.frame) {
+      max-width: 100% !important;
+      border: none !important;
+      padding: 0 !important;
+    }
+    #viewer-container {
+      border: none !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+    }
+    #table-grid-wrapper table {
+      width: 100% !important;
+      border: 2px solid #000 !important;
+      page-break-inside: auto;
+    }
+    #table-grid-wrapper tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    #table-grid-wrapper td {
+      border: 1px solid #222 !important;
+      color: #000 !important;
+      background: transparent !important;
+      padding: 8px 10px !important;
+    }
+  }
+</style>

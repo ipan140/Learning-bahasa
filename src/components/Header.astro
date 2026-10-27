@@ -4,6 +4,7 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 import Logo from './Logo.astro';
 import AuthModal from './AuthModal.astro';
 import CommandPalette from './CommandPalette.astro';
+import { Search } from 'lucide-astro';
 const path = Astro.url.pathname;
 ---
 
@@ -30,7 +31,7 @@ const path = Astro.url.pathname;
         class="text-[12px] font-mono px-2.5 py-1.5 border border-rule hover:border-ink transition-colors flex items-center gap-1.5 bg-canvas text-smoke hover:text-ink cursor-pointer"
         title="Buka Pencarian Cepat (Ctrl + K)"
       >
-        <span>🔍</span>
+        <Search class="size-3.5 text-steel" />
         <span class="hidden lg:inline text-steel">Cari</span>
         <kbd class="hidden sm:inline-block text-[10px] px-1 border border-rule bg-tint text-smoke uppercase font-mono">Ctrl+K</kbd>
       </button>
@@ -71,8 +72,9 @@ const path = Astro.url.pathname;
       ))}
     </ul>
     <div class="mt-auto px-5 pt-5 pb-7 border-t border-rule flex flex-col gap-4">
-            <button type="button" id="btn-trigger-search-mobile" class="btn btn-secondary w-full justify-center text-center font-mono text-[13px]">
-        🔍 Cari Cepat (Aksara &amp; Negara)
+            <button type="button" id="btn-trigger-search-mobile" class="btn btn-secondary w-full justify-center text-center font-mono text-[13px] flex items-center gap-2">
+        <Search class="size-4 text-steel" />
+        <span>Cari Cepat (Aksara &amp; Negara)</span>
       </button>
       <button type="button" id="auth-trigger-btn-mobile" class="btn btn-secondary w-full justify-center text-center">
         Masuk ke Akun

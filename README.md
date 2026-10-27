@@ -12,7 +12,7 @@ Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase*
 
 ### 1. Studio Belajar Aksara Interaktif (`/belajar`)
 - **3 Mode Studio Belajar Terpadu**:
-  - 📑 **Mode Tabel Aksara**: Grid fonetik interaktif dengan audio lafal asli, pelacak progres hafalan huruf (`0 / 46 Huruf`), tombol **▶ Putar Urut** untuk mendengarkan seluruh aksara secara berurutan dengan highlight visual sel, tombol langsung edit/hapus karakter & edit judul tabel di header kartu, penanda karakter kembar (`DOBEL`) & pembersih otomatis 1-klik (`🧹 Hapus Huruf Dobel Otomatis`).
+  - 📑 **Mode Tabel Aksara**: Grid fonetik interaktif dengan audio lafal asli, pelacak progres hafalan huruf (`0 / 46 Huruf`), tombol **▶ Putar Urut** untuk mendengarkan seluruh aksara secara berurutan dengan highlight visual sel, fitur cetak dokumen fisik & simpan PDF (**🖨️ Cetak / PDF**), tombol langsung edit/hapus karakter & edit judul tabel di header kartu, penanda karakter kembar (`DOBEL`) & pembersih otomatis 1-klik (`🧹 Hapus Huruf Dobel Otomatis`).
   - 🎴 **Mode Flashcard & Kuis Dua Arah**: Latihan kartu bolak-balik interaktif serta Kuis Pilihan Ganda 4 opsi dengan pilihan arah belajar: **Aksara → Bacaan** atau **Bacaan → Aksara** dan pelacak skor otomatis.
   - 💬 **Mode Frasa Dasar Sehari-hari**: Koleksi percakapan dasar (salam, angka, belanja, darurat) dengan bilah pencarian frasa cepat, filter chip kategori, tombol audio native, kontrol kecepatan 6 level (`0.5x, 0.75x, 1.0x, 1.25x, 1.5x, 2.0x`), fitur CRUD lengkap (tambah/edit/hapus frasa & kategori kustom), dan impor spreadsheet/CSV/teks instan via SheetJS.
 - **Audio Suara Native Google**: Klik setiap kotak huruf atau frasa untuk mendengarkan lafal fonetik alami menggunakan Web Speech Synthesis API dan Google Speech TTS fallback.
@@ -22,6 +22,7 @@ Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase*
 
 ### 2. Katalog 250 Negara & Target Belajar (`/katalog`)
 - **Katalog 250 Negara Lengkap**: Data resmi nama negara, bendera, ibukota, bahasa resmi, dan pembagian kawasan regional benua.
+- **Pencarian Cepat & Filter Urut (Sort)**: Cari negara/ibukota dan urutkan berdasarkan Nama (A-Z), Nama (Z-A), atau Kawasan Benua secara instan.
 - **Tandai Target Belajar (Bookmark)**: Simpan negara tujuan yang ingin Anda pelajari bahasanya.
 - **Catatan Target Belajar Pribadi**: Tambahkan motivasi, catatan khusus, atau target hafalan per negara yang tersinkron otomatis ke cloud.
 - **🎮 Game Kuis Trivia 250 Negara**: Kuis seru menebak bahasa resmi & ibukota negara dunia dengan pelacak streak dan skor tertinggi.
@@ -34,7 +35,7 @@ Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase*
 ### 4. Integrasi Cloud & Keamanan Akun Pengguna (Supabase)
 - **Modal Akun Bebas Reload (`AuthModal.astro`)**: Dialog modal login dan registrasi modern tanpa pengalihan halaman, dilengkapi tombol intip/sembunyikan kata sandi (👁️).
 - **Proteksi Keamanan & Rate Limit Login**: Sistem proteksi anti-spam / brute-force cerdas (jeda keamanan otomatis 30 detik setelah 5x gagal, hitung mundur real-time `⏳ Tunggu ... detik`, serta penanganan ramah batas laju permintaan server Supabase).
-- **4 Statistik Dinamis Akun**: Menampilkan ringkasan progres real-time (`Target Negara`, `Tabel Kustom`, `Huruf Hafal`, `Koleksi Frasa`) serta lencana keaktifan harian (`🔥 Aktif Belajar`).
+- **4 Statistik Dinamis & 🏆 6 Lencana Prestasi (Badges)**: Menampilkan ringkasan progres real-time (`Target Negara`, `Tabel Kustom`, `Huruf Hafal`, `Koleksi Frasa`), lencana keaktifan harian (`🔥 Aktif Belajar`), serta 6 lencana pencapaian belajar interaktif (Langkah Awal, Pejuang Huruf, Master Aksara, Penjelajah, Ahli Frasa, Juara Trivia).
 - **Sinkronisasi Data Otomatis**: Target negara, tabel kustom, progres hafalan aksara, skor kuis, frasa kustom, dan preferensi pengguna otomatis tersimpan di Supabase.
 - **Bekerja Penuh Tanpa Login (Offline-Ready)**: Seluruh fitur tetap dapat digunakan 100% tanpa login menggunakan penyimpanan `localStorage` browser.
 
