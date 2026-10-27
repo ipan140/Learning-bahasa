@@ -178,15 +178,26 @@
             </label>
             <span id="password-hint" class="text-[11px] text-smoke hidden">Minimal 6 karakter</span>
           </div>
-          <input 
-            type="password" 
-            id="auth-password" 
-            required 
-            minlength="6"
-            autocomplete="current-password"
-            placeholder="Masukkan kata sandi..." 
-            class="w-full text-[13px] px-3.5 py-2.5 bg-canvas border border-rule focus:border-ink focus:outline-none text-ink placeholder:text-smoke/60"
-          />
+          <div class="relative flex items-center">
+            <input 
+              type="password" 
+              id="auth-password" 
+              required 
+              minlength="6"
+              autocomplete="current-password"
+              placeholder="Masukkan kata sandi..." 
+              class="w-full text-[13px] px-3.5 py-2.5 pr-10 bg-canvas border border-rule focus:border-ink focus:outline-none text-ink placeholder:text-smoke/60"
+            />
+            <button 
+              type="button" 
+              id="btn-toggle-password" 
+              class="absolute right-2.5 text-smoke hover:text-ink text-sm p-1 cursor-pointer select-none focus:outline-none"
+              title="Tampilkan / Sembunyikan Kata Sandi"
+              aria-label="Lihat kata sandi"
+            >
+              👁️
+            </button>
+          </div>
         </div>
 
         <button 
@@ -535,10 +546,107 @@
   tabRegister?.addEventListener('click', () => switchAuthTab('register'));
   linkToRegister?.addEventListener('click', () => switchAuthTab('register'));
 
+  // Toggle Password Visibility (Lihat / Sembunyikan Kata Sandi)
+  const btnTogglePassword = document.getElementById('btn-toggle-password');
+  const authPasswordInput = document.getElementById('auth-password') as HTMLInputElement | null;
+
+  btnTogglePassword?.addEventListener('click', () => {
+    if (!authPasswordInput) return;
+    const isPassword = authPasswordInput.type === 'password';
+    authPasswordInput.type = isPassword ? 'text' : 'password';
+    if (btnTogglePassword) {
+      btnTogglePassword.textContent = isPassword ? '🙈' : '👁️';
+      btnTogglePassword.title = isPassword ? 'Sembunyikan Kata Sandi' : 'Tampilkan Kata Sandi';
+    }
+  });
+
+  // ========================================================
+  // RATE LIMITING & SECURITY COOLDOWN
+  // ========================================================
+  const AUTH_LOCKOUT_KEY = 'auth_login_lockout_until';
+  const AUTH_ATTEMPTS_KEY = 'auth_failed_attempts';
+  const MAX_FAILED_ATTEMPTS = 5;
+  let lockoutIntervalTimer: any = null;
+
+  function getLockoutRemainingMs(): number {
+    const lockoutUntil = parseInt(localStorage.getItem(AUTH_LOCKOUT_KEY) || '0', 10);
+    return Math.max(0, lockoutUntil - Date.now());
+  }
+
+  function getFailedAttempts(): number {
+    return parseInt(localStorage.getItem(AUTH_ATTEMPTS_KEY) || '0', 10);
+  }
+
+  function checkAndApplyLockout(): boolean {
+    const remainingMs = getLockoutRemainingMs();
+    if (remainingMs > 0) {
+      startLockoutCountdown(Math.ceil(remainingMs / 1000));
+      return true;
+    }
+    return false;
+  }
+
+  function triggerLockout(durationSecs: number, reasonText?: string) {
+    const lockoutUntil = Date.now() + (durationSecs * 1000);
+    localStorage.setItem(AUTH_LOCKOUT_KEY, String(lockoutUntil));
+    startLockoutCountdown(durationSecs, reasonText);
+  }
+
+  function startLockoutCountdown(totalSecs: number, reasonText?: string) {
+    if (lockoutIntervalTimer) clearInterval(lockoutIntervalTimer);
+
+    if (authSubmitBtn) {
+      authSubmitBtn.setAttribute('disabled', 'true');
+    }
+
+    let remaining = totalSecs;
+    const updateCountdown = () => {
+      if (remaining <= 0) {
+        clearInterval(lockoutIntervalTimer);
+        lockoutIntervalTimer = null;
+        localStorage.removeItem(AUTH_LOCKOUT_KEY);
+        localStorage.removeItem(AUTH_ATTEMPTS_KEY);
+        if (authSubmitBtn) {
+          authSubmitBtn.removeAttribute('disabled');
+          authSubmitBtn.textContent = currentAuthMode === 'login' ? 'Masuk ke Akun' : 'Buat Akun Saya';
+        }
+        hideAlert();
+        return;
+      }
+
+      if (authSubmitBtn) {
+        authSubmitBtn.setAttribute('disabled', 'true');
+        authSubmitBtn.textContent = `⏳ Tunggu ${remaining}s...`;
+      }
+      const msg = reasonText 
+        ? `${reasonText} Silakan tunggu ${remaining} detik.`
+        : `Terlalu banyak percobaan masuk yang salah (5x). Demi keamanan akun Anda, silakan tunggu ${remaining} detik sebelum mencoba lagi.`;
+      showAlert(msg, 'error');
+      remaining--;
+    };
+
+    updateCountdown();
+    lockoutIntervalTimer = setInterval(updateCountdown, 1000);
+  }
+
+  function clearLockout() {
+    if (lockoutIntervalTimer) {
+      clearInterval(lockoutIntervalTimer);
+      lockoutIntervalTimer = null;
+    }
+    localStorage.removeItem(AUTH_LOCKOUT_KEY);
+    localStorage.removeItem(AUTH_ATTEMPTS_KEY);
+    if (authSubmitBtn) {
+      authSubmitBtn.removeAttribute('disabled');
+      authSubmitBtn.textContent = currentAuthMode === 'login' ? 'Masuk ke Akun' : 'Buat Akun Saya';
+    }
+  }
+
   // Trigger buka modal dari header desktop & mobile
   document.getElementById('auth-trigger-btn')?.addEventListener('click', () => {
     hideAlert();
     checkAuthState();
+    checkAndApplyLockout();
     modal?.showModal();
   });
   document.getElementById('auth-trigger-btn-mobile')?.addEventListener('click', () => {
@@ -546,6 +654,7 @@
     mobileMenu?.close();
     hideAlert();
     checkAuthState();
+    checkAndApplyLockout();
     modal?.showModal();
   });
 
@@ -555,6 +664,10 @@
   authForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAlert();
+
+    if (checkAndApplyLockout()) {
+      return;
+    }
 
     if (!isSupabaseConfigured()) {
       showAlert('Layanan integrasi akun belum terhubung. Pastikan env telah diset dan di-redeploy di Vercel.', 'error');
@@ -575,6 +688,7 @@
       if (currentAuthMode === 'login') {
         const { error } = await signInWithEmail(email, password);
         if (error) throw error;
+        clearLockout();
         showAlert('✓ Berhasil masuk! Menghubungkan materi belajar...', 'success');
         await checkAuthState();
         await performFullSync();
@@ -587,18 +701,39 @@
       }
     } catch (err: any) {
       let msg = err.message || 'Terjadi kesalahan saat menghubungi server.';
+      const isRateLimit = msg.toLowerCase().includes('rate limit') || msg.toLowerCase().includes('over_email_send_rate_limit') || err.status === 429;
+
+      if (isRateLimit) {
+        triggerLockout(60, 'Batas percobaan dari penyedia autentikasi tercapai (Rate Limit).');
+        return;
+      }
+
+      if (currentAuthMode === 'login') {
+        const attempts = getFailedAttempts() + 1;
+        localStorage.setItem(AUTH_ATTEMPTS_KEY, String(attempts));
+
+        if (attempts >= MAX_FAILED_ATTEMPTS) {
+          triggerLockout(30);
+          return;
+        }
+
+        if (msg.includes('Invalid login credentials')) {
+          const sisa = MAX_FAILED_ATTEMPTS - attempts;
+          msg = `Email atau kata sandi salah. Percobaan tersisa: ${sisa}x sebelum jeda keamanan.`;
+        }
+      }
+
       if (msg.includes('fetch') || msg.includes('Failed to fetch') || err.name === 'AuthRetryableFetchError') {
         msg = 'Tidak dapat terhubung ke server autentikasi. Pastikan koneksi internet stabil atau coba beberapa saat lagi.';
       } else if (msg.includes('Email not confirmed')) {
         msg = 'Email belum dikonfirmasi. Silakan buka email Anda untuk konfirmasi aktivasi akun.';
-      } else if (msg.includes('Invalid login credentials')) {
-        msg = 'Email atau kata sandi salah. Silakan periksa kembali atau daftar akun baru.';
       } else if (msg.includes('User already registered')) {
         msg = 'Email ini sudah terdaftar. Silakan pilih tab "Masuk" untuk masuk ke akun Anda.';
       }
+
       showAlert(msg, 'error');
     } finally {
-      if (authSubmitBtn) {
+      if (!getLockoutRemainingMs() && authSubmitBtn) {
         authSubmitBtn.removeAttribute('disabled');
         authSubmitBtn.textContent = currentAuthMode === 'login' ? 'Masuk ke Akun' : 'Buat Akun Saya';
       }

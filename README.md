@@ -12,9 +12,9 @@ Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase*
 
 ### 1. Studio Belajar Aksara Interaktif (`/belajar`)
 - **3 Mode Studio Belajar Terpadu**:
-  - 📑 **Mode Tabel Aksara**: Grid fonetik interaktif dengan audio lafal asli, pelacak progres hafalan huruf (`0 / 46 Huruf`), tombol langsung edit/hapus karakter & edit judul tabel di header kartu, penanda karakter kembar (`DOBEL`) & pembersih otomatis 1-klik (`🧹 Hapus Huruf Dobel Otomatis`).
-  - 🎴 **Mode Flashcard & Kuis**: Latihan kartu bolak-balik interaktif (tebak cara baca, dengarkan audio, tandai Belum/Sudah Hafal) serta Kuis Pilihan Ganda 4 opsi dengan pelacak skor.
-  - 💬 **Mode Frasa Dasar Sehari-hari**: Koleksi percakapan dasar (salam, angka, belanja, darurat) dengan tombol audio native, kontrol kecepatan 6 level (`0.5x, 0.75x, 1.0x, 1.25x, 1.5x, 2.0x`), fitur CRUD lengkap (tambah/edit/hapus frasa & kategori kustom), dan fitur impor spreadsheet/CSV/teks instan via SheetJS.
+  - 📑 **Mode Tabel Aksara**: Grid fonetik interaktif dengan audio lafal asli, pelacak progres hafalan huruf (`0 / 46 Huruf`), tombol **▶ Putar Urut** untuk mendengarkan seluruh aksara secara berurutan dengan highlight visual sel, tombol langsung edit/hapus karakter & edit judul tabel di header kartu, penanda karakter kembar (`DOBEL`) & pembersih otomatis 1-klik (`🧹 Hapus Huruf Dobel Otomatis`).
+  - 🎴 **Mode Flashcard & Kuis Dua Arah**: Latihan kartu bolak-balik interaktif serta Kuis Pilihan Ganda 4 opsi dengan pilihan arah belajar: **Aksara → Bacaan** atau **Bacaan → Aksara** dan pelacak skor otomatis.
+  - 💬 **Mode Frasa Dasar Sehari-hari**: Koleksi percakapan dasar (salam, angka, belanja, darurat) dengan bilah pencarian frasa cepat, filter chip kategori, tombol audio native, kontrol kecepatan 6 level (`0.5x, 0.75x, 1.0x, 1.25x, 1.5x, 2.0x`), fitur CRUD lengkap (tambah/edit/hapus frasa & kategori kustom), dan impor spreadsheet/CSV/teks instan via SheetJS.
 - **Audio Suara Native Google**: Klik setiap kotak huruf atau frasa untuk mendengarkan lafal fonetik alami menggunakan Web Speech Synthesis API dan Google Speech TTS fallback.
 - **Kontrol Kecepatan Suara Presisi**: Pengaturan kecepatan audio 6 tingkat (`0.5x`, `0.75x`, `1.0x` default, `1.25x`, `1.5x`, `2.0x`) serta toggle On/Off audio.
 - **Pembuat Tabel Aksara Mandiri (+ Buat Tabel)**: Buat dan simpan materi belajar aksara buatan Anda sendiri langsung di browser, atau impor baris data dari file CSV / Excel.
@@ -31,8 +31,9 @@ Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase*
 ### 3. Pencarian Cepat Global (Command Palette - `Ctrl + K`)
 - Tekan `Ctrl + K` (atau klik tombol pencarian di navbar) untuk membuka Command Palette cepat: cari aksara, lompat ke mode belajar, akses 250 negara dunia, atau buat tabel baru secara instan.
 
-### 4. Integrasi Cloud & Akun Pengguna (Supabase)
-- **Modal Akun Bebas Reload (`AuthModal.astro`)**: Dialog modal login dan registrasi modern tanpa pengalihan halaman.
+### 4. Integrasi Cloud & Keamanan Akun Pengguna (Supabase)
+- **Modal Akun Bebas Reload (`AuthModal.astro`)**: Dialog modal login dan registrasi modern tanpa pengalihan halaman, dilengkapi tombol intip/sembunyikan kata sandi (👁️).
+- **Proteksi Keamanan & Rate Limit Login**: Sistem proteksi anti-spam / brute-force cerdas (jeda keamanan otomatis 30 detik setelah 5x gagal, hitung mundur real-time `⏳ Tunggu ... detik`, serta penanganan ramah batas laju permintaan server Supabase).
 - **4 Statistik Dinamis Akun**: Menampilkan ringkasan progres real-time (`Target Negara`, `Tabel Kustom`, `Huruf Hafal`, `Koleksi Frasa`) serta lencana keaktifan harian (`🔥 Aktif Belajar`).
 - **Sinkronisasi Data Otomatis**: Target negara, tabel kustom, progres hafalan aksara, skor kuis, frasa kustom, dan preferensi pengguna otomatis tersimpan di Supabase.
 - **Bekerja Penuh Tanpa Login (Offline-Ready)**: Seluruh fitur tetap dapat digunakan 100% tanpa login menggunakan penyimpanan `localStorage` browser.

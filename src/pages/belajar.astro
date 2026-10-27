@@ -150,6 +150,14 @@ import { languagePhrasesData } from '../data/phrases';
             </button>
             <button 
               type="button" 
+              id="btn-play-all" 
+              class="btn btn-secondary btn-s font-mono cursor-pointer"
+              title="Dengarkan seluruh aksara dalam tabel ini secara berurutan otomatis"
+            >
+              ▶ Putar Urut
+            </button>
+            <button 
+              type="button" 
               id="copy-all-btn" 
               class="btn btn-secondary btn-s"
               title="Salin seluruh isi tabel ke clipboard"
@@ -326,13 +334,21 @@ import { languagePhrasesData } from '../data/phrases';
 
           <!-- 2B. Kuis Pilihan Ganda -->
           <div id="fc-quiz-subview" class="hidden max-w-md mx-auto flex flex-col items-center">
-            <div class="w-full flex items-center justify-between text-xs font-mono text-smoke mb-3">
-              <span>Pertanyaan Soal</span>
-              <span id="quiz-score-badge" class="text-ink font-bold">Skor: 0</span>
+            <!-- Mode Arah Kuis & Skor -->
+            <div class="w-full flex items-center justify-between gap-2 text-xs font-mono mb-3 flex-wrap">
+              <div class="flex items-center gap-1">
+                <button type="button" id="btn-quiz-dir-char" class="px-2.5 py-1 text-[11px] border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer">
+                  Aksara → Bacaan
+                </button>
+                <button type="button" id="btn-quiz-dir-romaji" class="px-2.5 py-1 text-[11px] border border-rule bg-canvas text-steel hover:text-ink cursor-pointer">
+                  Bacaan → Aksara
+                </button>
+              </div>
+              <span id="quiz-score-badge" class="text-ink font-bold shrink-0">Skor: 0</span>
             </div>
 
             <div class="w-full p-8 border-2 border-ink bg-canvas flex flex-col items-center justify-center text-center shadow-md">
-              <span class="text-xs text-smoke font-mono mb-2 uppercase tracking-wider">Bagaimana cara membaca aksara ini?</span>
+              <span id="quiz-question-prompt" class="text-xs text-smoke font-mono mb-2 uppercase tracking-wider">Bagaimana cara membaca aksara ini?</span>
               <span id="quiz-question-char" class="text-[72px] font-bold text-ink leading-none">あ</span>
             </div>
 
@@ -410,6 +426,22 @@ import { languagePhrasesData } from '../data/phrases';
             <button type="button" id="btn-finish-phrase-edit" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer shrink-0">
               ✓ Selesai Edit
             </button>
+          </div>
+
+          <!-- Phrase Search & Category Filter Toolbar -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 border border-rule bg-smoke/5">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <span class="text-steel text-xs font-mono select-none">CARI:</span>
+              <input 
+                type="text" 
+                id="phrase-search-input" 
+                placeholder="Cari kata, cara baca, atau arti frasa..." 
+                class="w-full px-3 py-1.5 text-xs bg-canvas border border-rule text-ink outline-none focus:border-ink font-mono"
+              />
+            </div>
+            <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 text-xs font-mono shrink-0" id="phrase-category-filter-chips">
+              <!-- Dynamically populated category chips -->
+            </div>
           </div>
 
           <div id="phrases-content-wrapper" class="space-y-6">
@@ -923,6 +955,10 @@ import { languagePhrasesData } from '../data/phrases';
     const quizOptionsGrid = document.getElementById('quiz-options-grid');
     const quizFeedback = document.getElementById('quiz-feedback');
     const btnQuizNextQuestion = document.getElementById('btn-quiz-next-question');
+    const btnQuizDirChar = document.getElementById('btn-quiz-dir-char');
+    const btnQuizDirRomaji = document.getElementById('btn-quiz-dir-romaji');
+    const quizQuestionPrompt = document.getElementById('quiz-question-prompt');
+    const btnPlayAll = document.getElementById('btn-play-all');
 
     // Phrases DOM Elements
     const phrasesTitle = document.getElementById('phrases-title');
@@ -935,6 +971,8 @@ import { languagePhrasesData } from '../data/phrases';
     const btnResetPhrase = document.getElementById('btn-reset-phrase');
     const phraseEditToolbar = document.getElementById('phrase-edit-toolbar');
     const btnFinishPhraseEdit = document.getElementById('btn-finish-phrase-edit');
+    const phraseSearchInput = document.getElementById('phrase-search-input') as HTMLInputElement | null;
+    const phraseCategoryFilterChips = document.getElementById('phrase-category-filter-chips');
 
     // Phrase Modal DOM Elements
     const phraseModal = document.getElementById('phrase-modal') as HTMLDialogElement | null;
@@ -1060,6 +1098,82 @@ import { languagePhrasesData } from '../data/phrases';
       }
     });
 
+    // ========================================================
+    // SEQUENTIAL AUDIO WALKTHROUGH (PUTAR URUT OTOMATIS)
+    // ========================================================
+    let isPlayingAll = false;
+    let playAllTimeout = null;
+    let currentPlayCellEl = null;
+
+    function stopPlayAll() {
+      if (!isPlayingAll && !currentPlayCellEl) return;
+      isPlayingAll = false;
+      if (playAllTimeout) {
+        clearTimeout(playAllTimeout);
+        playAllTimeout = null;
+      }
+      if (currentPlayCellEl) {
+        currentPlayCellEl.classList.remove('ring-4', 'ring-cta', 'bg-cta/25', 'scale-105', 'z-20');
+        currentPlayCellEl = null;
+      }
+      if (btnPlayAll) {
+        btnPlayAll.textContent = '▶ Putar Urut';
+        btnPlayAll.className = 'btn btn-secondary btn-s font-mono cursor-pointer';
+      }
+    }
+
+    function startPlayAll() {
+      const allCells = gridWrapper ? gridWrapper.querySelectorAll('td[data-char]') : [];
+      if (!allCells.length) {
+        showToast('Tabel ini tidak memiliki karakter untuk diputar.');
+        return;
+      }
+
+      isPlayingAll = true;
+      if (btnPlayAll) {
+        btnPlayAll.textContent = '⏹ Hentikan';
+        btnPlayAll.className = 'btn btn-primary btn-s font-mono cursor-pointer shadow-md';
+      }
+
+      let idx = 0;
+      function playStep() {
+        if (!isPlayingAll) return;
+        if (idx >= allCells.length) {
+          stopPlayAll();
+          showToast('✓ Selesai memutar seluruh aksara.');
+          return;
+        }
+
+        if (currentPlayCellEl) {
+          currentPlayCellEl.classList.remove('ring-4', 'ring-cta', 'bg-cta/25', 'scale-105', 'z-20');
+        }
+
+        const cellEl = allCells[idx];
+        currentPlayCellEl = cellEl;
+        cellEl.classList.add('ring-4', 'ring-cta', 'bg-cta/25', 'scale-105', 'z-20');
+        cellEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+        const ch = cellEl.getAttribute('data-char') || '';
+        const lang = cellEl.getAttribute('data-lang') || '';
+        speakText(ch, lang);
+
+        if (btnPlayAll) {
+          btnPlayAll.textContent = `⏹ Stop (${idx + 1}/${allCells.length})`;
+        }
+
+        idx++;
+        const interval = Math.max(900, Math.round(1500 / currentAudioRate));
+        playAllTimeout = setTimeout(playStep, interval);
+      }
+
+      playStep();
+    }
+
+    btnPlayAll?.addEventListener('click', () => {
+      if (isPlayingAll) stopPlayAll();
+      else startPlayAll();
+    });
+
     // Helper: get flat list of valid characters for current table
     function getCurrentTableCells(): { char: string; romaji: string }[] {
       const allTables = getAllTables();
@@ -1103,6 +1217,7 @@ import { languagePhrasesData } from '../data/phrases';
 
     // Mode Switchers
     function switchViewMode(mode: 'table' | 'flashcard' | 'phrases') {
+      stopPlayAll();
       currentViewMode = mode;
       
       const setBtnState = (btn: HTMLElement | null, isActive: boolean) => {
@@ -1269,9 +1384,30 @@ import { languagePhrasesData } from '../data/phrases';
     });
 
     // ========================================================
-    // QUIZ MODE LOGIC
+    // QUIZ MODE LOGIC (DUA ARAH: AKSARA ↔ BACAAN)
     // ========================================================
     let currentQuizAnswer = '';
+    let quizQuestionDirection = 'char-to-romaji';
+
+    function setQuizDirection(dir) {
+      quizQuestionDirection = dir;
+      if (dir === 'char-to-romaji') {
+        btnQuizDirChar?.classList.remove('border-rule', 'bg-canvas', 'text-steel');
+        btnQuizDirChar?.classList.add('border-2', 'border-cta', 'bg-cta/10', 'text-ink', 'font-bold', 'shadow-xs');
+        btnQuizDirRomaji?.classList.remove('border-2', 'border-cta', 'bg-cta/10', 'font-bold', 'shadow-xs');
+        btnQuizDirRomaji?.classList.add('border', 'border-rule', 'bg-canvas', 'text-steel');
+      } else {
+        btnQuizDirRomaji?.classList.remove('border-rule', 'bg-canvas', 'text-steel');
+        btnQuizDirRomaji?.classList.add('border-2', 'border-cta', 'bg-cta/10', 'text-ink', 'font-bold', 'shadow-xs');
+        btnQuizDirChar?.classList.remove('border-2', 'border-cta', 'bg-cta/10', 'font-bold', 'shadow-xs');
+        btnQuizDirChar?.classList.add('border', 'border-rule', 'bg-canvas', 'text-steel');
+      }
+      initQuizQuestion();
+    }
+
+    btnQuizDirChar?.addEventListener('click', () => setQuizDirection('char-to-romaji'));
+    btnQuizDirRomaji?.addEventListener('click', () => setQuizDirection('romaji-to-char'));
+
     function initQuizQuestion() {
       const cells = getCurrentTableCells();
       if (cells.length < 4) {
@@ -1284,27 +1420,60 @@ import { languagePhrasesData } from '../data/phrases';
       if (quizFeedback) quizFeedback.textContent = '';
 
       const targetCell = cells[Math.floor(Math.random() * cells.length)];
-      currentQuizAnswer = targetCell.romaji || targetCell.char;
+      const isCharToRomaji = quizQuestionDirection === 'char-to-romaji';
 
-      if (quizQuestionChar) quizQuestionChar.textContent = targetCell.char;
+      if (isCharToRomaji) {
+        currentQuizAnswer = targetCell.romaji || targetCell.char;
+        if (quizQuestionPrompt) quizQuestionPrompt.textContent = 'Bagaimana cara membaca aksara ini?';
+        if (quizQuestionChar) {
+          quizQuestionChar.textContent = targetCell.char;
+          quizQuestionChar.className = 'text-[68px] sm:text-[76px] font-bold text-ink leading-none';
+        }
 
-      const distractors = cells
-        .filter(c => (c.romaji || c.char) !== currentQuizAnswer)
-        .map(c => c.romaji || c.char);
-      
-      const shuffledDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 3);
-      const options = [currentQuizAnswer, ...shuffledDistractors].sort(() => 0.5 - Math.random());
+        const distractors = cells
+          .filter(c => (c.romaji || c.char) !== currentQuizAnswer)
+          .map(c => c.romaji || c.char);
+        
+        const shuffledDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [currentQuizAnswer, ...shuffledDistractors].sort(() => 0.5 - Math.random());
 
-      if (quizOptionsGrid) {
-        quizOptionsGrid.innerHTML = '';
-        options.forEach(opt => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'py-3.5 px-4 border-2 border-rule bg-canvas hover:border-ink font-mono font-bold text-[16px] text-ink transition-colors shadow-sm select-none';
-          btn.textContent = opt;
-          btn.addEventListener('click', () => handleQuizOptionClick(btn, opt, targetCell.char));
-          quizOptionsGrid.appendChild(btn);
-        });
+        if (quizOptionsGrid) {
+          quizOptionsGrid.innerHTML = '';
+          options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'py-3.5 px-4 border-2 border-rule bg-canvas hover:border-ink font-mono font-bold text-[16px] text-ink transition-colors shadow-sm select-none cursor-pointer';
+            btn.textContent = opt;
+            btn.addEventListener('click', () => handleQuizOptionClick(btn, opt, targetCell.char));
+            quizOptionsGrid.appendChild(btn);
+          });
+        }
+      } else {
+        currentQuizAnswer = targetCell.char;
+        if (quizQuestionPrompt) quizQuestionPrompt.textContent = 'Manakah aksara yang berbunyi demikian?';
+        if (quizQuestionChar) {
+          quizQuestionChar.textContent = targetCell.romaji || targetCell.char;
+          quizQuestionChar.className = 'text-[44px] sm:text-[52px] font-bold text-ink leading-none font-mono';
+        }
+
+        const distractors = cells
+          .filter(c => c.char !== currentQuizAnswer)
+          .map(c => c.char);
+        
+        const shuffledDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [currentQuizAnswer, ...shuffledDistractors].sort(() => 0.5 - Math.random());
+
+        if (quizOptionsGrid) {
+          quizOptionsGrid.innerHTML = '';
+          options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'py-3.5 px-4 border-2 border-rule bg-canvas hover:border-ink font-mono font-bold text-[24px] text-ink transition-colors shadow-sm select-none cursor-pointer';
+            btn.textContent = opt;
+            btn.addEventListener('click', () => handleQuizOptionClick(btn, opt, targetCell.char));
+            quizOptionsGrid.appendChild(btn);
+          });
+        }
       }
     }
 
@@ -1760,8 +1929,53 @@ import { languagePhrasesData } from '../data/phrases';
     });
 
     // ========================================================
-    // RENDER PHRASES
+    // RENDER PHRASES WITH SEARCH & CATEGORY FILTER
     // ========================================================
+    let phraseSearchQuery = '';
+    let selectedPhraseCategory = 'all';
+
+    function renderPhraseCategoryChips(allCategories) {
+      if (!phraseCategoryFilterChips) return;
+      if (!allCategories || allCategories.length <= 1) {
+        phraseCategoryFilterChips.innerHTML = '';
+        return;
+      }
+
+      let chipsHtml = `
+        <button type="button" data-cat="all" class="px-2.5 py-1 border transition-colors cursor-pointer ${selectedPhraseCategory === 'all' ? 'border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs' : 'border-rule bg-canvas text-steel hover:text-ink'}">
+          Semua
+        </button>
+      `;
+
+      allCategories.forEach((cat) => {
+        const isActive = selectedPhraseCategory === cat.categoryName;
+        chipsHtml += `
+          <button type="button" data-cat="${encodeURIComponent(cat.categoryName)}" class="px-2.5 py-1 border transition-colors cursor-pointer whitespace-nowrap ${isActive ? 'border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs' : 'border-rule bg-canvas text-steel hover:text-ink'}">
+            ${cat.categoryName}
+          </button>
+        `;
+      });
+
+      phraseCategoryFilterChips.innerHTML = chipsHtml;
+
+      phraseCategoryFilterChips.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cat = btn.getAttribute('data-cat');
+          selectedPhraseCategory = cat === 'all' ? 'all' : decodeURIComponent(cat || 'all');
+          renderPhrases();
+        });
+      });
+    }
+
+    let phraseSearchDebounceTimer = null;
+    phraseSearchInput?.addEventListener('input', (e) => {
+      clearTimeout(phraseSearchDebounceTimer);
+      phraseSearchDebounceTimer = setTimeout(() => {
+        phraseSearchQuery = e.target.value;
+        renderPhrases();
+      }, 120);
+    });
+
     function renderPhrases() {
       if (!phrasesContentWrapper) return;
       const data = getActivePhrasesData(currentTableId);
@@ -1773,6 +1987,7 @@ import { languagePhrasesData } from '../data/phrases';
       }
 
       if (!data || !data.categories || data.categories.length === 0) {
+        if (phraseCategoryFilterChips) phraseCategoryFilterChips.innerHTML = '';
         phrasesContentWrapper.innerHTML = `
           <div class="py-12 px-4 text-center border-2 border-dashed border-rule bg-canvas text-smoke font-mono space-y-3">
             <div class="text-3xl">💬</div>
@@ -1781,10 +1996,10 @@ import { languagePhrasesData } from '../data/phrases';
               Mulai koleksi frasa penting Anda sendiri sekarang. Anda bisa menambahkan satu per satu atau langsung impor dari file Excel/CSV!
             </p>
             <div class="flex items-center justify-center gap-2 pt-2">
-              <button type="button" id="btn-empty-add-phrase" class="btn btn-primary btn-s font-mono text-xs">
+              <button type="button" id="btn-empty-add-phrase" class="btn btn-primary btn-s font-mono text-xs cursor-pointer">
                 + Tambah Frasa Pertama
               </button>
-              <button type="button" id="btn-empty-import-phrase" class="btn btn-secondary btn-s font-mono text-xs">
+              <button type="button" id="btn-empty-import-phrase" class="btn btn-secondary btn-s font-mono text-xs cursor-pointer">
                 📁 Impor dari Excel
               </button>
             </div>
@@ -1795,8 +2010,56 @@ import { languagePhrasesData } from '../data/phrases';
         return;
       }
 
+      renderPhraseCategoryChips(data.categories);
+
+      const searchLower = phraseSearchQuery.trim().toLowerCase();
+      const filteredCategories = data.categories.map((cat, catIdx) => {
+        if (selectedPhraseCategory !== 'all' && cat.categoryName !== selectedPhraseCategory) {
+          return null;
+        }
+        const matchingItems = cat.items
+          .map((item, itemIdx) => ({ ...item, originalItemIdx: itemIdx }))
+          .filter((item) => {
+            if (!searchLower) return true;
+            return (
+              (item.native && item.native.toLowerCase().includes(searchLower)) ||
+              (item.transliteration && item.transliteration.toLowerCase().includes(searchLower)) ||
+              (item.meaning && item.meaning.toLowerCase().includes(searchLower))
+            );
+          });
+        if (matchingItems.length === 0) return null;
+        return {
+          ...cat,
+          originalCatIdx: catIdx,
+          items: matchingItems
+        };
+      }).filter(Boolean);
+
+      if (filteredCategories.length === 0) {
+        phrasesContentWrapper.innerHTML = `
+          <div class="py-12 px-4 text-center border-2 border-dashed border-rule bg-canvas text-smoke font-mono space-y-2">
+            <div class="text-2xl">🔍</div>
+            <div class="text-sm font-bold text-ink">Tidak ada frasa yang cocok</div>
+            <p class="text-xs text-steel font-sans">
+              Tidak ditemukan frasa untuk pencarian "<b>${phraseSearchQuery}</b>"${selectedPhraseCategory !== 'all' ? ` pada kategori <b>${selectedPhraseCategory}</b>` : ''}.
+            </p>
+            <button type="button" id="btn-clear-phrase-search" class="mt-2 btn btn-secondary btn-s font-mono text-xs cursor-pointer">
+              Bersihkan Filter
+            </button>
+          </div>
+        `;
+        document.getElementById('btn-clear-phrase-search')?.addEventListener('click', () => {
+          phraseSearchQuery = '';
+          selectedPhraseCategory = 'all';
+          if (phraseSearchInput) phraseSearchInput.value = '';
+          renderPhrases();
+        });
+        return;
+      }
+
       let html = '';
-      data.categories.forEach((cat: any, catIdx: number) => {
+      filteredCategories.forEach((cat) => {
+        const catIdx = cat.originalCatIdx;
         html += `
           <div class="p-4 sm:p-5 border border-rule bg-canvas space-y-3 shadow-xs">
             <div class="border-b border-rule pb-2.5 flex items-center justify-between flex-wrap gap-2">
@@ -1846,7 +2109,7 @@ import { languagePhrasesData } from '../data/phrases';
                     type="button" 
                     class="btn-edit-phrase px-2 py-1.5 border border-rule hover:border-ink bg-canvas text-ink text-xs cursor-pointer shadow-xs"
                     data-cat="${catIdx}"
-                    data-item="${itemIdx}"
+                    data-item="${item.originalItemIdx ?? itemIdx}"
                     title="Edit frasa ini"
                   >
                     ✏️
@@ -1855,7 +2118,7 @@ import { languagePhrasesData } from '../data/phrases';
                     type="button" 
                     class="btn-delete-phrase px-2 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs cursor-pointer shadow-xs font-bold"
                     data-cat="${catIdx}"
-                    data-item="${itemIdx}"
+                    data-item="${item.originalItemIdx ?? itemIdx}"
                     data-native="${item.native}"
                     title="Hapus frasa ini"
                   >
