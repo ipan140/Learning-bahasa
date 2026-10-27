@@ -25,7 +25,9 @@ import {
   FileSpreadsheet, 
   FileText,
   Search,
-  X
+  X,
+  Lightbulb,
+  AlertCircle
 } from 'lucide-astro';
 ---
 
@@ -69,7 +71,7 @@ import {
       <!-- Notification Toast -->
       <div id="toast" class="hidden mb-6 px-4 py-2.5 text-[13px] border border-ok text-ok bg-canvas flex items-center justify-between font-mono">
         <span id="toast-message">Berhasil disimpan!</span>
-        <button type="button" id="toast-close" class="text-smoke hover:text-ink font-bold ml-4">✕</button>
+        <button type="button" id="toast-close" class="text-smoke hover:text-ink font-bold ml-4 cursor-pointer p-0.5" aria-label="Tutup"><X class="size-3.5" /></button>
       </div>
 
       <!-- ========================================== -->
@@ -250,7 +252,7 @@ import {
           <div id="table-edit-toolbar" class="hidden mb-4 p-3.5 border-2 border-badge bg-badge/10 font-mono text-[13px] flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
             <div class="flex items-center gap-2">
               <span class="text-badge font-bold flex items-center gap-1.5"><Edit3 class="size-3.5 inline text-badge" /> MODE EDIT AKTIF:</span>
-              <span class="text-ink text-xs sm:text-sm">Klik <span class="text-red-500 font-bold">✕</span> pada kotak untuk menghapus huruf dobel, atau <span class="font-bold">✏️</span> untuk mengedit romaji &amp; aksara.</span>
+              <span class="text-ink text-xs sm:text-sm">Klik icon silang <span class="text-red-500 font-bold">[✕]</span> pada kotak untuk menghapus huruf, atau icon pensil untuk mengedit.</span>
             </div>
             <div class="flex items-center gap-2 flex-wrap shrink-0">
               <button type="button" id="btn-auto-dedup" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer inline-flex items-center gap-1" title="Cari huruf yang kembar/dobel di tabel ini dan hapus otomatis">
@@ -273,7 +275,7 @@ import {
 
           <!-- Instructions footer -->
           <div class="mt-6 p-4 border border-dashed border-rule text-[13px] text-smoke flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-tint/30">
-            <span>💡 <strong>Tips:</strong> Klik kotak huruf untuk mendengar audio asli &amp; salin karakter. Huruf bergaris hijau menandakan sudah Anda tandai hafal.</span>
+            <span class="inline-flex items-center gap-1.5"><Lightbulb class="size-4 inline text-badge shrink-0" /> <strong>Tips:</strong> Klik kotak huruf untuk mendengar audio asli &amp; salin karakter. Huruf bergaris hijau menandakan sudah Anda tandai hafal.</span>
             <span class="font-mono text-[12px]">Format: [Romaji/Cara Baca] = [Aksara]</span>
           </div>
         </div>
@@ -458,7 +460,7 @@ import {
           <div id="phrase-edit-toolbar" class="hidden p-3 border-2 border-badge bg-badge/10 font-mono text-xs text-ink flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm">
             <div class="flex items-center gap-2">
               <span class="text-badge font-bold flex items-center gap-1"><Edit3 class="size-3.5 inline text-badge" /> MODE EDIT FRASA:</span>
-              <span>Klik <span class="font-bold">✏️</span> pada kartu frasa untuk mengedit teks/arti, atau tombol merah <span class="text-red-500 font-bold">✕</span> untuk menghapus frasa.</span>
+              <span>Klik icon pensil pada kartu frasa untuk mengedit, atau tombol silang merah <span class="text-red-500 font-bold">[✕]</span> untuk menghapus frasa.</span>
             </div>
             <button type="button" id="btn-finish-phrase-edit" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer shrink-0 inline-flex items-center gap-1">
               <Check class="size-3.5 inline" /> Selesai Edit
@@ -502,7 +504,7 @@ import {
             Tambahkan materi atau bahasa apa saja dengan format teks bebas, atau <strong>impor langsung dari file Excel/Spreadsheet</strong> Anda.
           </p>
         </div>
-        <button type="button" id="close-creator-btn" class="btn btn-secondary btn-s shrink-0">✕ Tutup</button>
+        <button type="button" id="close-creator-btn" class="btn btn-secondary btn-s shrink-0 inline-flex items-center gap-1"><X class="size-3.5 inline" /> Tutup</button>
       </div>
 
       <form id="creator-form" class="space-y-5">
@@ -615,7 +617,7 @@ import {
     <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
         <h4 id="char-modal-title" class="text-base font-bold text-ink flex items-center gap-1.5"><Edit3 class="size-4 inline text-ink" /> Edit Karakter</h4>
-        <button type="button" id="close-char-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
+        <button type="button" id="close-char-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer p-1" aria-label="Tutup"><X class="size-4" /></button>
       </div>
       <form id="char-edit-form" class="space-y-4">
         <input type="hidden" id="char-edit-row" value="" />
@@ -662,7 +664,7 @@ import {
     <div class="p-5 sm:p-6">
       <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
         <h4 id="phrase-modal-title" class="text-base font-bold text-ink flex items-center gap-1.5"><Plus class="size-4 inline text-ink" /> Tambah Frasa Baru</h4>
-        <button type="button" id="close-phrase-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
+        <button type="button" id="close-phrase-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer p-1" aria-label="Tutup"><X class="size-4" /></button>
       </div>
       <form id="phrase-form" class="space-y-4">
         <input type="hidden" id="phrase-edit-cat-idx" value="-1" />
@@ -740,7 +742,7 @@ import {
           <h4 class="text-base font-bold text-ink flex items-center gap-1.5"><FileSpreadsheet class="size-4 inline text-ink" /> Impor Kumpulan Frasa</h4>
           <p class="text-xs text-steel mt-0.5">Unggah spreadsheet atau salin teks banyak frasa sekaligus.</p>
         </div>
-        <button type="button" id="close-phrase-import-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer">✕</button>
+        <button type="button" id="close-phrase-import-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer p-1" aria-label="Tutup"><X class="size-4" /></button>
       </div>
 
       <form id="phrase-import-form" class="space-y-4">
@@ -1140,7 +1142,7 @@ import {
         : currentAudioRate < 1.0 
           ? '(Lambat)' 
           : '(Cepat)';
-      showToast(`🐢 Kecepatan audio: ${currentAudioRate}x ${label}`);
+      showToast(`Kecepatan audio: ${currentAudioRate}x ${label}`);
       if (currentUser) {
         saveUserPreferencesToCloud(currentUser.id, { audioSpeed: currentAudioRate, isAudioEnabled: isAudioEnabled }).catch(() => {});
       }
@@ -1630,7 +1632,7 @@ import {
       updatePhraseEditModeUI();
       renderPhrases();
       if (isPhraseEditModeActive) {
-        showToast('✏️ Mode Edit Frasa Aktif: Klik ✏️ untuk edit atau ✕ untuk hapus frasa.');
+        showToast('Mode Edit Frasa Aktif: Klik tombol edit atau silang untuk mengubah frasa.');
       } else {
         showToast('Mode Edit Frasa ditutup.');
       }
@@ -1734,7 +1736,9 @@ import {
 
       const isEdit = catIdx >= 0 && itemIdx >= 0;
       if (phraseModalTitle) {
-        phraseModalTitle.textContent = isEdit ? '✏️ Edit Frasa' : '➕ Tambah Frasa Baru';
+        phraseModalTitle.innerHTML = isEdit 
+          ? '<svg class="size-4 inline mr-1.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Edit Frasa'
+          : '<svg class="size-4 inline mr-1.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Tambah Frasa Baru';
       }
       if (phraseDeleteBtn) {
         phraseDeleteBtn.classList.toggle('hidden', !isEdit);
@@ -2137,7 +2141,7 @@ import {
                     data-cat-name="${cat.categoryName}"
                     title="Hapus seluruh kategori ini"
                   >
-                    ✕ Hapus Kategori
+                    <svg class="size-3 inline mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>Hapus Kategori
                   </button>
                 ` : ''}
               </div>
@@ -2435,7 +2439,7 @@ import {
       updateEditModeUI();
       renderCurrentTable();
       if (isEditModeActive) {
-        showToast('✏️ Mode Edit Aktif: Hapus huruf dobel dengan tombol ✕ merah, atau klik ✏️ untuk edit.');
+        showToast('Mode Edit Aktif: Hapus huruf dengan tombol silang merah, atau klik tombol edit.');
       } else {
         showToast('Mode Edit ditutup.');
       }
@@ -2495,7 +2499,7 @@ import {
         }
         renderCurrentTable();
         updateProgressUI();
-        showToast(`🧹 Berhasil menghapus ${removedCount} karakter dobel!`);
+        showToast(`Berhasil menghapus ${removedCount} karakter dobel!`);
       }
     });
 
@@ -2508,7 +2512,7 @@ import {
       const cloned = {
         id: newId,
         name: `${curr.name} (Salinan)`,
-        flag: curr.flag || '✨',
+        flag: curr.flag || '',
         category: 'custom',
         badge: 'Tabel Kustom',
         title: `${curr.title} (Salinan)`,
@@ -2538,7 +2542,9 @@ import {
       if (charEditCharInput) charEditCharInput.value = char;
       if (charEditRomajiInput) charEditRomajiInput.value = romaji;
       if (charModalTitle) {
-        charModalTitle.textContent = row === -1 ? '+ Tambah Huruf Baru' : `✏️ Edit Huruf: ${char}`;
+        charModalTitle.innerHTML = row === -1 
+          ? '<svg class="size-4 inline mr-1.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Tambah Huruf Baru' 
+          : `<svg class="size-4 inline mr-1.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Edit Huruf: ${char}`;
       }
       if (charEditDeleteBtn) {
         charEditDeleteBtn.style.display = row === -1 ? 'none' : 'block';
@@ -2716,7 +2722,7 @@ import {
             <div class="py-12 sm:py-16 px-4 sm:px-8 text-center border-2 border-dashed border-rule bg-canvas select-none font-mono">
               <div class="text-[48px] sm:text-[60px] mb-3 leading-none">${unaddedInfo.flag}</div>
               <div class="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-mono border border-badge text-badge bg-badge/10 uppercase tracking-wider mb-4 font-bold">
-                <span>⚠️</span>
+                <svg class="size-3.5 inline text-badge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
                 <span>STATUS: AKSARA BELUM DITAMBAHKAN</span>
               </div>
               <h3 class="text-[20px] sm:text-[24px] font-bold text-ink mb-2">
@@ -2818,7 +2824,7 @@ import {
             data-lang="${currentTable.voiceLang || ''}"
             data-row="${rIdx}"
             data-col="${cIdx}"
-            title="${isEditModeActive ? 'Klik tombol ✕ untuk hapus atau ✏️ untuk edit' : 'Klik untuk dengar suara atau salin'}"
+            title="${isEditModeActive ? 'Klik icon silang untuk hapus atau icon pensil untuk edit' : 'Klik untuk dengar suara atau salin'}"
           >`;
 
           if (isEditModeActive) {
@@ -2898,7 +2904,7 @@ import {
           const romaji = td.getAttribute('data-romaji') || '';
           speakText(char, lang);
           navigator.clipboard?.writeText(char).catch(() => {});
-          showToast(`Karakter "${char}" (${romaji}) disalin ke clipboard! 🔊`);
+          showToast(`Karakter "${char}" (${romaji}) disalin ke clipboard!`);
         });
       });
     }
@@ -2925,7 +2931,7 @@ import {
     // Copy All Table Text
     copyAllBtn?.addEventListener('click', () => {
       if (isUnaddedState) {
-        showToast('⚠️ Aksara ini belum ditambahkan, buat tabel terlebih dahulu.');
+        showToast('Aksara ini belum ditambahkan, buat tabel terlebih dahulu.');
         return;
       }
       const allTables = getAllTables();
@@ -2943,7 +2949,7 @@ import {
     // Print / Export PDF
     document.getElementById('print-table-btn')?.addEventListener('click', () => {
       if (isUnaddedState) {
-        showToast('⚠️ Aksara ini belum ditambahkan, buat tabel terlebih dahulu.');
+        showToast('Aksara ini belum ditambahkan, buat tabel terlebih dahulu.');
         return;
       }
       window.print();

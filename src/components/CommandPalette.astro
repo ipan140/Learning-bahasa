@@ -14,7 +14,7 @@ const searchData = [
   // Language Tables
   ...defaultLanguageTables.map(t => ({
     type: 'language',
-    title: `${t.flag || '🌐'} ${t.name}`,
+    title: `${t.flag || ''} ${t.name}`.trim(),
     subtitle: `${t.title} (${t.category || 'Aksara'})`,
     href: `/belajar?lang=${t.id}`
   })),
