@@ -29,7 +29,10 @@ import {
   Lightbulb,
   AlertCircle,
   Upload,
-  Headphones
+  Headphones,
+  Star,
+  Mic,
+  Trophy
 } from 'lucide-astro';
 ---
 
@@ -364,15 +367,23 @@ import {
 
             <!-- Navigation Controls -->
             <div class="w-full flex items-center justify-between gap-2 mt-5 pt-4 border-t border-rule text-xs font-mono">
-              <button type="button" id="btn-fc-prev" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink">
+              <button type="button" id="btn-fc-prev" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink cursor-pointer">
                 ← Sebelumnya
               </button>
-              <button type="button" id="btn-fc-random" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink inline-flex items-center gap-1">
+              <button type="button" id="btn-fc-random" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink inline-flex items-center gap-1 cursor-pointer">
                 <Shuffle class="size-3 inline text-steel" /> Acak Huruf
               </button>
-              <button type="button" id="btn-fc-next" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink">
+              <button type="button" id="btn-fc-next" class="px-3 py-1.5 border border-rule hover:border-ink text-steel hover:text-ink cursor-pointer">
                 Selanjutnya →
               </button>
+            </div>
+
+            <!-- Keyboard Shortcuts Helper -->
+            <div class="hidden sm:flex items-center justify-center gap-3 text-[11px] font-mono text-smoke mt-4 pt-3 border-t border-rule/60">
+              <span class="inline-flex items-center gap-1"><kbd class="px-1.5 py-0.5 border border-rule bg-tint text-ink text-[10px] font-bold">Space</kbd> Balik</span>
+              <span class="inline-flex items-center gap-1"><kbd class="px-1.5 py-0.5 border border-rule bg-tint text-ink text-[10px] font-bold">←</kbd> <kbd class="px-1.5 py-0.5 border border-rule bg-tint text-ink text-[10px] font-bold">→</kbd> Pindah</span>
+              <span class="inline-flex items-center gap-1"><kbd class="px-1.5 py-0.5 border border-rule bg-tint text-ink text-[10px] font-bold">A</kbd> Audio</span>
+              <span class="inline-flex items-center gap-1"><kbd class="px-1.5 py-0.5 border border-rule bg-tint text-ink text-[10px] font-bold">M</kbd> Hafal</span>
             </div>
           </div>
 
@@ -436,6 +447,22 @@ import {
             <div class="flex items-center gap-2 flex-wrap shrink-0">
               <button 
                 type="button" 
+                id="btn-play-all-phrases" 
+                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
+                title="Dengarkan seluruh frasa yang tampil secara otomatis satu per satu"
+              >
+                <Play class="size-3.5 inline text-steel" /> <span>Putar Otomatis</span>
+              </button>
+              <button 
+                type="button" 
+                id="btn-open-phrase-quiz" 
+                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
+                title="Mulai Kuis Tebak Arti Frasa Sehari-hari"
+              >
+                <Trophy class="size-3.5 inline text-amber-500" /> <span>Kuis Frasa</span>
+              </button>
+              <button 
+                type="button" 
                 id="btn-open-phrase-modal" 
                 class="btn btn-primary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
                 title="Tambah frasa baru ke koleksi bahasa ini"
@@ -448,7 +475,23 @@ import {
                 class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
                 title="Impor kumpulan frasa dari file Excel atau teks"
               >
-                <FileSpreadsheet class="size-3.5 inline text-steel" /> Impor Excel / CSV
+                <FileSpreadsheet class="size-3.5 inline text-steel" /> Impor Excel
+              </button>
+              <button 
+                type="button" 
+                id="btn-export-phrases-excel" 
+                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
+                title="Unduh seluruh frasa ke file Excel (.xlsx)"
+              >
+                <FileSpreadsheet class="size-3.5 inline text-steel" /> Ekspor Excel
+              </button>
+              <button 
+                type="button" 
+                id="btn-print-phrases" 
+                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
+                title="Cetak kumpulan frasa ini ke kertas atau simpan sebagai dokumen PDF"
+              >
+                <Printer class="size-3.5 inline text-steel" /> Cetak / PDF
               </button>
               <button 
                 type="button" 
@@ -979,6 +1022,66 @@ import {
   </dialog>
 
   <!-- ============================================== -->
+  <!-- MODAL: KUIS FRASA INTERAKTIF                   -->
+  <!-- ============================================== -->
+  <dialog 
+    id="phrase-quiz-modal" 
+    class="m-auto backdrop:bg-black/75 p-0 bg-canvas text-ink border-2 border-ink w-[94vw] max-w-[560px] shadow-2xl max-h-[92dvh] overflow-y-auto font-mono"
+  >
+    <div class="p-5 sm:p-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-rule mb-4 text-[12px] text-smoke">
+        <span class="flex items-center gap-1.5 uppercase font-bold text-ink">
+          <Trophy class="size-4 inline text-amber-500" />
+          <span id="phrase-quiz-lang-title">KUIS FRASA</span>
+        </span>
+        <button type="button" id="phrase-quiz-btn-close" class="hover:text-ink p-1 cursor-pointer" aria-label="Tutup Kuis">
+          <X class="size-4" />
+        </button>
+      </div>
+
+      <!-- Live Stats & Streak -->
+      <div class="flex items-center justify-between text-xs mb-4 pb-2 border-b border-rule/50">
+        <div class="flex items-center gap-2">
+          <span id="phrase-quiz-counter" class="text-steel">Soal 1</span>
+          <span id="phrase-quiz-score-badge" class="px-2 py-0.5 border border-rule bg-tint text-ink font-bold">Skor: 0 Benar • 0 Salah</span>
+        </div>
+        <button type="button" id="btn-phrase-quiz-replay-audio" class="px-2 py-1 text-[11px] border border-rule hover:border-ink bg-canvas text-ink inline-flex items-center gap-1 cursor-pointer" title="Dengarkan ulang pengucapan">
+          <Volume2 class="size-3 inline text-steel" /> Putar Suara
+        </button>
+      </div>
+
+      <!-- Question Card Area -->
+      <div id="phrase-quiz-card-box" class="p-5 border-2 border-rule bg-smoke/5 text-center mb-5 transition-all">
+        <div id="phrase-quiz-native-prompt" class="text-[26px] sm:text-[30px] font-bold text-ink leading-tight tracking-wide mb-1">
+          ...
+        </div>
+        <div id="phrase-quiz-translit-prompt" class="text-[13px] text-steel font-medium">
+          ...
+        </div>
+      </div>
+
+      <!-- Prompt text -->
+      <div class="text-[11px] text-smoke uppercase tracking-wider mb-2 font-bold">
+        PILIH ARTI BAHASA INDONESIA YANG TEPAT:
+      </div>
+
+      <!-- 4 Answer Options -->
+      <div id="phrase-quiz-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
+        <!-- Dynamically injected buttons -->
+      </div>
+
+      <!-- Next Button / Result State -->
+      <div id="phrase-quiz-footer" class="flex items-center justify-between pt-3 border-t border-rule text-xs">
+        <span id="phrase-quiz-feedback" class="font-bold text-[12px] text-smoke">Pilih jawaban di atas...</span>
+        <button type="button" id="phrase-quiz-btn-next" class="btn btn-secondary btn-s text-xs font-mono inline-flex items-center gap-1 cursor-pointer">
+          Lewati Soal →
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============================================== -->
   <!-- RETRO-TECH CONFIRM & ALERT DIALOG (SWEETALERT) -->
   <!-- ============================================== -->
   <dialog 
@@ -1243,6 +1346,7 @@ import {
     // Phrases DOM Elements
     const phrasesTitle = document.getElementById('phrases-title');
     const phrasesContentWrapper = document.getElementById('phrases-content-wrapper');
+    const btnPlayAllPhrases = document.getElementById('btn-play-all-phrases');
 
     // Phrases CRUD & Import Elements
     const btnOpenPhraseModal = document.getElementById('btn-open-phrase-modal');
@@ -1479,8 +1583,8 @@ import {
     // SEQUENTIAL AUDIO WALKTHROUGH (PUTAR URUT OTOMATIS)
     // ========================================================
     let isPlayingAll = false;
-    let playAllTimeout = null;
-    let currentPlayCellEl = null;
+    let playAllTimeout: any = null;
+    let currentPlayCellEl: HTMLElement | null = null;
 
     function stopPlayAll() {
       if (!isPlayingAll && !currentPlayCellEl) return;
@@ -1500,7 +1604,7 @@ import {
     }
 
     function startPlayAll() {
-      const allCells = gridWrapper ? gridWrapper.querySelectorAll('td[data-char]') : [];
+      const allCells = gridWrapper ? gridWrapper.querySelectorAll<HTMLElement>('td[data-char]') : [];
       if (!allCells.length) {
         showToast('Tabel ini tidak memiliki karakter untuk diputar.');
         return;
@@ -1525,7 +1629,7 @@ import {
           currentPlayCellEl.classList.remove('ring-4', 'ring-cta', 'bg-cta/25', 'scale-105', 'z-20');
         }
 
-        const cellEl = allCells[idx];
+        const cellEl = allCells[idx] as HTMLElement;
         currentPlayCellEl = cellEl;
         cellEl.classList.add('ring-4', 'ring-cta', 'bg-cta/25', 'scale-105', 'z-20');
         cellEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -1601,6 +1705,7 @@ import {
     // Mode Switchers
     function switchViewMode(mode: 'table' | 'flashcard' | 'phrases') {
       stopPlayAll();
+      if (typeof stopPlayAllPhrases === 'function') stopPlayAllPhrases();
       currentViewMode = mode;
       
       const setBtnState = (btn: HTMLElement | null, isActive: boolean) => {
@@ -1766,6 +1871,37 @@ import {
       updateFlashcardCard();
     });
 
+    // Keyboard shortcuts untuk Mode Flashcard (Spasi, Panah, A, M, R)
+    window.addEventListener('keydown', (e) => {
+      if (currentViewMode !== 'flashcard') return;
+      if (fcCardSubview?.classList.contains('hidden')) return;
+
+      const activeTag = document.activeElement?.tagName?.toLowerCase();
+      if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
+      const openDialog = document.querySelector('dialog[open]');
+      if (openDialog) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        fcFlashcard?.click();
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        btnFcNext?.click();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        btnFcPrev?.click();
+      } else if (e.code === 'KeyA') {
+        e.preventDefault();
+        btnFcSpeak?.click();
+      } else if (e.code === 'KeyM') {
+        e.preventDefault();
+        btnFcMemorized?.click();
+      } else if (e.code === 'KeyR') {
+        e.preventDefault();
+        btnFcRandom?.click();
+      }
+    });
+
     // ========================================================
     // QUIZ MODE LOGIC (AKSARA ↔ BACAAN ↔ LISTENING AUDIO)
     // ========================================================
@@ -1773,7 +1909,7 @@ import {
     let currentQuizTargetChar = '';
     let quizQuestionDirection = 'char-to-romaji';
 
-    function setQuizDirection(dir) {
+    function setQuizDirection(dir: string) {
       quizQuestionDirection = dir;
       const allDirBtns = [btnQuizDirChar, btnQuizDirRomaji, btnQuizDirAudio];
       allDirBtns.forEach(b => {
@@ -2449,49 +2585,181 @@ import {
     });
 
     // ========================================================
+    // FAVORITE PHRASES (BOOKMARK ⭐)
+    // ========================================================
+    let userFavoritePhrases = new Set<string>();
+    function loadFavoritePhrases() {
+      try {
+        const stored = localStorage.getItem('user_favorite_phrases');
+        if (stored) {
+          userFavoritePhrases = new Set(JSON.parse(stored));
+        }
+      } catch {}
+    }
+    function saveFavoritePhrases() {
+      try {
+        localStorage.setItem('user_favorite_phrases', JSON.stringify(Array.from(userFavoritePhrases)));
+      } catch {}
+    }
+    loadFavoritePhrases();
+
+    function getPhraseKey(tableId: string, nativeText: string): string {
+      return `${tableId}:::${nativeText.trim()}`;
+    }
+
+    function isPhraseFavorite(tableId: string, nativeText: string): boolean {
+      return userFavoritePhrases.has(getPhraseKey(tableId, nativeText));
+    }
+
+    function togglePhraseFavorite(tableId: string, nativeText: string): boolean {
+      const key = getPhraseKey(tableId, nativeText);
+      const isFav = userFavoritePhrases.has(key);
+      if (isFav) {
+        userFavoritePhrases.delete(key);
+      } else {
+        userFavoritePhrases.add(key);
+      }
+      saveFavoritePhrases();
+      return !isFav;
+    }
+
+    // ========================================================
+    // SEQUENTIAL AUDIO WALKTHROUGH FOR PHRASES (PUTAR OTOMATIS)
+    // ========================================================
+    let isPlayingAllPhrases = false;
+    let playAllPhrasesTimeout: any = null;
+    let currentPlayPhraseCardEl: HTMLElement | null = null;
+
+    function stopPlayAllPhrases() {
+      if (!isPlayingAllPhrases && !currentPlayPhraseCardEl) return;
+      isPlayingAllPhrases = false;
+      if (playAllPhrasesTimeout) {
+        clearTimeout(playAllPhrasesTimeout);
+        playAllPhrasesTimeout = null;
+      }
+      if (currentPlayPhraseCardEl) {
+        currentPlayPhraseCardEl.classList.remove('ring-4', 'ring-cta', 'bg-cta/20', 'scale-[1.01]', 'z-10');
+        currentPlayPhraseCardEl = null;
+      }
+      if (btnPlayAllPhrases) {
+        btnPlayAllPhrases.innerHTML = `<svg class="size-3.5 inline text-steel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg> <span>Putar Otomatis</span>`;
+        btnPlayAllPhrases.className = 'btn btn-secondary btn-s font-mono text-[12px] cursor-pointer inline-flex items-center gap-1.5';
+      }
+    }
+
+    function startPlayAllPhrases() {
+      const cards = phrasesContentWrapper ? phrasesContentWrapper.querySelectorAll('.phrase-card-item') : [];
+      if (!cards.length) {
+        showToast('Tidak ada frasa yang tampil untuk diputar.');
+        return;
+      }
+
+      // Hentikan putar tabel karakter jika sedang jalan
+      stopPlayAll();
+
+      isPlayingAllPhrases = true;
+      if (btnPlayAllPhrases) {
+        btnPlayAllPhrases.innerHTML = `<svg class="size-3.5 inline text-canvas" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg> <span>Hentikan</span>`;
+        btnPlayAllPhrases.className = 'btn btn-primary btn-s font-mono text-[12px] cursor-pointer shadow-md inline-flex items-center gap-1.5';
+      }
+
+      let idx = 0;
+      function playStep() {
+        if (!isPlayingAllPhrases) return;
+        if (idx >= cards.length) {
+          stopPlayAllPhrases();
+          showToast('✓ Selesai memutar seluruh frasa.');
+          return;
+        }
+
+        if (currentPlayPhraseCardEl) {
+          currentPlayPhraseCardEl.classList.remove('ring-4', 'ring-cta', 'bg-cta/20', 'scale-[1.01]', 'z-10');
+        }
+
+        const card = cards[idx] as HTMLElement;
+        currentPlayPhraseCardEl = card;
+        card.classList.add('ring-4', 'ring-cta', 'bg-cta/20', 'scale-[1.01]', 'z-10');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        const text = card.getAttribute('data-native') || '';
+        const lang = card.getAttribute('data-lang') || '';
+        speakText(text, lang);
+
+        if (btnPlayAllPhrases) {
+          btnPlayAllPhrases.innerHTML = `<svg class="size-3.5 inline text-canvas" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg> <span>Stop (${idx + 1}/${cards.length})</span>`;
+        }
+
+        idx++;
+        const charLen = text.length || 6;
+        const estDuration = Math.max(1400, Math.round((charLen * 130) / currentAudioRate));
+        playAllPhrasesTimeout = setTimeout(playStep, estDuration + 1100);
+      }
+
+      playStep();
+    }
+
+    btnPlayAllPhrases?.addEventListener('click', () => {
+      if (isPlayingAllPhrases) stopPlayAllPhrases();
+      else startPlayAllPhrases();
+    });
+
+    // ========================================================
     // RENDER PHRASES WITH SEARCH & CATEGORY FILTER
     // ========================================================
     let phraseSearchQuery = '';
     let selectedPhraseCategory = 'all';
 
-    function renderPhraseCategoryChips(allCategories) {
+    function renderPhraseCategoryChips(allCategories: any[]) {
       if (!phraseCategoryFilterChips) return;
-      if (!allCategories || allCategories.length <= 1) {
+      if (!allCategories || allCategories.length === 0) {
         phraseCategoryFilterChips.innerHTML = '';
         return;
       }
+
+      let totalFavsInTable = 0;
+      allCategories.forEach((cat: any) => {
+        cat.items.forEach((item: any) => {
+          if (isPhraseFavorite(currentTableId, item.native)) totalFavsInTable++;
+        });
+      });
 
       let chipsHtml = `
         <button type="button" data-cat="all" class="px-2.5 py-1 border transition-colors cursor-pointer ${selectedPhraseCategory === 'all' ? 'border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs' : 'border-rule bg-canvas text-steel hover:text-ink'}">
           Semua
         </button>
+        <button type="button" data-cat="__favorites__" class="px-2.5 py-1 border transition-colors cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap ${selectedPhraseCategory === '__favorites__' ? 'border-2 border-amber-500 bg-amber-500/15 text-ink font-bold shadow-xs' : 'border-rule bg-canvas text-steel hover:text-amber-500'}">
+          <svg class="size-3.5 inline ${totalFavsInTable > 0 ? 'text-amber-500 fill-amber-400' : 'text-smoke'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="${totalFavsInTable > 0 ? 'currentColor' : 'none'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Favorit (${totalFavsInTable})
+        </button>
       `;
 
-      allCategories.forEach((cat) => {
+      allCategories.forEach((cat: any) => {
         const isActive = selectedPhraseCategory === cat.categoryName;
         chipsHtml += `
           <button type="button" data-cat="${encodeURIComponent(cat.categoryName)}" class="px-2.5 py-1 border transition-colors cursor-pointer whitespace-nowrap ${isActive ? 'border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs' : 'border-rule bg-canvas text-steel hover:text-ink'}">
-            ${cat.categoryName}
+            ${cat.categoryName} (${cat.items.length})
           </button>
         `;
       });
 
       phraseCategoryFilterChips.innerHTML = chipsHtml;
 
-      phraseCategoryFilterChips.querySelectorAll('button').forEach(btn => {
+      phraseCategoryFilterChips.querySelectorAll('button[data-cat]').forEach(btn => {
         btn.addEventListener('click', () => {
           const cat = btn.getAttribute('data-cat');
-          selectedPhraseCategory = cat === 'all' ? 'all' : decodeURIComponent(cat || 'all');
+          selectedPhraseCategory = cat === 'all' ? 'all' : (cat === '__favorites__' ? '__favorites__' : decodeURIComponent(cat || 'all'));
+          stopPlayAllPhrases();
           renderPhrases();
         });
       });
     }
 
-    let phraseSearchDebounceTimer = null;
+    let phraseSearchDebounceTimer: any = null;
     phraseSearchInput?.addEventListener('input', (e) => {
       clearTimeout(phraseSearchDebounceTimer);
       phraseSearchDebounceTimer = setTimeout(() => {
-        phraseSearchQuery = e.target.value;
+        phraseSearchQuery = (e.target as HTMLInputElement)?.value || '';
+        stopPlayAllPhrases();
         renderPhrases();
       }, 120);
     });
@@ -2535,13 +2803,16 @@ import {
       renderPhraseCategoryChips(data.categories);
 
       const searchLower = phraseSearchQuery.trim().toLowerCase();
-      const filteredCategories = data.categories.map((cat, catIdx) => {
-        if (selectedPhraseCategory !== 'all' && cat.categoryName !== selectedPhraseCategory) {
+      const filteredCategories = data.categories.map((cat: any, catIdx: number) => {
+        if (selectedPhraseCategory !== 'all' && selectedPhraseCategory !== '__favorites__' && cat.categoryName !== selectedPhraseCategory) {
           return null;
         }
         const matchingItems = cat.items
-          .map((item, itemIdx) => ({ ...item, originalItemIdx: itemIdx }))
-          .filter((item) => {
+          .map((item: any, itemIdx: number) => ({ ...item, originalItemIdx: itemIdx }))
+          .filter((item: any) => {
+            if (selectedPhraseCategory === '__favorites__' && !isPhraseFavorite(currentTableId, item.native)) {
+              return false;
+            }
             if (!searchLower) return true;
             return (
               (item.native && item.native.toLowerCase().includes(searchLower)) ||
@@ -2560,15 +2831,19 @@ import {
       if (filteredCategories.length === 0) {
         phrasesContentWrapper.innerHTML = `
           <div class="py-12 px-4 text-center border-2 border-dashed border-rule bg-canvas text-smoke font-mono space-y-2">
-            <div class="size-10 mx-auto rounded-none bg-tint flex items-center justify-center border border-rule text-smoke">
-              <svg class="size-5 text-steel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <div class="size-10 mx-auto rounded-none ${selectedPhraseCategory === '__favorites__' ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' : 'bg-tint border-rule text-smoke'} flex items-center justify-center border">
+              ${selectedPhraseCategory === '__favorites__' ? `
+                <svg class="size-5 fill-amber-400 text-amber-500" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              ` : `
+                <svg class="size-5 text-steel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              `}
             </div>
-            <div class="text-sm font-bold text-ink">Tidak ada frasa yang cocok</div>
-            <p class="text-xs text-steel font-sans">
-              Tidak ditemukan frasa untuk pencarian "<b>${phraseSearchQuery}</b>"${selectedPhraseCategory !== 'all' ? ` pada kategori <b>${selectedPhraseCategory}</b>` : ''}.
+            <div class="text-sm font-bold text-ink">${selectedPhraseCategory === '__favorites__' ? 'Belum Ada Frasa Favorit' : 'Tidak ada frasa yang cocok'}</div>
+            <p class="text-xs text-steel font-sans max-w-sm mx-auto">
+              ${selectedPhraseCategory === '__favorites__' ? 'Tandai frasa yang ingin Anda pelajari lebih sering dengan mengklik ikon bintang (⭐) pada kartu frasa.' : `Tidak ditemukan frasa untuk pencarian "<b>${phraseSearchQuery}</b>"${selectedPhraseCategory !== 'all' ? ` pada kategori <b>${selectedPhraseCategory}</b>` : ''}.`}
             </p>
             <button type="button" id="btn-clear-phrase-search" class="mt-2 btn btn-secondary btn-s font-mono text-xs cursor-pointer">
-              Bersihkan Filter
+              ${selectedPhraseCategory === '__favorites__' ? 'Tampilkan Semua Frasa' : 'Bersihkan Filter'}
             </button>
           </div>
         `;
@@ -2582,7 +2857,7 @@ import {
       }
 
       let html = '';
-      filteredCategories.forEach((cat) => {
+      filteredCategories.forEach((cat: any) => {
         const catIdx = cat.originalCatIdx;
         html += `
           <div class="p-4 sm:p-5 border border-rule bg-canvas space-y-3 shadow-xs">
@@ -2619,6 +2894,7 @@ import {
         `;
 
         cat.items.forEach((item: any, itemIdx: number) => {
+          const isFav = isPhraseFavorite(currentTableId, item.native);
           html += `
             <div 
               class="phrase-card-item p-3 border border-rule bg-smoke/5 hover:border-ink hover:bg-smoke/10 cursor-pointer active:scale-[0.99] transition-all flex items-center justify-between gap-3 font-mono relative select-none ${isPhraseEditModeActive ? 'ring-1 ring-badge/40' : ''}"
@@ -2632,7 +2908,25 @@ import {
                 <div class="text-[11px] text-smoke italic font-sans mt-0.5">${item.meaning}</div>
               </div>
 
-              <div class="flex items-center gap-1 shrink-0">
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button 
+                  type="button" 
+                  class="btn-fav-phrase p-1.5 border border-rule hover:border-amber-400 bg-canvas text-xs cursor-pointer inline-flex items-center justify-center transition-colors ${isFav ? 'text-amber-500 border-amber-400/60 bg-amber-500/10' : 'text-smoke hover:text-amber-500'}"
+                  data-native="${item.native}"
+                  title="${isFav ? 'Hapus dari daftar favorit' : 'Tandai sebagai frasa favorit'}"
+                >
+                  <svg class="size-3.5 inline ${isFav ? 'fill-amber-400 text-amber-500' : 'text-smoke hover:text-amber-500'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="${isFav ? 'currentColor' : 'none'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn-mic-phrase p-1.5 border border-rule hover:border-cta bg-canvas text-xs cursor-pointer inline-flex items-center justify-center transition-colors text-steel hover:text-cta"
+                  data-native="${item.native}"
+                  data-translit="${item.transliteration || ''}"
+                  data-lang="${data.voiceLang || currentTable?.voiceLang || 'en-US'}"
+                  title="Tes pelafalan suara Anda untuk frasa ini"
+                >
+                  <svg class="size-3.5 inline text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                </button>
                 ${isPhraseEditModeActive ? `
                   <button 
                     type="button" 
@@ -2680,8 +2974,8 @@ import {
       phrasesContentWrapper.querySelectorAll('.phrase-card-item').forEach(card => {
         card.addEventListener('click', (e) => {
           const target = e.target as HTMLElement;
-          // Abaikan jika yang diklik adalah tombol edit atau hapus
-          if (target.closest('.btn-edit-phrase') || target.closest('.btn-delete-phrase')) {
+          // Abaikan jika yang diklik adalah tombol edit, hapus, bintang favorit, atau mic
+          if (target.closest('.btn-edit-phrase') || target.closest('.btn-delete-phrase') || target.closest('.btn-fav-phrase') || target.closest('.btn-mic-phrase')) {
             return;
           }
           const text = card.getAttribute('data-native') || '';
@@ -2693,6 +2987,28 @@ import {
           setTimeout(() => {
             card.classList.remove('ring-2', 'ring-cta', 'bg-cta/10');
           }, 350);
+        });
+      });
+
+      // Toggle Bookmark Favorit
+      phrasesContentWrapper.querySelectorAll('.btn-fav-phrase').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const native = btn.getAttribute('data-native') || '';
+          const isNowFav = togglePhraseFavorite(currentTableId, native);
+          showToast(isNowFav ? `⭐ Frasa "${native}" ditambahkan ke favorit!` : `Dihapus dari favorit.`);
+          renderPhrases();
+        });
+      });
+
+      // Uji Pelafalan Mikrofon
+      phrasesContentWrapper.querySelectorAll('.btn-mic-phrase').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const native = btn.getAttribute('data-native') || '';
+          const translit = btn.getAttribute('data-translit') || '';
+          const lang = btn.getAttribute('data-lang') || '';
+          testPhrasePronunciation(native, translit, lang, btn as HTMLElement);
         });
       });
 
@@ -2783,6 +3099,397 @@ import {
         });
       }
     }
+
+    // Ekspor Frasa ke File Excel (.xlsx)
+    document.getElementById('btn-export-phrases-excel')?.addEventListener('click', () => {
+      const data = getActivePhrasesData(currentTableId);
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+      const langName = currentTable?.name || 'Bahasa';
+
+      if (!data || !data.categories || data.categories.length === 0) {
+        showToast('Tidak ada data frasa untuk diekspor.');
+        return;
+      }
+
+      if (!(window as any).XLSX) {
+        showToast('Pustaka Excel belum siap. Coba muat ulang halaman.');
+        return;
+      }
+
+      const rows: any[][] = [
+        ['Kategori', 'Aksara / Teks Asli', 'Transliterasi / Cara Baca', 'Arti Bahasa Indonesia']
+      ];
+
+      data.categories.forEach((cat: any) => {
+        cat.items.forEach((item: any) => {
+          rows.push([
+            cat.categoryName,
+            item.native || '',
+            item.transliteration || '',
+            item.meaning || ''
+          ]);
+        });
+      });
+
+      const ws = (window as any).XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = [
+        { wch: 22 },
+        { wch: 28 },
+        { wch: 28 },
+        { wch: 35 }
+      ];
+
+      const wb = (window as any).XLSX.utils.book_new();
+      (window as any).XLSX.utils.book_append_sheet(wb, ws, 'Frasa');
+
+      const cleanFileName = `Frasa_${langName.replace(/[^a-zA-Z0-9_-]/g, '_')}.xlsx`;
+      (window as any).XLSX.writeFile(wb, cleanFileName);
+      showToast(`✓ File "${cleanFileName}" berhasil diunduh!`);
+    });
+
+    // Cetak Lembar Frasa ke Printer / PDF
+    document.getElementById('btn-print-phrases')?.addEventListener('click', () => {
+      window.print();
+    });
+
+    // ========================================================
+    // VOICE RECOGNITION PRONUNCIATION CHECKER (TES LAFAL MIC)
+    // ========================================================
+    let activeRecognition: any = null;
+    let activeMicBtn: HTMLElement | null = null;
+
+    function stopActiveMic() {
+      if (activeRecognition) {
+        try { activeRecognition.stop(); } catch {}
+        activeRecognition = null;
+      }
+      if (activeMicBtn) {
+        activeMicBtn.classList.remove('border-red-500', 'text-red-500', 'bg-red-500/15', 'animate-pulse');
+        activeMicBtn = null;
+      }
+    }
+
+    function testPhrasePronunciation(targetNative: string, targetTranslit: string, langCode: string, btnEl: HTMLElement) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast('⚠️ Fitur mic butuh browser Chrome atau Edge di desktop/Android.');
+        return;
+      }
+
+      if (activeMicBtn === btnEl && activeRecognition) {
+        stopActiveMic();
+        showToast('Perekaman suara dihentikan.');
+        return;
+      }
+
+      stopActiveMic();
+      activeMicBtn = btnEl;
+      btnEl.classList.add('border-red-500', 'text-red-500', 'bg-red-500/15', 'animate-pulse');
+
+      const card = btnEl.closest('.phrase-card-item');
+
+      try {
+        const recognition = new SpeechRecognition();
+        activeRecognition = recognition;
+        recognition.lang = langCode || 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 3;
+
+        showToast(`🎙️ Mendengarkan... Silakan ucapkan: "${targetTranslit || targetNative}"`);
+
+        recognition.onresult = (evt: any) => {
+          stopActiveMic();
+          const results = evt.results?.[0];
+          if (!results || results.length === 0) {
+            showToast('Suara tidak terdengar jelas. Silakan coba lagi.');
+            return;
+          }
+
+          const heardWords: string[] = [];
+          for (let i = 0; i < results.length; i++) {
+            heardWords.push(results[i].transcript.toLowerCase().trim());
+          }
+          const primaryHeard = heardWords[0] || '';
+
+          const clean = (s: string) => s.toLowerCase().replace(/[\s.,/#!$%^&*;:{}=\-_`~()?'"！？、。]/g, '');
+          const cleanNative = clean(targetNative);
+          const cleanTranslit = clean(targetTranslit);
+
+          let bestMatch = 0;
+          for (const heard of heardWords) {
+            const cleanHeard = clean(heard);
+            if (cleanHeard === cleanNative || cleanHeard === cleanTranslit) {
+              bestMatch = 100;
+              break;
+            }
+            if (cleanNative && (cleanHeard.includes(cleanNative) || cleanNative.includes(cleanHeard))) {
+              bestMatch = Math.max(bestMatch, 85);
+            }
+            if (cleanTranslit && (cleanHeard.includes(cleanTranslit) || cleanTranslit.includes(cleanHeard))) {
+              bestMatch = Math.max(bestMatch, 85);
+            }
+            let commonChars = 0;
+            const targetRef = cleanTranslit || cleanNative;
+            for (const ch of cleanHeard) {
+              if (targetRef.includes(ch)) commonChars++;
+            }
+            const ratio = Math.round((commonChars / Math.max(targetRef.length, cleanHeard.length, 1)) * 100);
+            bestMatch = Math.max(bestMatch, ratio);
+          }
+
+          if (bestMatch >= 75) {
+            showToast(`🎉 Luar biasa! Pelafalan cocok (${bestMatch}%): "${primaryHeard}"`);
+            if (card) {
+              card.classList.add('ring-2', 'ring-ok', 'bg-ok/10');
+              setTimeout(() => card.classList.remove('ring-2', 'ring-ok', 'bg-ok/10'), 1500);
+            }
+          } else if (bestMatch >= 40) {
+            showToast(`👍 Cukup baik (${bestMatch}%). Terdengar: "${primaryHeard}". Coba ucapkan lebih jelas!`);
+            if (card) {
+              card.classList.add('ring-2', 'ring-amber-500', 'bg-amber-500/10');
+              setTimeout(() => card.classList.remove('ring-2', 'ring-amber-500', 'bg-amber-500/10'), 1500);
+            }
+          } else {
+            showToast(`🗣️ Terdengar: "${primaryHeard}" (${bestMatch}%). Dengarkan audio lalu ulangi ya!`);
+          }
+        };
+
+        recognition.onerror = (err: any) => {
+          stopActiveMic();
+          if (err.error === 'not-allowed') {
+            showToast('⚠️ Izin mic ditolak. Izinkan mikrofon di browser Anda.');
+          } else if (err.error === 'no-speech') {
+            showToast('Tidak ada suara terdeteksi. Silakan coba lagi.');
+          } else {
+            showToast('Gagal memproses suara. Coba lagi beberapa saat lagi.');
+          }
+        };
+
+        recognition.onend = () => {
+          stopActiveMic();
+        };
+
+        recognition.start();
+      } catch (err) {
+        stopActiveMic();
+        showToast('Tidak dapat memulai mic. Pastikan perangkat memiliki mic aktif.');
+      }
+    }
+
+    // ========================================================
+    // PHRASE QUIZ LOGIC (KUIS TEBAK ARTI FRASA SEHARI-HARI)
+    // ========================================================
+    const phraseQuizModal = document.getElementById('phrase-quiz-modal') as HTMLDialogElement | null;
+    const phraseQuizLangTitle = document.getElementById('phrase-quiz-lang-title');
+    const phraseQuizCounter = document.getElementById('phrase-quiz-counter');
+    const phraseQuizScoreBadge = document.getElementById('phrase-quiz-score-badge');
+    const phraseQuizNativePrompt = document.getElementById('phrase-quiz-native-prompt');
+    const phraseQuizTranslitPrompt = document.getElementById('phrase-quiz-translit-prompt');
+    const phraseQuizOptionsGrid = document.getElementById('phrase-quiz-options-grid');
+    const phraseQuizFeedback = document.getElementById('phrase-quiz-feedback');
+    const phraseQuizBtnNext = document.getElementById('phrase-quiz-btn-next');
+    const phraseQuizBtnClose = document.getElementById('phrase-quiz-btn-close');
+    const btnPhraseQuizReplayAudio = document.getElementById('btn-phrase-quiz-replay-audio');
+
+    let phraseQuizQuestions: { native: string; transliteration: string; meaning: string; voiceLang: string }[] = [];
+    let phraseQuizIndex = 0;
+    let phraseQuizCorrectCount = 0;
+    let phraseQuizWrongCount = 0;
+    let phraseQuizAnswered = false;
+    let phraseQuizCurrentItem: any = null;
+
+    function openPhraseQuiz() {
+      const data = getActivePhrasesData(currentTableId);
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+
+      if (!data || !data.categories || data.categories.length === 0) {
+        showToast('Bahasa ini belum memiliki frasa untuk dimainkan kuis.');
+        return;
+      }
+
+      const allItems: any[] = [];
+      data.categories.forEach((c: any) => {
+        c.items.forEach((it: any) => {
+          if (it.native && it.meaning) {
+            allItems.push({
+              native: it.native,
+              transliteration: it.transliteration || '',
+              meaning: it.meaning,
+              voiceLang: data.voiceLang || currentTable?.voiceLang || 'en-US'
+            });
+          }
+        });
+      });
+
+      if (allItems.length < 2) {
+        showToast('Minimal butuh 2 frasa untuk memulai kuis. Tambah frasa terlebih dahulu!');
+        return;
+      }
+
+      phraseQuizQuestions = [...allItems].sort(() => Math.random() - 0.5).slice(0, 10);
+      phraseQuizIndex = 0;
+      phraseQuizCorrectCount = 0;
+      phraseQuizWrongCount = 0;
+
+      if (phraseQuizLangTitle) {
+        phraseQuizLangTitle.textContent = `KUIS FRASA: ${currentTable?.name || 'BAHASA'}`;
+      }
+
+      phraseQuizModal?.showModal();
+      renderPhraseQuizQuestion();
+    }
+
+    function renderPhraseQuizQuestion() {
+      if (!phraseQuizQuestions.length || phraseQuizIndex >= phraseQuizQuestions.length) {
+        renderPhraseQuizSummary();
+        return;
+      }
+
+      phraseQuizAnswered = false;
+      phraseQuizCurrentItem = phraseQuizQuestions[phraseQuizIndex];
+
+      if (phraseQuizCounter) {
+        phraseQuizCounter.textContent = `Soal ${phraseQuizIndex + 1} dari ${phraseQuizQuestions.length}`;
+      }
+      if (phraseQuizScoreBadge) {
+        phraseQuizScoreBadge.textContent = `Skor: ${phraseQuizCorrectCount} Benar • ${phraseQuizWrongCount} Salah`;
+      }
+      if (phraseQuizNativePrompt) {
+        phraseQuizNativePrompt.textContent = phraseQuizCurrentItem.native;
+      }
+      if (phraseQuizTranslitPrompt) {
+        phraseQuizTranslitPrompt.textContent = phraseQuizCurrentItem.transliteration || '';
+      }
+      if (phraseQuizFeedback) {
+        phraseQuizFeedback.textContent = 'Pilih arti yang tepat:';
+        phraseQuizFeedback.className = 'font-bold text-[12px] text-smoke';
+      }
+      if (phraseQuizBtnNext) {
+        phraseQuizBtnNext.textContent = 'Lewati Soal →';
+      }
+
+      speakText(phraseQuizCurrentItem.native, phraseQuizCurrentItem.voiceLang);
+
+      const data = getActivePhrasesData(currentTableId);
+      const allMeanings: string[] = [];
+      data.categories.forEach((c: any) => {
+        c.items.forEach((it: any) => {
+          if (it.meaning && it.meaning !== phraseQuizCurrentItem.meaning && !allMeanings.includes(it.meaning)) {
+            allMeanings.push(it.meaning);
+          }
+        });
+      });
+
+      const distractors = allMeanings.sort(() => Math.random() - 0.5).slice(0, 3);
+      const options = [phraseQuizCurrentItem.meaning, ...distractors].sort(() => Math.random() - 0.5);
+
+      if (phraseQuizOptionsGrid) {
+        phraseQuizOptionsGrid.innerHTML = '';
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'p-3 text-left font-mono text-[13px] border border-rule bg-canvas text-ink hover:border-ink hover:bg-tint/40 transition-all cursor-pointer flex items-center justify-between gap-2 shadow-xs';
+          btn.innerHTML = `<span class="truncate flex-1">${opt}</span><span class="text-smoke text-[11px] shrink-0">[Pilih]</span>`;
+
+          btn.addEventListener('click', () => handlePhraseQuizAnswer(opt, btn));
+          phraseQuizOptionsGrid.appendChild(btn);
+        });
+      }
+    }
+
+    function handlePhraseQuizAnswer(selectedMeaning: string, selectedBtn: HTMLElement) {
+      if (phraseQuizAnswered) return;
+      phraseQuizAnswered = true;
+
+      const isCorrect = selectedMeaning === phraseQuizCurrentItem.meaning;
+      const allBtns = phraseQuizOptionsGrid ? phraseQuizOptionsGrid.querySelectorAll('button') : [];
+
+      allBtns.forEach((b: HTMLButtonElement) => {
+        b.disabled = true;
+        b.classList.remove('hover:border-ink', 'hover:bg-tint/40', 'cursor-pointer');
+        if (b.textContent?.includes(phraseQuizCurrentItem.meaning)) {
+          b.className = 'p-3 text-left font-mono text-[13px] border-2 border-ok bg-ok/15 text-ok font-bold flex items-center justify-between gap-2 shadow-xs';
+          b.innerHTML = `<span class="truncate flex-1">${phraseQuizCurrentItem.meaning}</span><span class="text-ok font-bold shrink-0">✓ Benar</span>`;
+        }
+      });
+
+      if (isCorrect) {
+        phraseQuizCorrectCount++;
+        if (phraseQuizFeedback) {
+          phraseQuizFeedback.textContent = '🎉 Tepat sekali! Jawaban Anda benar!';
+          phraseQuizFeedback.className = 'font-bold text-[12px] text-ok';
+        }
+      } else {
+        phraseQuizWrongCount++;
+        selectedBtn.className = 'p-3 text-left font-mono text-[13px] border-2 border-red-500 bg-red-500/15 text-red-500 font-bold flex items-center justify-between gap-2 shadow-xs';
+        selectedBtn.innerHTML = `<span class="truncate flex-1">${selectedMeaning}</span><span class="text-red-500 font-bold shrink-0">✕ Salah</span>`;
+        if (phraseQuizFeedback) {
+          phraseQuizFeedback.textContent = `Jawaban benar: "${phraseQuizCurrentItem.meaning}"`;
+          phraseQuizFeedback.className = 'font-bold text-[12px] text-red-500';
+        }
+      }
+
+      if (phraseQuizScoreBadge) {
+        phraseQuizScoreBadge.textContent = `Skor: ${phraseQuizCorrectCount} Benar • ${phraseQuizWrongCount} Salah`;
+      }
+      if (phraseQuizBtnNext) {
+        phraseQuizBtnNext.textContent = 'Soal Selanjutnya →';
+      }
+
+      setTimeout(() => {
+        if (phraseQuizAnswered && phraseQuizModal?.open) {
+          phraseQuizIndex++;
+          renderPhraseQuizQuestion();
+        }
+      }, 1400);
+    }
+
+    function renderPhraseQuizSummary() {
+      const total = phraseQuizQuestions.length;
+      const percent = total > 0 ? Math.round((phraseQuizCorrectCount / total) * 100) : 0;
+
+      if (phraseQuizCounter) phraseQuizCounter.textContent = 'Kuis Selesai!';
+      if (phraseQuizNativePrompt) phraseQuizNativePrompt.textContent = `${percent}%`;
+      if (phraseQuizTranslitPrompt) phraseQuizTranslitPrompt.textContent = `${phraseQuizCorrectCount} dari ${total} soal terjawab benar`;
+      if (phraseQuizFeedback) {
+        phraseQuizFeedback.textContent = percent >= 80 ? '🏆 Hebat sekali! Anda sudah menguasai frasa-frasa ini!' : 'Terus berlatih untuk meningkatkan hafalan Anda!';
+        phraseQuizFeedback.className = 'font-bold text-[12px] text-ink';
+      }
+
+      if (phraseQuizOptionsGrid) {
+        phraseQuizOptionsGrid.innerHTML = `
+          <div class="col-span-full py-4 text-center">
+            <button type="button" id="btn-replay-phrase-quiz" class="btn btn-primary btn-s font-mono text-xs cursor-pointer inline-flex items-center gap-1.5 mx-auto">
+              <svg class="size-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Main Lagi
+            </button>
+          </div>
+        `;
+        document.getElementById('btn-replay-phrase-quiz')?.addEventListener('click', openPhraseQuiz);
+      }
+
+      if (phraseQuizBtnNext) {
+        phraseQuizBtnNext.textContent = 'Tutup Kuis';
+      }
+    }
+
+    phraseQuizBtnNext?.addEventListener('click', () => {
+      if (phraseQuizIndex >= phraseQuizQuestions.length) {
+        phraseQuizModal?.close();
+      } else {
+        phraseQuizIndex++;
+        renderPhraseQuizQuestion();
+      }
+    });
+
+    phraseQuizBtnClose?.addEventListener('click', () => phraseQuizModal?.close());
+    btnPhraseQuizReplayAudio?.addEventListener('click', () => {
+      if (phraseQuizCurrentItem) {
+        speakText(phraseQuizCurrentItem.native, phraseQuizCurrentItem.voiceLang);
+      }
+    });
+    document.getElementById('btn-open-phrase-quiz')?.addEventListener('click', openPhraseQuiz);
 
     function parseTextToGrid(text: string) {
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
@@ -3389,6 +4096,8 @@ import {
         btn.title = t.name;
         
         btn.addEventListener('click', () => {
+          stopPlayAll();
+          stopPlayAllPhrases();
           isUnaddedState = false;
           currentTableId = t.id;
           tableSearchQuery = '';
@@ -4066,10 +4775,21 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
     #study-progress-box, 
     #action-toolbar, 
     #table-edit-toolbar, 
+    #phrase-edit-toolbar,
     .btn, 
     #tab-bar, 
     #buat-tabel, 
-    :global(#toast) {
+    :global(#toast),
+    .btn-fav-phrase,
+    .btn-mic-phrase,
+    .btn-speak-phrase,
+    .btn-edit-phrase,
+    .btn-delete-phrase,
+    .btn-cat-add,
+    .btn-cat-delete,
+    #phrase-category-filter-chips,
+    #phrase-quiz-modal,
+    #phrase-search-input {
       display: none !important;
     }
     :global(body), :global(html) {
@@ -4101,6 +4821,12 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
       color: #000 !important;
       background: transparent !important;
       padding: 8px 10px !important;
+    }
+    .phrase-card-item {
+      border: 1px solid #333 !important;
+      background: transparent !important;
+      page-break-inside: avoid;
+      box-shadow: none !important;
     }
   }
 </style>
