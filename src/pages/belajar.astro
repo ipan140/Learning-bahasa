@@ -28,7 +28,8 @@ import {
   X,
   Lightbulb,
   AlertCircle,
-  Upload
+  Upload,
+  Headphones
 } from 'lucide-astro';
 ---
 
@@ -257,10 +258,13 @@ import {
             </div>
             <div class="flex items-center gap-2 flex-wrap shrink-0">
               <button type="button" id="btn-auto-dedup" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer inline-flex items-center gap-1" title="Cari huruf yang kembar/dobel di tabel ini dan hapus otomatis">
-                <Sparkles class="size-3.5 inline text-steel" /> Hapus Huruf Dobel Otomatis
+                <Sparkles class="size-3.5 inline text-steel" /> Hapus Dobel
               </button>
-              <button type="button" id="btn-add-char-table" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer inline-flex items-center gap-1">
-                <Plus class="size-3.5 inline text-steel" /> Tambah Huruf
+              <button type="button" id="btn-add-char-table" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer inline-flex items-center gap-1" title="Tambah 1 huruf baru">
+                <Plus class="size-3.5 inline text-steel" /> + 1 Huruf
+              </button>
+              <button type="button" id="btn-import-batch-table" class="px-2.5 py-1 text-xs border border-rule bg-canvas hover:border-ink font-bold text-ink cursor-pointer inline-flex items-center gap-1" title="Impor banyak huruf dari Excel atau tempel teks">
+                <FileSpreadsheet class="size-3.5 inline text-cta" /> 📥 Impor Banyak
               </button>
               <button type="button" id="btn-finish-edit-mode" class="px-3 py-1 text-xs border border-ink bg-ink text-canvas font-bold cursor-pointer inline-flex items-center gap-1">
                 <Check class="size-3.5 inline" /> Selesai Edit
@@ -376,20 +380,28 @@ import {
           <div id="fc-quiz-subview" class="hidden max-w-md mx-auto flex flex-col items-center">
             <!-- Mode Arah Kuis & Skor -->
             <div class="w-full flex items-center justify-between gap-2 text-xs font-mono mb-3 flex-wrap">
-              <div class="flex items-center gap-1">
+              <div class="flex items-center gap-1 flex-wrap">
                 <button type="button" id="btn-quiz-dir-char" class="px-2.5 py-1 text-[11px] border-2 border-cta bg-cta/10 text-ink font-bold shadow-xs cursor-pointer">
                   Aksara → Bacaan
                 </button>
                 <button type="button" id="btn-quiz-dir-romaji" class="px-2.5 py-1 text-[11px] border border-rule bg-canvas text-steel hover:text-ink cursor-pointer">
                   Bacaan → Aksara
                 </button>
+                <button type="button" id="btn-quiz-dir-audio" class="px-2.5 py-1 text-[11px] border border-rule bg-canvas text-steel hover:text-ink cursor-pointer inline-flex items-center gap-1" title="Kuis Listening: Dengar suara audio dan tebak aksara yang tepat">
+                  <Headphones class="size-3 text-cta" /> 🎧 Dengar Audio → Tebak
+                </button>
               </div>
               <span id="quiz-score-badge" class="text-ink font-bold shrink-0">Skor: 0</span>
             </div>
 
-            <div class="w-full p-8 border-2 border-ink bg-canvas flex flex-col items-center justify-center text-center shadow-md">
+            <div class="w-full p-6 sm:p-8 border-2 border-ink bg-canvas flex flex-col items-center justify-center text-center shadow-md">
               <span id="quiz-question-prompt" class="text-xs text-smoke font-mono mb-2 uppercase tracking-wider">Bagaimana cara membaca aksara ini?</span>
               <span id="quiz-question-char" class="text-[72px] font-bold text-ink leading-none">あ</span>
+              <!-- Listening Replay Audio Button -->
+              <button type="button" id="btn-quiz-replay-audio" class="hidden mt-3 px-4 py-2.5 border-2 border-cta bg-cta/10 hover:bg-cta/20 text-ink font-mono text-xs font-bold items-center gap-2 cursor-pointer shadow-xs transition-colors">
+                <Volume2 class="size-4 text-cta" />
+                <span>🔊 Klik untuk Dengar Ulang Suara</span>
+              </button>
             </div>
 
             <div id="quiz-feedback" class="h-6 mt-3 text-xs font-mono font-bold text-center"></div>
@@ -697,12 +709,24 @@ import {
   <!-- ========================================== -->
   <!-- SINGLE CHARACTER / AKSARA EDIT MODAL       -->
   <!-- ========================================== -->
-  <dialog id="char-edit-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-sm shadow-2xl max-h-[90dvh] overflow-y-auto">
+  <dialog id="char-edit-modal" class="m-auto backdrop:bg-black/60 p-0 bg-canvas text-ink border-2 border-ink w-[92vw] max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto">
     <div class="p-5 sm:p-6">
-      <div class="flex items-center justify-between border-b border-rule pb-3 mb-4">
+      <div class="flex items-center justify-between border-b border-rule pb-3 mb-3">
         <h4 id="char-modal-title" class="text-base font-bold text-ink flex items-center gap-1.5"><Edit3 class="size-4 inline text-ink" /> Edit Karakter</h4>
         <button type="button" id="close-char-modal-btn" class="text-smoke hover:text-ink font-mono text-sm cursor-pointer p-1" aria-label="Tutup"><X class="size-4" /></button>
       </div>
+
+      <!-- Mode Switcher Tabs (hanya tampil saat nambah huruf baru) -->
+      <div id="char-modal-tabs" class="flex border-b border-rule mb-4 font-mono text-xs">
+        <button type="button" id="tab-char-single" class="px-3.5 py-2 border-b-2 border-ink text-ink font-bold cursor-pointer inline-flex items-center gap-1.5">
+          <Plus class="size-3.5 text-steel" /> 1 Huruf Satuan
+        </button>
+        <button type="button" id="tab-char-batch" class="px-3.5 py-2 border-b-2 border-transparent text-smoke hover:text-ink cursor-pointer inline-flex items-center gap-1.5">
+          <FileSpreadsheet class="size-3.5 text-cta" /> Impor Banyak (Excel / Teks)
+        </button>
+      </div>
+
+      <!-- TAB 1: FORM 1 HURUF SATUAN -->
       <form id="char-edit-form" class="space-y-4">
         <input type="hidden" id="char-edit-row" value="" />
         <input type="hidden" id="char-edit-col" value="" />
@@ -739,6 +763,53 @@ import {
           </div>
         </div>
       </form>
+
+      <!-- TAB 2: FORM IMPOR MASSAL (EXCEL / TEXTAREA) -->
+      <div id="char-batch-pane" class="hidden space-y-4">
+        <!-- Unggah Excel -->
+        <div class="p-3 border border-dashed border-rule bg-tint/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <FileSpreadsheet class="size-5 text-cta shrink-0" />
+            <div>
+              <p class="text-xs font-bold text-ink">Unggah Spreadsheet Excel / CSV</p>
+              <p class="text-[11px] text-smoke font-mono">Format kolom: Romaji / Cara Baca, Aksara</p>
+            </div>
+          </div>
+          <label class="btn btn-secondary btn-s font-mono text-xs cursor-pointer shrink-0 inline-flex items-center gap-1.5">
+            <Upload class="size-3.5" /> Pilih File
+            <input type="file" id="char-batch-file-input" accept=".xlsx,.xls,.csv" class="hidden" />
+          </label>
+        </div>
+
+        <!-- Tempel Teks -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-mono text-steel">Atau Tempel Baris Teks:</label>
+            <span id="char-batch-count-badge" class="text-[11px] font-mono text-ok font-bold">0 huruf terdeteksi</span>
+          </div>
+          <textarea 
+            id="char-batch-textarea" 
+            rows="5" 
+            placeholder="Contoh format per baris:&#10;A = あ&#10;I = い&#10;U = う&#10;E = え&#10;O = お&#10;&#10;Atau dengan pemisah pipe: Ka = か | Ki = き | Ku = く"
+            class="w-full px-3 py-2 text-xs bg-tint border border-rule text-ink outline-none focus:border-ink font-mono resize-y"
+          ></textarea>
+        </div>
+
+        <!-- Checkbox Anti Duplikat -->
+        <div class="flex items-center gap-2 text-xs font-mono text-steel">
+          <input type="checkbox" id="char-batch-dedup-check" checked class="accent-cta cursor-pointer size-4" />
+          <label for="char-batch-dedup-check" class="cursor-pointer select-none">Lewati jika huruf sudah ada di tabel ini (cegah duplikat)</label>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 pt-3 border-t border-rule">
+          <button type="button" id="btn-char-batch-cancel" class="px-3 py-1.5 text-xs font-mono border border-rule text-smoke hover:text-ink cursor-pointer">
+            Batal
+          </button>
+          <button type="button" id="btn-submit-char-batch" class="px-4 py-1.5 text-xs font-mono border border-ink bg-ink text-canvas font-bold cursor-pointer inline-flex items-center gap-1.5">
+            <Check class="size-3.5 inline" /> Tambahkan ke Tabel Ini
+          </button>
+        </div>
+      </div>
     </div>
   </dialog>
   <!-- ========================================== -->
@@ -1095,7 +1166,18 @@ import {
     const deleteTableBtn = document.getElementById('delete-table-btn');
 
     // Character Modal Elements
+    const btnImportBatchTable = document.getElementById('btn-import-batch-table');
     const charEditModal = document.getElementById('char-edit-modal') as HTMLDialogElement | null;
+    const charModalTabs = document.getElementById('char-modal-tabs');
+    const tabCharSingle = document.getElementById('tab-char-single');
+    const tabCharBatch = document.getElementById('tab-char-batch');
+    const charBatchPane = document.getElementById('char-batch-pane');
+    const charBatchFileInput = document.getElementById('char-batch-file-input') as HTMLInputElement | null;
+    const charBatchTextarea = document.getElementById('char-batch-textarea') as HTMLTextAreaElement | null;
+    const charBatchCountBadge = document.getElementById('char-batch-count-badge');
+    const charBatchDedupCheck = document.getElementById('char-batch-dedup-check') as HTMLInputElement | null;
+    const btnSubmitCharBatch = document.getElementById('btn-submit-char-batch');
+    const btnCharBatchCancel = document.getElementById('btn-char-batch-cancel');
     const charEditForm = document.getElementById('char-edit-form') as HTMLFormElement | null;
     const charEditRow = document.getElementById('char-edit-row') as HTMLInputElement | null;
     const charEditCol = document.getElementById('char-edit-col') as HTMLInputElement | null;
@@ -1153,6 +1235,8 @@ import {
     const btnQuizNextQuestion = document.getElementById('btn-quiz-next-question');
     const btnQuizDirChar = document.getElementById('btn-quiz-dir-char');
     const btnQuizDirRomaji = document.getElementById('btn-quiz-dir-romaji');
+    const btnQuizDirAudio = document.getElementById('btn-quiz-dir-audio');
+    const btnQuizReplayAudio = document.getElementById('btn-quiz-replay-audio');
     const quizQuestionPrompt = document.getElementById('quiz-question-prompt');
     const btnPlayAll = document.getElementById('btn-play-all');
 
@@ -1683,29 +1767,45 @@ import {
     });
 
     // ========================================================
-    // QUIZ MODE LOGIC (DUA ARAH: AKSARA ↔ BACAAN)
+    // QUIZ MODE LOGIC (AKSARA ↔ BACAAN ↔ LISTENING AUDIO)
     // ========================================================
     let currentQuizAnswer = '';
+    let currentQuizTargetChar = '';
     let quizQuestionDirection = 'char-to-romaji';
 
     function setQuizDirection(dir) {
       quizQuestionDirection = dir;
+      const allDirBtns = [btnQuizDirChar, btnQuizDirRomaji, btnQuizDirAudio];
+      allDirBtns.forEach(b => {
+        b?.classList.remove('border-2', 'border-cta', 'bg-cta/10', 'text-ink', 'font-bold', 'shadow-xs');
+        b?.classList.add('border', 'border-rule', 'bg-canvas', 'text-steel');
+      });
+
       if (dir === 'char-to-romaji') {
-        btnQuizDirChar?.classList.remove('border-rule', 'bg-canvas', 'text-steel');
+        btnQuizDirChar?.classList.remove('border', 'border-rule', 'bg-canvas', 'text-steel');
         btnQuizDirChar?.classList.add('border-2', 'border-cta', 'bg-cta/10', 'text-ink', 'font-bold', 'shadow-xs');
-        btnQuizDirRomaji?.classList.remove('border-2', 'border-cta', 'bg-cta/10', 'font-bold', 'shadow-xs');
-        btnQuizDirRomaji?.classList.add('border', 'border-rule', 'bg-canvas', 'text-steel');
-      } else {
-        btnQuizDirRomaji?.classList.remove('border-rule', 'bg-canvas', 'text-steel');
+      } else if (dir === 'romaji-to-char') {
+        btnQuizDirRomaji?.classList.remove('border', 'border-rule', 'bg-canvas', 'text-steel');
         btnQuizDirRomaji?.classList.add('border-2', 'border-cta', 'bg-cta/10', 'text-ink', 'font-bold', 'shadow-xs');
-        btnQuizDirChar?.classList.remove('border-2', 'border-cta', 'bg-cta/10', 'font-bold', 'shadow-xs');
-        btnQuizDirChar?.classList.add('border', 'border-rule', 'bg-canvas', 'text-steel');
+      } else if (dir === 'audio-to-char') {
+        btnQuizDirAudio?.classList.remove('border', 'border-rule', 'bg-canvas', 'text-steel');
+        btnQuizDirAudio?.classList.add('border-2', 'border-cta', 'bg-cta/10', 'text-ink', 'font-bold', 'shadow-xs');
       }
+
       initQuizQuestion();
     }
 
     btnQuizDirChar?.addEventListener('click', () => setQuizDirection('char-to-romaji'));
     btnQuizDirRomaji?.addEventListener('click', () => setQuizDirection('romaji-to-char'));
+    btnQuizDirAudio?.addEventListener('click', () => setQuizDirection('audio-to-char'));
+
+    btnQuizReplayAudio?.addEventListener('click', () => {
+      const allTables = getAllTables();
+      const currentTable = allTables.find(t => t.id === currentTableId);
+      if (currentQuizTargetChar) {
+        speakText(currentQuizTargetChar, currentTable?.voiceLang);
+      }
+    });
 
     function initQuizQuestion() {
       const cells = getCurrentTableCells();
@@ -1719,9 +1819,12 @@ import {
       if (quizFeedback) quizFeedback.textContent = '';
 
       const targetCell = cells[Math.floor(Math.random() * cells.length)];
-      const isCharToRomaji = quizQuestionDirection === 'char-to-romaji';
+      currentQuizTargetChar = targetCell.char;
 
-      if (isCharToRomaji) {
+      if (quizQuestionDirection === 'char-to-romaji') {
+        btnQuizReplayAudio?.classList.add('hidden');
+        btnQuizReplayAudio?.classList.remove('inline-flex');
+
         currentQuizAnswer = targetCell.romaji || targetCell.char;
         if (quizQuestionPrompt) quizQuestionPrompt.textContent = 'Bagaimana cara membaca aksara ini?';
         if (quizQuestionChar) {
@@ -1747,13 +1850,53 @@ import {
             quizOptionsGrid.appendChild(btn);
           });
         }
-      } else {
+      } else if (quizQuestionDirection === 'romaji-to-char') {
+        btnQuizReplayAudio?.classList.add('hidden');
+        btnQuizReplayAudio?.classList.remove('inline-flex');
+
         currentQuizAnswer = targetCell.char;
         if (quizQuestionPrompt) quizQuestionPrompt.textContent = 'Manakah aksara yang berbunyi demikian?';
         if (quizQuestionChar) {
           quizQuestionChar.textContent = targetCell.romaji || targetCell.char;
           quizQuestionChar.className = 'text-[44px] sm:text-[52px] font-bold text-ink leading-none font-mono';
         }
+
+        const distractors = cells
+          .filter(c => c.char !== currentQuizAnswer)
+          .map(c => c.char);
+        
+        const shuffledDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [currentQuizAnswer, ...shuffledDistractors].sort(() => 0.5 - Math.random());
+
+        if (quizOptionsGrid) {
+          quizOptionsGrid.innerHTML = '';
+          options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'py-3.5 px-4 border-2 border-rule bg-canvas hover:border-ink font-mono font-bold text-[24px] text-ink transition-colors shadow-sm select-none cursor-pointer';
+            btn.textContent = opt;
+            btn.addEventListener('click', () => handleQuizOptionClick(btn, opt, targetCell.char));
+            quizOptionsGrid.appendChild(btn);
+          });
+        }
+      } else if (quizQuestionDirection === 'audio-to-char') {
+        currentQuizAnswer = targetCell.char;
+        if (quizQuestionPrompt) quizQuestionPrompt.textContent = '🎧 Dengarkan audio dan tebak aksara yang tepat:';
+        if (quizQuestionChar) {
+          quizQuestionChar.textContent = '🎧';
+          quizQuestionChar.className = 'text-[54px] sm:text-[64px] font-bold text-cta leading-none select-none';
+        }
+        if (btnQuizReplayAudio) {
+          btnQuizReplayAudio.classList.remove('hidden');
+          btnQuizReplayAudio.classList.add('inline-flex');
+        }
+
+        // Otomatis putar audio pengucapan aksara
+        setTimeout(() => {
+          const allTables = getAllTables();
+          const currentTable = allTables.find(t => t.id === currentTableId);
+          speakText(targetCell.char, currentTable?.voiceLang);
+        }, 180);
 
         const distractors = cells
           .filter(c => c.char !== currentQuizAnswer)
@@ -2477,7 +2620,12 @@ import {
 
         cat.items.forEach((item: any, itemIdx: number) => {
           html += `
-            <div class="p-3 border border-rule bg-smoke/5 hover:border-ink transition-colors flex items-center justify-between gap-3 font-mono relative ${isPhraseEditModeActive ? 'ring-1 ring-badge/40' : ''}">
+            <div 
+              class="phrase-card-item p-3 border border-rule bg-smoke/5 hover:border-ink hover:bg-smoke/10 cursor-pointer active:scale-[0.99] transition-all flex items-center justify-between gap-3 font-mono relative select-none ${isPhraseEditModeActive ? 'ring-1 ring-badge/40' : ''}"
+              data-native="${item.native}"
+              data-lang="${data.voiceLang || currentTable?.voiceLang || 'en-US'}"
+              title="Klik kartu untuk mendengarkan pengucapan audio"
+            >
               <div class="min-w-0 flex-1">
                 <div class="text-[16px] font-bold text-ink tracking-wide truncate">${item.native}</div>
                 <div class="text-[12px] text-steel font-medium mt-0.5">${item.transliteration || ''}</div>
@@ -2528,20 +2676,49 @@ import {
 
       phrasesContentWrapper.innerHTML = html;
 
-      // Audio buttons
+      // Click card to speak audio
+      phrasesContentWrapper.querySelectorAll('.phrase-card-item').forEach(card => {
+        card.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement;
+          // Abaikan jika yang diklik adalah tombol edit atau hapus
+          if (target.closest('.btn-edit-phrase') || target.closest('.btn-delete-phrase')) {
+            return;
+          }
+          const text = card.getAttribute('data-native') || '';
+          const lang = card.getAttribute('data-lang') || '';
+          speakText(text, lang);
+
+          // Efek visual kartu menyala saat dibunyikan
+          card.classList.add('ring-2', 'ring-cta', 'bg-cta/10');
+          setTimeout(() => {
+            card.classList.remove('ring-2', 'ring-cta', 'bg-cta/10');
+          }, 350);
+        });
+      });
+
+      // Audio buttons (tetap support jika user klik langsung icon speaker)
       phrasesContentWrapper.querySelectorAll('.btn-speak-phrase').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
+          const card = btn.closest('.phrase-card-item');
           const text = btn.getAttribute('data-native') || '';
           const lang = btn.getAttribute('data-lang') || '';
           speakText(text, lang);
+
+          if (card) {
+            card.classList.add('ring-2', 'ring-cta', 'bg-cta/10');
+            setTimeout(() => {
+              card.classList.remove('ring-2', 'ring-cta', 'bg-cta/10');
+            }, 350);
+          }
         });
       });
 
       // Edit Mode buttons
       if (isPhraseEditModeActive) {
         phrasesContentWrapper.querySelectorAll('.btn-edit-phrase').forEach(btn => {
-          btn.addEventListener('click', () => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const catIdx = parseInt(btn.getAttribute('data-cat') || '-1');
             const itemIdx = parseInt(btn.getAttribute('data-item') || '-1');
             openPhraseModal(catIdx, itemIdx);
@@ -2549,7 +2726,8 @@ import {
         });
 
         phrasesContentWrapper.querySelectorAll('.btn-delete-phrase').forEach(btn => {
-          btn.addEventListener('click', async () => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
             const catIdx = parseInt(btn.getAttribute('data-cat') || '-1');
             const itemIdx = parseInt(btn.getAttribute('data-item') || '-1');
             const native = btn.getAttribute('data-native') || '';
@@ -2880,21 +3058,213 @@ import {
       showToast(`✓ Tabel "${curr.name}" diduplikasi! Mode Edit kini aktif.`);
     });
 
+    // Character Modal Tabs & Batch Import Logic
+    function switchCharModalTab(tab: 'single' | 'batch') {
+      if (tab === 'single') {
+        charEditForm?.classList.remove('hidden');
+        charBatchPane?.classList.add('hidden');
+        tabCharSingle?.classList.add('border-b-2', 'border-ink', 'text-ink', 'font-bold');
+        tabCharSingle?.classList.remove('border-transparent', 'text-smoke');
+        tabCharBatch?.classList.remove('border-b-2', 'border-ink', 'text-ink', 'font-bold');
+        tabCharBatch?.classList.add('border-transparent', 'text-smoke');
+      } else {
+        charEditForm?.classList.add('hidden');
+        charBatchPane?.classList.remove('hidden');
+        tabCharBatch?.classList.add('border-b-2', 'border-ink', 'text-ink', 'font-bold');
+        tabCharBatch?.classList.remove('border-transparent', 'text-smoke');
+        tabCharSingle?.classList.remove('border-b-2', 'border-ink', 'text-ink', 'font-bold');
+        tabCharSingle?.classList.add('border-transparent', 'text-smoke');
+        updateBatchCountBadge();
+      }
+    }
+
+    tabCharSingle?.addEventListener('click', () => switchCharModalTab('single'));
+    tabCharBatch?.addEventListener('click', () => switchCharModalTab('batch'));
+
+    function parseLinesToCharItems(text: string): { romaji: string; char: string }[] {
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const items: { romaji: string; char: string }[] = [];
+      for (const line of lines) {
+        let parts: string[] = [];
+        if (line.includes('|')) {
+          parts = line.split('|').map(p => p.trim());
+        } else if (line.includes('\t')) {
+          parts = line.split('\t').map(p => p.trim());
+        } else if (line.includes(',')) {
+          parts = line.split(',').map(p => p.trim());
+        } else {
+          parts = [line];
+        }
+
+        for (const part of parts) {
+          if (!part || part === '-' || part === 'null') continue;
+          if (part.includes('=')) {
+            const [romaji, ch] = part.split('=').map(s => s.trim());
+            if (ch) items.push({ romaji: romaji || '', char: ch });
+          } else {
+            items.push({ romaji: '', char: part });
+          }
+        }
+      }
+      return items;
+    }
+
+    function updateBatchCountBadge() {
+      const text = charBatchTextarea?.value || '';
+      const items = parseLinesToCharItems(text);
+      if (charBatchCountBadge) {
+        charBatchCountBadge.textContent = `${items.length} huruf terdeteksi`;
+      }
+    }
+
+    charBatchTextarea?.addEventListener('input', updateBatchCountBadge);
+
+    // Excel / CSV file upload inside batch modal
+    charBatchFileInput?.addEventListener('change', (e: any) => {
+      const file = e.target?.files?.[0];
+      if (!file) return;
+
+      const fileName = file.name.toLowerCase();
+      const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv');
+
+      if (isExcel && (window as any).XLSX) {
+        showToast(`Membaca file "${file.name}"...`);
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const data = new Uint8Array(evt.target?.result as ArrayBuffer);
+            const workbook = (window as any).XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonRows: any[][] = (window as any).XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            const formattedLines: string[] = [];
+            for (const row of jsonRows) {
+              if (!row || row.length === 0) continue;
+              if (row.length === 2) {
+                formattedLines.push(`${row[0] ?? ''} = ${row[1] ?? ''}`);
+              } else {
+                const rowItems: string[] = [];
+                for (let i = 0; i < row.length; i += 2) {
+                  if (row[i] !== undefined && row[i+1] !== undefined) {
+                    rowItems.push(`${row[i]} = ${row[i+1]}`);
+                  }
+                }
+                if (rowItems.length > 0) formattedLines.push(rowItems.join(' | '));
+              }
+            }
+
+            if (charBatchTextarea) {
+              charBatchTextarea.value = formattedLines.join('\n');
+              updateBatchCountBadge();
+              showToast(`✓ Berhasil memuat ${formattedLines.length} baris dari "${file.name}"!`);
+            }
+          } catch {
+            showToast('Gagal memproses file Excel.');
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          if (charBatchTextarea) {
+            charBatchTextarea.value = evt.target?.result as string;
+            updateBatchCountBadge();
+            showToast(`✓ Berhasil memuat file teks!`);
+          }
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    // Batch Submit Handler
+    btnSubmitCharBatch?.addEventListener('click', () => {
+      const text = charBatchTextarea?.value || '';
+      const items = parseLinesToCharItems(text);
+      if (items.length === 0) {
+        showToast('Silakan tempel teks huruf atau upload file Excel terlebih dahulu.');
+        return;
+      }
+
+      const table = ensureCustomTableForEditing();
+      if (!table || !table.grid) return;
+
+      const shouldDedup = charBatchDedupCheck ? charBatchDedupCheck.checked : true;
+      const existingChars = new Set<string>();
+      for (const row of table.grid) {
+        if (!row) continue;
+        for (const cell of row) {
+          if (cell && cell.char) existingChars.add(cell.char.trim());
+        }
+      }
+
+      let addedCount = 0;
+      for (const item of items) {
+        if (!item.char) continue;
+        if (shouldDedup && existingChars.has(item.char.trim())) {
+          continue; // Lewati jika duplikat
+        }
+
+        existingChars.add(item.char.trim());
+        if (table.grid.length === 0) {
+          table.grid.push([item]);
+        } else {
+          const lastRow = table.grid[table.grid.length - 1];
+          if (lastRow.length < 5) {
+            lastRow.push(item);
+          } else {
+            table.grid.push([item]);
+          }
+        }
+        addedCount++;
+      }
+
+      if (addedCount === 0) {
+        showToast('Semua huruf yang diimpor sudah ada di tabel ini (tidak ada huruf baru yang ditambahkan).');
+        return;
+      }
+
+      saveCustomTablesToStorage();
+      if (currentUser) {
+        saveCustomTableToCloud(currentUser.id, table).catch(() => {});
+      }
+
+      closeCharModal();
+      renderCurrentTable();
+      updateProgressUI();
+      showToast(`✓ Berhasil menambahkan ${addedCount} huruf baru ke tabel "${table.name}"!`);
+      if (charBatchTextarea) charBatchTextarea.value = '';
+    });
+
+    btnCharBatchCancel?.addEventListener('click', closeCharModal);
+
     // Single Character Modal logic
-    function openCharModal(row: number, col: number, char: string = '', romaji: string = '') {
+    function openCharModal(row: number, col: number, char: string = '', romaji: string = '', defaultTab: 'single' | 'batch' = 'single') {
       if (!charEditModal) return;
       if (charEditRow) charEditRow.value = String(row);
       if (charEditCol) charEditCol.value = String(col);
       if (charEditCharInput) charEditCharInput.value = char;
       if (charEditRomajiInput) charEditRomajiInput.value = romaji;
+
+      const isNew = row === -1 && col === -1;
+
       if (charModalTitle) {
-        charModalTitle.innerHTML = row === -1 
-          ? '<svg class="size-4 inline mr-1.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Tambah Huruf Baru' 
+        charModalTitle.innerHTML = isNew 
+          ? '<svg class="size-4 inline mr-1.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Tambah Huruf ke Tabel' 
           : `<svg class="size-4 inline mr-1.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Edit Huruf: ${char}`;
       }
       if (charEditDeleteBtn) {
-        charEditDeleteBtn.style.display = row === -1 ? 'none' : 'block';
+        charEditDeleteBtn.style.display = isNew ? 'none' : 'block';
       }
+
+      if (isNew) {
+        if (charModalTabs) charModalTabs.style.display = 'flex';
+        switchCharModalTab(defaultTab);
+      } else {
+        if (charModalTabs) charModalTabs.style.display = 'none';
+        switchCharModalTab('single');
+      }
+
       charEditModal.showModal();
     }
 
@@ -2964,7 +3334,11 @@ import {
     });
 
     btnAddCharTable?.addEventListener('click', () => {
-      openCharModal(-1, -1, '', '');
+      openCharModal(-1, -1, '', '', 'single');
+    });
+
+    btnImportBatchTable?.addEventListener('click', () => {
+      openCharModal(-1, -1, '', '', 'batch');
     });
 
     // Render Language Tabs
