@@ -9,6 +9,11 @@
   "theme_color": "#4C2365",
   "icons": [
     {
+      "src": "/logo-learning-bahasa.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    },
+    {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"

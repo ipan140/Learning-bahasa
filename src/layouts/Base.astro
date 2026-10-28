@@ -9,7 +9,7 @@ const { title, description = site.description, image = '/og.png', footer = true,
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name}: ${site.description.split('.')[0]}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
 const ogImage = new URL(image, Astro.site ?? site.url).href;
-const jsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: site.name, url: site.url, logo: new URL('/favicon.svg', site.url).href };
+const jsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name: site.name, url: site.url, logo: new URL('/logo-learning-bahasa.jpg', site.url).href };
 ---
 
 <html lang="en">
@@ -19,7 +19,9 @@ const jsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/jpeg" href="/logo-learning-bahasa.jpg" />
+    <link rel="shortcut icon" href="/logo-learning-bahasa.jpg" />
+    <link rel="apple-touch-icon" href="/logo-learning-bahasa.jpg" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#4C2365" />
     <link rel="sitemap" href="/sitemap-index.xml" />

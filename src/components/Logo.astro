@@ -2,6 +2,14 @@
 import { site } from '../data/site';
 ---
 
-<a href="/" class="text-ink font-bold text-[17px] tracking-[-0.02em] shrink-0 max-md:text-[16px]" aria-label={`${site.name} home`}>
-  {site.name.toLowerCase()}<span class="text-cta">_</span>
+<a href="/" class="inline-flex items-center gap-2.5 text-ink font-bold text-[17px] tracking-[-0.02em] shrink-0 max-md:text-[16px] hover:opacity-90 transition-opacity" aria-label={`${site.name} home`}>
+  <img 
+    src="/logo-learning-bahasa.jpg" 
+    alt="Logo Belajar Bahasa" 
+    class="size-7 sm:size-8 object-cover border border-rule shrink-0" 
+    width="32" 
+    height="32" 
+    loading="eager"
+  />
+  <span class="tracking-tight">{site.name.toLowerCase()}<span class="text-cta">_</span></span>
 </a>

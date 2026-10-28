@@ -7,17 +7,26 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
   <div class="p-5 sm:p-6 flex flex-col gap-4">
     
     <!-- Header Modal -->
-    <div class="flex items-start justify-between pb-3 border-b border-rule">
-      <div>
-        <h2 id="auth-modal-title" class="text-[18px] font-bold tracking-tight text-ink">Masuk ke Akun</h2>
-        <p class="text-[12px] text-steel mt-0.5" id="auth-modal-subtitle">
-          Simpan target belajar dan integrasikan data antar-perangkat Anda.
-        </p>
+    <div class="flex items-start justify-between pb-3 border-b border-rule gap-2">
+      <div class="flex items-center gap-3 min-w-0">
+        <img 
+          src="/logo-learning-bahasa.jpg" 
+          alt="Logo Belajar Bahasa" 
+          class="size-10 object-cover border border-rule shrink-0 shadow-xs" 
+          width="40" 
+          height="40" 
+        />
+        <div class="min-w-0">
+          <h2 id="auth-modal-title" class="text-[17px] font-bold tracking-tight text-ink leading-tight">Masuk ke Akun</h2>
+          <p class="text-[12px] text-steel mt-0.5 truncate" id="auth-modal-subtitle">
+            Simpan target belajar dan integrasikan data antar-perangkat Anda.
+          </p>
+        </div>
       </div>
       <button 
         type="button" 
         id="auth-modal-close" 
-        class="text-xs font-mono p-1 border border-rule hover:bg-smoke/10 text-smoke hover:text-ink transition-colors shrink-0 ml-3 cursor-pointer" 
+        class="text-xs font-mono p-1 border border-rule hover:bg-smoke/10 text-smoke hover:text-ink transition-colors shrink-0 cursor-pointer" 
         aria-label="Tutup Modal"
       >
         <X class="size-3.5" />
