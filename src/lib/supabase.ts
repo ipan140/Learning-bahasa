@@ -604,7 +604,33 @@ export async function saveUserQuizScoreToCloud(userId: string, tableId: string, 
 }
 
 
-// ================= USER PREFERENCES (SETTINGS) HELPERS =================
+// ================= USER PREFERENCES & FAVORITES (SETTINGS) HELPERS =================
+
+/** Simpan daftar frasa favorit (bookmark) pengguna ke Supabase user metadata */
+export async function saveFavoritePhrasesToCloud(favorites: string[]): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    await sb.auth.updateUser({
+      data: {
+        favorite_phrases: favorites
+      }
+    });
+    return true;
+  } catch (err) {
+    console.warn('Gagal saveFavoritePhrasesToCloud:', err);
+    return false;
+  }
+}
+
+/** Ambil daftar frasa favorit pengguna dari Supabase */
+export function fetchFavoritePhrasesFromCloud(user: any): string[] {
+  if (!user) return [];
+  if (Array.isArray(user.user_metadata?.favorite_phrases)) {
+    return user.user_metadata.favorite_phrases;
+  }
+  return [];
+}
 
 /** Simpan preferensi pengguna (kecepatan audio, status audio, tema) ke Supabase */
 export async function saveUserPreferencesToCloud(userId: string, prefs: { audioSpeed?: number; isAudioEnabled?: boolean; theme?: string }): Promise<boolean> {

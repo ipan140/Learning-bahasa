@@ -1160,7 +1160,9 @@ import {
     saveUserPhraseCategoryToCloud,
     saveUserQuizScoreToCloud,
     saveUserPreferencesToCloud,
-    fetchUserPreferencesFromCloud
+    fetchUserPreferencesFromCloud,
+    saveFavoritePhrasesToCloud,
+    fetchFavoritePhrasesFromCloud
   } from '../lib/supabase';
 
   const appEl = document.getElementById('main-app');
@@ -2607,7 +2609,11 @@ import {
     }
     function saveFavoritePhrases() {
       try {
-        localStorage.setItem('user_favorite_phrases', JSON.stringify(Array.from(userFavoritePhrases)));
+        const arr = Array.from(userFavoritePhrases);
+        localStorage.setItem('user_favorite_phrases', JSON.stringify(arr));
+        if (currentUser) {
+          saveFavoritePhrasesToCloud(arr).catch(() => {});
+        }
       } catch {}
     }
     loadFavoritePhrases();
@@ -4747,6 +4753,14 @@ Ta = た | Chi = ち | Tsu = つ | Te = て | To = と`;
               };
             });
             localStorage.setItem('user_custom_phrases_map', JSON.stringify(userPhrasesMap));
+            if (currentViewMode === 'phrases') renderPhrases();
+          }
+
+          // 4. Fetch favorite phrases from Supabase
+          const cloudFavorites = fetchFavoritePhrasesFromCloud(currentUser);
+          if (cloudFavorites && cloudFavorites.length > 0) {
+            cloudFavorites.forEach((k: string) => userFavoritePhrases.add(k));
+            localStorage.setItem('user_favorite_phrases', JSON.stringify(Array.from(userFavoritePhrases)));
             if (currentViewMode === 'phrases') renderPhrases();
           }
         }
