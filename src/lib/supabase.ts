@@ -42,39 +42,91 @@ export function getSupabase(): SupabaseClient | null {
 
 // ================= AUTH HELPERS =================
 
+let cachedUser: User | null = null;
+let authListenerRegistered = false;
+
 export async function getCurrentUser(): Promise<User | null> {
   const sb = getSupabase();
   if (!sb) return null;
+
+  // Pasang listener auth state change sekali saja untuk menjaga sinkronisasi memori
+  if (!authListenerRegistered && typeof window !== 'undefined') {
+    authListenerRegistered = true;
+    sb.auth.onAuthStateChange((_event, session) => {
+      cachedUser = session?.user ?? null;
+    });
+  }
+
   try {
-    const { data: { user } } = await sb.auth.getUser();
-    return user;
-  } catch {
-    return null;
+    // 1. Dapatkan session dari storage lokal (cepat & tidak memicu request jaringan berlebih)
+    const { data: { session }, error: sessionErr } = await sb.auth.getSession();
+    if (sessionErr || !session) {
+      cachedUser = null;
+      return null;
+    }
+
+    if (session.user) {
+      cachedUser = session.user;
+      return cachedUser;
+    }
+
+    return cachedUser;
+  } catch (err) {
+    console.warn('getCurrentUser warning:', err);
+    return cachedUser;
   }
 }
 
 export async function signUpWithEmail(email: string, password: string) {
   const sb = getSupabase();
   if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
-  return await sb.auth.signUp({
+  const res = await sb.auth.signUp({
     email,
     password,
   });
+  if (res.data?.user) {
+    cachedUser = res.data.user;
+  }
+  return res;
 }
 
 export async function signInWithEmail(email: string, password: string) {
   const sb = getSupabase();
   if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
-  return await sb.auth.signInWithPassword({
+  const res = await sb.auth.signInWithPassword({
     email,
     password,
+  });
+  if (res.data?.user) {
+    cachedUser = res.data.user;
+  }
+  return res;
+}
+
+export async function signInWithGoogle() {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
+  return await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/` : undefined,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
   });
 }
 
 export async function signOutUser() {
   const sb = getSupabase();
+  cachedUser = null;
   if (!sb) return;
-  return await sb.auth.signOut();
+  try {
+    return await sb.auth.signOut();
+  } catch (err) {
+    console.warn('signOutUser warning:', err);
+  }
 }
 
 export async function resetPasswordForEmail(email: string) {

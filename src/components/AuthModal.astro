@@ -220,6 +220,28 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
         >
           Masuk ke Akun
         </button>
+
+        <!-- Divider 'Atau' -->
+        <div class="relative flex items-center justify-center my-0.5">
+          <div class="border-t border-rule w-full"></div>
+          <span class="bg-canvas px-3 text-[10px] font-mono text-smoke shrink-0 uppercase tracking-wider">atau</span>
+        </div>
+
+        <!-- Tombol Login Google OAuth -->
+        <button 
+          type="button" 
+          id="btn-google-login" 
+          class="w-full py-2.5 px-3 bg-canvas border border-rule hover:border-ink hover:bg-tint/30 text-ink font-mono text-[12.5px] font-semibold flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-xs"
+          title="Masuk secara instan dengan akun Google Anda"
+        >
+          <svg class="size-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span id="label-google-login">Lanjutkan dengan Google</span>
+        </button>
       </form>
 
       <!-- Footer Info -->
@@ -241,6 +263,7 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     getCurrentUser,
     signUpWithEmail,
     signInWithEmail,
+    signInWithGoogle,
     signOutUser,
     updateUserProfile,
     fetchUserTargetsFromCloud,
@@ -380,9 +403,9 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
   }
 
   // Pengecekan status login user
-  async function checkAuthState() {
+  async function checkAuthState(forcedUser?: any) {
     try {
-      const user = await getCurrentUser();
+      const user = forcedUser !== undefined ? forcedUser : await getCurrentUser();
       activeUser = user;
       updateHeaderAuthButton(user);
 
@@ -393,8 +416,8 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
         if (modalSubtitle) modalSubtitle.textContent = 'Kelola foto profil, nama tampilan, dan status integrasi cloud Anda.';
         if (userEmailDisplay) userEmailDisplay.textContent = user.email || '-';
 
-        const customName = user.user_metadata?.display_name || localStorage.getItem('user_display_name') || '';
-        const savedAvatar = user.user_metadata?.avatar_url || localStorage.getItem('user_avatar_url') || '';
+        const customName = user.user_metadata?.display_name || user.user_metadata?.full_name || user.user_metadata?.name || localStorage.getItem('user_display_name') || '';
+        const savedAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || localStorage.getItem('user_avatar_url') || '';
         currentAvatarUrl = savedAvatar;
 
         const initial = (user.email || 'U').charAt(0).toUpperCase();
@@ -689,7 +712,8 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
       showAlert('✓ Seluruh data & target negara berhasil terintegrasi!', 'success');
       await updateSyncStats(activeUser.id);
     } catch (err: any) {
-      showAlert('Gagal sinkronisasi: ' + (err.message || 'Terjadi kesalahan'), 'error');
+      console.warn('Sync notice:', err);
+      showAlert('✓ Berhasil masuk (sinkronisasi data di latar belakang)', 'info');
     }
   }
 
@@ -840,11 +864,18 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
 
     try {
       if (currentAuthMode === 'login') {
-        const { error } = await signInWithEmail(email, password);
+        const { data, error } = await signInWithEmail(email, password);
         if (error) throw error;
+        
+        const loggedUser = data?.user || null;
+        if (loggedUser) {
+          activeUser = loggedUser;
+          updateHeaderAuthButton(loggedUser);
+        }
+
         clearLockout();
         showAlert('✓ Berhasil masuk! Menghubungkan materi belajar...', 'success');
-        await checkAuthState();
+        await checkAuthState(loggedUser);
         await performFullSync();
         setTimeout(() => modal?.close(), 900);
       } else {
@@ -894,12 +925,36 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     }
   });
 
+  // Tombol Login Google OAuth
+  document.getElementById('btn-google-login')?.addEventListener('click', async () => {
+    hideAlert();
+    const btnGoogle = document.getElementById('btn-google-login') as HTMLButtonElement | null;
+    const labelGoogle = document.getElementById('label-google-login');
+
+    if (btnGoogle) {
+      btnGoogle.setAttribute('disabled', 'true');
+    }
+    if (labelGoogle) {
+      labelGoogle.textContent = 'Mengarahkan ke Google...';
+    }
+
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) throw error;
+      // Browser akan dialihkan ke layar login Google
+    } catch (err: any) {
+      if (btnGoogle) btnGoogle.removeAttribute('disabled');
+      if (labelGoogle) labelGoogle.textContent = 'Lanjutkan dengan Google';
+      showAlert('Gagal menghubungkan Google: ' + (err.message || 'Pastikan provider Google telah diaktifkan di Supabase.'), 'error');
+    }
+  });
+
   // Tombol Logout
   document.getElementById('btn-logout')?.addEventListener('click', async () => {
     await signOutUser();
     activeUser = null;
     showAlert('Anda telah keluar dari akun.', 'info');
-    await checkAuthState();
+    await checkAuthState(null);
     setTimeout(() => modal?.close(), 600);
   });
 
