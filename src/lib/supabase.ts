@@ -107,8 +107,13 @@ export async function signInWithGoogle() {
   const sb = getSupabase();
   if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
   
-  let redirectUrl = 'https://learning-bahasa-news.vercel.app/';
-  if (typeof window !== 'undefined' && window.location.origin) {
+  // Baca URL dari .env (PUBLIC_SITE_URL) jika diset, atau gunakan origin aktif browser secara dinamis
+  const envSiteUrl = import.meta.env.PUBLIC_SITE_URL;
+  let redirectUrl: string | undefined = undefined;
+
+  if (envSiteUrl && envSiteUrl.trim().length > 0) {
+    redirectUrl = envSiteUrl.trim().endsWith('/') ? envSiteUrl.trim() : `${envSiteUrl.trim()}/`;
+  } else if (typeof window !== 'undefined' && window.location.origin) {
     redirectUrl = `${window.location.origin}/`;
   }
 
