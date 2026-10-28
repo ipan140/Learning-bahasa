@@ -106,10 +106,16 @@ export async function signInWithEmail(email: string, password: string) {
 export async function signInWithGoogle() {
   const sb = getSupabase();
   if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
+  
+  let redirectUrl = 'https://learning-bahasa-news.vercel.app/';
+  if (typeof window !== 'undefined' && window.location.origin) {
+    redirectUrl = `${window.location.origin}/`;
+  }
+
   return await sb.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/` : undefined,
+      redirectTo: redirectUrl,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
