@@ -431,20 +431,33 @@ import {
         <!-- ============================================== -->
         <!-- VIEW 3: FRASA DASAR SEHARI-HARI                -->
         <!-- ============================================== -->
-        <div id="phrases-container" class="hidden border border-rule bg-canvas p-5 sm:p-6 shadow-sm space-y-5">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-rule pb-4">
-            <div>
-              <span class="px-2.5 py-1 text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider bg-tint">Survival Phrases</span>
-              <h2 id="phrases-title" class="text-[22px] sm:text-[24px] font-bold text-ink tracking-tight mt-1">
-                Frasa Penting Sehari-hari
-              </h2>
-              <p class="text-[13px] text-steel mt-0.5">
-                Kosakata &amp; percakapan dasar: salam, angka, belanja, dan frasa darurat dengan tombol audio asli.
-              </p>
+        <div id="phrases-container" class="hidden border border-rule bg-canvas p-4 sm:p-6 shadow-sm space-y-4">
+          <!-- Phrases Header Info -->
+          <div class="border-b border-rule pb-3.5 space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-0.5 text-[10px] sm:text-[11px] font-mono border border-rule text-smoke uppercase tracking-wider bg-tint">Survival Phrases</span>
+              <span class="text-[11px] font-mono text-steel hidden sm:inline">&middot; Audio Asli &amp; Kuis Interaktif</span>
             </div>
+            <h2 id="phrases-title" class="text-[20px] sm:text-[26px] font-bold text-ink tracking-tight leading-snug">
+              Frasa Penting Sehari-hari
+            </h2>
+            <p class="text-[12px] sm:text-[13px] text-steel max-w-2xl leading-relaxed">
+              Kosakata &amp; percakapan dasar: salam, angka, belanja, dan frasa darurat dengan audio pengucapan asli.
+            </p>
+          </div>
 
-            <!-- Phrases Action Buttons -->
-            <div class="flex items-center gap-2 flex-wrap shrink-0">
+          <!-- Phrases Action Toolbar (Responsive & Clean Grouping) -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5 p-3 border border-rule bg-smoke/5">
+            <!-- Group 1: Primary Actions -->
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <button 
+                type="button" 
+                id="btn-open-phrase-modal" 
+                class="btn btn-primary btn-s font-mono text-[12px] inline-flex items-center gap-1.5 shadow-xs"
+                title="Tambah frasa baru ke koleksi bahasa ini"
+              >
+                <Plus class="size-3.5 inline" /> Tambah Frasa
+              </button>
               <button 
                 type="button" 
                 id="btn-play-all-phrases" 
@@ -461,18 +474,14 @@ import {
               >
                 <Trophy class="size-3.5 inline text-amber-500" /> <span>Kuis Frasa</span>
               </button>
-              <button 
-                type="button" 
-                id="btn-open-phrase-modal" 
-                class="btn btn-primary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
-                title="Tambah frasa baru ke koleksi bahasa ini"
-              >
-                <Plus class="size-3.5 inline" /> Tambah Frasa
-              </button>
+            </div>
+
+            <!-- Group 2: Tools & Utilities -->
+            <div class="flex items-center gap-1.5 flex-wrap">
               <button 
                 type="button" 
                 id="btn-open-phrase-import" 
-                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
+                class="btn btn-secondary btn-s font-mono text-[11px] sm:text-[12px] inline-flex items-center gap-1"
                 title="Impor kumpulan frasa dari file Excel atau teks"
               >
                 <FileSpreadsheet class="size-3.5 inline text-steel" /> Impor Excel
@@ -480,7 +489,7 @@ import {
               <button 
                 type="button" 
                 id="btn-export-phrases-excel" 
-                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
+                class="btn btn-secondary btn-s font-mono text-[11px] sm:text-[12px] inline-flex items-center gap-1"
                 title="Unduh seluruh frasa ke file Excel (.xlsx)"
               >
                 <FileSpreadsheet class="size-3.5 inline text-steel" /> Ekspor Excel
@@ -488,7 +497,7 @@ import {
               <button 
                 type="button" 
                 id="btn-print-phrases" 
-                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
+                class="btn btn-secondary btn-s font-mono text-[11px] sm:text-[12px] inline-flex items-center gap-1"
                 title="Cetak kumpulan frasa ini ke kertas atau simpan sebagai dokumen PDF"
               >
                 <Printer class="size-3.5 inline text-steel" /> Cetak / PDF
@@ -496,15 +505,15 @@ import {
               <button 
                 type="button" 
                 id="btn-toggle-phrase-edit" 
-                class="btn btn-secondary btn-s font-mono text-[12px] inline-flex items-center gap-1.5"
+                class="btn btn-secondary btn-s font-mono text-[11px] sm:text-[12px] inline-flex items-center gap-1"
                 title="Aktifkan mode edit/hapus untuk frasa"
               >
-                <Edit3 class="size-3.5 inline text-steel" /> Mode Edit Frasa
+                <Edit3 class="size-3.5 inline text-steel" /> Mode Edit
               </button>
               <button 
                 type="button" 
                 id="btn-reset-phrase" 
-                class="px-2.5 py-1.5 text-[11px] font-mono border border-rule text-smoke hover:text-ink hover:border-ink transition-colors inline-flex items-center gap-1"
+                class="px-2.5 py-1 text-[11px] font-mono border border-rule text-smoke hover:text-ink hover:border-ink transition-colors inline-flex items-center gap-1"
                 title="Kembalikan frasa ke bawaan awal"
               >
                 <RotateCcw class="size-3 inline text-smoke" /> Reset
