@@ -456,24 +456,85 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     });
   });
 
-  // Custom File Avatar Upload (Image File)
-  avatarFileInput?.addEventListener('change', (e) => {
+  // Helper untuk kompresi gambar otomatis (Resize ke max 256px & konversi ke WebP/JPEG ringan)
+  function compressImage(file: File, maxDim = 256, quality = 0.82): Promise<{ dataUrl: string; originalKb: number; compressedKb: number }> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          // Proporsional resize ke dimensi maksimal
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            const fallbackUrl = e.target?.result as string;
+            resolve({ dataUrl: fallbackUrl, originalKb: Math.round(file.size / 1024), compressedKb: Math.round(file.size / 1024) });
+            return;
+          }
+
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Coba format WebP untuk efisiensi maksimal, fallback ke JPEG
+          let dataUrl = canvas.toDataURL('image/webp', quality);
+          if (!dataUrl.startsWith('data:image/webp')) {
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+          }
+
+          // Hitung perkiraan ukuran hasil kompresi dalam KB
+          const head = dataUrl.indexOf(',') + 1;
+          const compressedBytes = Math.round(((dataUrl.length - head) * 3) / 4);
+          const originalKb = Math.round(file.size / 1024);
+          const compressedKb = Math.round(compressedBytes / 1024);
+
+          resolve({ dataUrl, originalKb, compressedKb });
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Custom File Avatar Upload (Image File dengan Auto-Kompresi)
+  avatarFileInput?.addEventListener('change', async (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      showAlert('Ukuran gambar maksimal 2MB.', 'error');
+    if (file.size > 8 * 1024 * 1024) {
+      showAlert('Ukuran file foto maksimal 8MB.', 'error');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const base64 = evt.target?.result as string;
-      currentAvatarUrl = base64;
-      setAvatarDisplay(base64, (activeUser?.email || 'U').charAt(0).toUpperCase());
-      showAlert('Foto profil dimuat! Klik "Simpan Perubahan Profil" untuk menyimpan.', 'info');
-    };
-    reader.readAsDataURL(file);
+    try {
+      showAlert('Mengompresi dan memproses foto...', 'info');
+      const { dataUrl, originalKb, compressedKb } = await compressImage(file, 256, 0.82);
+      currentAvatarUrl = dataUrl;
+      setAvatarDisplay(dataUrl, (activeUser?.email || 'U').charAt(0).toUpperCase());
+      showAlert(`✓ Foto profil dioptimalkan (${originalKb} KB → ${compressedKb} KB). Klik "Simpan Perubahan Profil" untuk menyimpan.`, 'info');
+    } catch (err: any) {
+      console.error('Gagal kompresi foto:', err);
+      showAlert('Gagal memproses gambar. Silakan coba gambar lain.', 'error');
+    }
   });
 
   // Simpan Nama & Foto Profil
@@ -954,7 +1015,7 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     } catch (err: any) {
       if (btnGoogle) btnGoogle.removeAttribute('disabled');
       if (labelGoogle) labelGoogle.textContent = 'Lanjutkan dengan Google';
-      showAlert('Gagal menghubungkan Google: ' + (err.message || 'Pastikan provider Google telah diaktifkan di Supabase.'), 'error');
+      showAlert('Gagal menghubungkan Google: ' + (err.message || 'Silakan coba lagi beberapa saat lagi.'), 'error');
     }
   });
 
