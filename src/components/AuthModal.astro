@@ -21,10 +21,6 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
           <p class="text-[12px] text-steel mt-0.5 truncate" id="auth-modal-subtitle">
             Simpan target belajar dan integrasikan data antar-perangkat Anda.
           </p>
-          <div class="mt-1 flex items-center gap-1.5" id="auth-backend-indicator">
-            <span class="inline-block size-1.5 rounded-full bg-ok animate-pulse"></span>
-            <span class="text-[10px] font-mono text-steel" id="auth-backend-label">Mode: Memeriksa...</span>
-          </div>
         </div>
       </div>
       <button 
@@ -334,20 +330,23 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
 
   function showAlert(msg: string, type: 'error' | 'success' | 'info' = 'info') {
     if (!alertBox) return;
-    alertBox.textContent = msg;
-    alertBox.className = 'text-xs p-3 border font-mono block';
+    alertBox.className = 'text-xs p-3 border font-mono block transition-all leading-relaxed';
     if (type === 'error') {
       alertBox.classList.add('bg-red-500/10', 'border-red-500/40', 'text-red-500');
+      alertBox.innerHTML = `<strong>✕ Gagal:</strong> ${msg}`;
     } else if (type === 'success') {
       alertBox.classList.add('bg-ok/10', 'border-ok/40', 'text-ok');
+      alertBox.innerHTML = `<strong>✓ Berhasil:</strong> ${msg}`;
     } else {
       alertBox.classList.add('bg-cta/10', 'border-cta/40', 'text-ink');
+      alertBox.innerHTML = `<strong>ℹ️ Info:</strong> ${msg}`;
     }
   }
 
   function hideAlert() {
     if (!alertBox) return;
     alertBox.className = 'hidden';
+    alertBox.innerHTML = '';
   }
 
   function setAvatarDisplay(avatar: string, fallbackInitial: string) {
@@ -368,9 +367,11 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     }
   }
 
-  function switchAuthTab(mode: 'login' | 'register') {
+  function switchAuthTab(mode: 'login' | 'register', preserveAlert = false) {
     currentAuthMode = mode;
-    hideAlert();
+    if (!preserveAlert) {
+      hideAlert();
+    }
     if (mode === 'login') {
       if (modalTitle) modalTitle.textContent = 'Masuk ke Akun';
       if (modalSubtitle) modalSubtitle.textContent = 'Simpan target belajar dan integrasikan data antar-perangkat Anda.';
@@ -422,10 +423,6 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
   // Pengecekan status login user
   async function checkAuthState(forcedUser?: any) {
     try {
-      const beInfo = getActiveBackendInfo();
-      const badgeEl = document.getElementById('auth-backend-label');
-      if (badgeEl) badgeEl.textContent = `Penyimpanan: ${beInfo.label}`;
-
       const user = forcedUser !== undefined ? forcedUser : await getCurrentUser();
       activeUser = user;
       updateHeaderAuthButton(user);
@@ -956,15 +953,15 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
         }
 
         clearLockout();
-        showAlert('✓ Berhasil masuk! Menghubungkan materi belajar...', 'success');
+        showAlert('Berhasil masuk! Menghubungkan sesi belajar Anda...', 'success');
         await checkAuthState(loggedUser);
         await performFullSync();
-        setTimeout(() => modal?.close(), 900);
+        setTimeout(() => modal?.close(), 1200);
       } else {
         const { error } = await signUpWithEmail(email, password, email.split('@')[0]);
         if (error) throw error;
-        showAlert('✓ Pendaftaran berhasil! Silakan masuk dengan akun baru Anda.', 'success');
-        switchAuthTab('login');
+        switchAuthTab('login', true);
+        showAlert('Pendaftaran akun berhasil! Akun Anda telah aktif, silakan masukkan kata sandi untuk masuk.', 'success');
       }
     } catch (err: any) {
       let msg = err.message || 'Terjadi kesalahan saat menghubungi server.';
@@ -1063,6 +1060,11 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
       const tokenClient = googleObj.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: 'email profile openid',
+        error_callback: (nonOAuthError: any) => {
+          if (btnGoogle) btnGoogle.removeAttribute('disabled');
+          if (labelGoogle) labelGoogle.textContent = 'Lanjutkan dengan Google';
+          showAlert('Google OAuth Error: URL origin (' + window.location.origin + ') belum didaftarkan di Google Cloud Console. Silakan login menggunakan Email & Sandi.', 'error');
+        },
         callback: async (tokenResponse: any) => {
           if (btnGoogle) btnGoogle.removeAttribute('disabled');
           if (labelGoogle) labelGoogle.textContent = 'Lanjutkan dengan Google';

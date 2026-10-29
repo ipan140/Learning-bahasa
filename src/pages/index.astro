@@ -3,7 +3,6 @@ import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 import MediaWindow from '../components/MediaWindow.astro';
 import GuideWindow from '../components/GuideWindow.astro';
-import AdNative from '../components/AdNative.astro';
 import { defaultLanguageTables } from '../data/languages';
 import { worldCountries } from '../data/countries';
 import { 
@@ -478,13 +477,6 @@ const sampleCountries = worldCountries.filter(c => ['JP', 'DE', 'KR', 'SA', 'ES'
       </div>
     </div>
   </Section>
-
-  <!-- REKOMENDASI / NATIVE SPONSOR -->
-  <section class="border-t border-rule bg-canvas py-8" aria-label="Rekomendasi Sponsor">
-    <div class="frame px-6 max-md:px-5">
-      <AdNative />
-    </div>
-  </section>
 
   <!-- [05] CTA BANNER -->
   <Section top={true} inner="px-6 py-16 lg:py-20 max-md:px-5">

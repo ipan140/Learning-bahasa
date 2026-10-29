@@ -3,6 +3,8 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import AdLeaderboard from '../components/AdLeaderboard.astro';
+import AdSquare from '../components/AdSquare.astro';
+import AdNative from '../components/AdNative.astro';
 import { site } from '../data/site';
 
 interface Props { title?: string; description?: string; image?: string; footer?: boolean; header?: boolean; type?: 'website' | 'article'; showAds?: boolean }
@@ -43,16 +45,28 @@ const jsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name
   <body>
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[70] btn btn-inverse btn-s">Skip to content</a>
     {header ? <Header /> : <slot name="header" />}
+
+    {showAds && (
+      <aside class="border-b border-rule bg-canvas" aria-label="Sponsor Atas">
+        <div class="frame px-4 py-2 flex justify-center">
+          <AdLeaderboard />
+        </div>
+      </aside>
+    )}
+
     <main id="main">
       <slot />
     </main>
+
     {showAds && (
       <>
-        <aside class="border-t border-rule bg-canvas" aria-label="Sponsor">
-          <div class="frame px-4 py-3">
-            <AdLeaderboard />
+        <aside class="border-t border-rule bg-canvas py-8" aria-label="Sponsor Bawah">
+          <div class="frame px-4 flex flex-col items-center justify-center gap-8">
+            <AdSquare />
+            <AdNative />
           </div>
         </aside>
+
         <script is:inline data-cfasync="false" src="https://bauval.org/14/41032622d0139395045eb7f4a0091449"></script>
         <script is:inline data-cfasync="false" src="https://abscloud.org/1/aaed6edc55d82140a3b352fd6c876a1f"></script>
         <script is:inline data-cfasync="false" src="https://araplhn.org/4/1baa1d9c858703801c6e954279a0db94"></script>

@@ -1,28 +1,62 @@
 ---
 import { site } from '../data/site';
 import Logo from './Logo.astro';
+
+const currentYear = new Date().getFullYear();
 ---
 
 <footer class="border-t border-rule bg-canvas">
-  <div class="frame px-6 pt-16 pb-10 max-md:px-5 max-md:pt-12">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-x-8 lg:gap-x-10 gap-y-10">
-      <div class="sm:col-span-2">
+  <div class="frame px-6 pt-12 pb-10 sm:pt-16 max-md:px-5">
+    {/* Layout Grid: 2 Kolom di Mobile, 5 Kolom di Desktop agar responsif dan ringkas */}
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-x-6 sm:gap-x-8 lg:gap-x-10 gap-y-8 sm:gap-y-10">
+      
+      {/* Brand & Status Section */}
+      <div class="col-span-2 md:col-span-2 pr-0 md:pr-4">
         <Logo />
-        <p class="mt-4 text-[13px] text-smoke max-w-[32ch] leading-[1.5]">{site.description}</p>
-        <p class="mt-5 text-[13px] text-steel flex items-center gap-2"><span class="size-2 rounded-full bg-ok" aria-hidden="true"></span> Sistem berjalan normal</p>
+        <p class="mt-3.5 text-[13px] text-smoke max-w-[36ch] leading-relaxed">{site.description}</p>
+        <p class="mt-4 text-[13px] text-steel flex items-center gap-2">
+          <span class="size-2 rounded-full bg-ok shrink-0" aria-hidden="true"></span>
+          <span>Sistem berjalan normal</span>
+        </p>
       </div>
+
+      {/* Navigasi Kolom Footer */}
       {site.footer.map((col) => (
-        <div>
+        <div class="col-span-1">
           <p class="label">{col.title}</p>
-          <ul class="mt-4 space-y-3 text-[13px]">
-            {col.links.map(([label, href]) => <li><a href={href} class="text-steel hover:text-ink">{label}</a></li>)}
+          <ul class="mt-3 sm:mt-4 space-y-2.5 sm:space-y-3 text-[13px]">
+            {col.links.map(([label, href]) => (
+              <li>
+                <a href={href} class="text-steel hover:text-ink transition-colors block py-0.5 sm:py-0">
+                  {label}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       ))}
     </div>
-    <div class="mt-14 pt-5 border-t border-rule text-[12px] text-smoke flex flex-wrap justify-between gap-3">
-      <span>&copy; {new Date().getFullYear()} {site.name}. Aplikasi Belajar Mandiri.</span>
-      <span>Aksara Teks &middot; Audio Web Speech</span>
+
+    {/* Copyright & Info: Otomatis Update Tahun Tanpa Perlu Hardcode Manual */}
+    <div class="mt-10 sm:mt-14 pt-5 border-t border-rule text-[12px] text-smoke flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span>&copy;</span>
+        <span id="footer-dynamic-year">{currentYear}</span>
+        <span>{site.name}. Aplikasi Belajar Mandiri.</span>
+      </div>
+      <div class="text-steel font-mono text-[11px]">
+        Aksara Teks &middot; Audio Web Speech
+      </div>
     </div>
   </div>
 </footer>
+
+{/* Script client-side agar tahun selalu otomatis berganti sesuai tahun kalender terkini pengguna */}
+<script is:inline>
+  (function() {
+    const el = document.getElementById('footer-dynamic-year');
+    if (el) {
+      el.textContent = new Date().getFullYear();
+    }
+  })();
+</script>
