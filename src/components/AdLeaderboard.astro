@@ -1,0 +1,38 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`w-full py-6 flex flex-col items-center justify-center overflow-hidden ${className}`}>
+  <div class="text-[10px] uppercase tracking-wider text-smoke mb-1.5 select-none font-mono">Sponsor</div>
+  
+  {/* Tampilan Desktop: Banner 728x90 */}
+  <div class="hidden md:flex justify-center items-center min-h-[90px] w-[728px] max-w-full overflow-hidden bg-canvas border border-rule">
+    <script is:inline>
+      atOptions = {
+        'key' : 'cb69140d18ec74fe8c9237920650be32',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script is:inline src="https://bauval.org/22/cb69140d18ec74fe8c9237920650be32"></script>
+  </div>
+
+  {/* Tampilan Mobile: Banner 320x50 agar pas di layar HP tanpa scroll horizontal */}
+  <div class="flex md:hidden justify-center items-center min-h-[50px] w-[320px] max-w-full overflow-hidden bg-canvas border border-rule">
+    <script is:inline>
+      atOptions = {
+        'key' : '5a3c274967a42710ec9235a2b9bbbc65',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script is:inline src="https://bauval.org/22/5a3c274967a42710ec9235a2b9bbbc65"></script>
+  </div>
+</div>

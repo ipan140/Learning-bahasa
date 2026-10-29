@@ -2,10 +2,11 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import AdLeaderboard from '../components/AdLeaderboard.astro';
 import { site } from '../data/site';
 
-interface Props { title?: string; description?: string; image?: string; footer?: boolean; header?: boolean; type?: 'website' | 'article' }
-const { title, description = site.description, image = '/og.png', footer = true, header = true, type = 'website' } = Astro.props;
+interface Props { title?: string; description?: string; image?: string; footer?: boolean; header?: boolean; type?: 'website' | 'article'; showAds?: boolean }
+const { title, description = site.description, image = '/og.png', footer = true, header = true, type = 'website', showAds = true } = Astro.props;
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name}: ${site.description.split('.')[0]}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
 const ogImage = new URL(image, Astro.site ?? site.url).href;
@@ -45,6 +46,13 @@ const jsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name
     <main id="main">
       <slot />
     </main>
+    {showAds && (
+      <aside class="border-t border-rule bg-canvas" aria-label="Sponsor">
+        <div class="frame px-4 py-3">
+          <AdLeaderboard />
+        </div>
+      </aside>
+    )}
     {footer && <Footer />}
 
     <script is:inline>
