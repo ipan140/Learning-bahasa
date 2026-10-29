@@ -1,4 +1,32 @@
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
+import {
+  getStoredToken,
+  goRegister,
+  goLogin,
+  goGoogleLogin,
+  goGetMe,
+  goLogout,
+  goUpdateProfile,
+  goFetchTargets,
+  goAddTarget,
+  goRemoveTarget,
+  goBatchSyncTargets,
+  goSaveTargetNotes,
+  goFetchCustomTables,
+  goSaveCustomTable,
+  goDeleteCustomTable,
+  goFetchProgress,
+  goSaveProgress,
+  goSaveQuizScore,
+  goFetchPhrases,
+  goSavePhrases,
+  goDeletePhrases,
+  goFetchPhraseCategories,
+  goSavePhraseCategory,
+  goDeletePhraseCategory,
+  goFetchPreferences,
+  goSavePreferences
+} from './api';
 
 // Cache client instance in memory
 let supabaseInstance: SupabaseClient | null = null;
@@ -8,7 +36,7 @@ export function getSupabaseConfig(): { url: string; anonKey: string } | null {
   const envUrl = import.meta.env.PUBLIC_SUPABASE_URL;
   const envKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-  if (envUrl && envKey && !envKey.includes('your-anon-key') && envKey.trim().length > 10) {
+  if (envUrl && envKey && !envKey.includes('your-anon-key') && !envKey.includes('paste_kunci_lengkap') && envKey.trim().length > 10) {
     return { url: envUrl.trim(), anonKey: envKey.trim() };
   }
 
@@ -17,6 +45,36 @@ export function getSupabaseConfig(): { url: string; anonKey: string } | null {
 
 export function isSupabaseConfigured(): boolean {
   return getSupabaseConfig() !== null;
+}
+
+/**
+ * Cek apakah aplikasi sedang menggunakan mode Backend Go (Lokal / VPS)
+ */
+export function isGoBackendMode(): boolean {
+  if (typeof window === 'undefined') {
+    return Boolean(import.meta.env.PUBLIC_API_URL);
+  }
+  const hasGoToken = Boolean(getStoredToken());
+  const hasApiUrl = Boolean(import.meta.env.PUBLIC_API_URL);
+  const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  
+  // Prioritas: Jika ada token Go, atau jika di localhost dan PUBLIC_API_URL diset, gunakan Go Backend
+  if (hasGoToken) return true;
+  if (hasApiUrl && isLocalHost) return true;
+  if (hasApiUrl && !isSupabaseConfigured()) return true;
+
+  return false;
+}
+
+export function isBackendConfigured(): boolean {
+  return isGoBackendMode() || isSupabaseConfigured();
+}
+
+export function getActiveBackendInfo(): { type: 'go' | 'supabase'; label: string } {
+  if (isGoBackendMode()) {
+    return { type: 'go', label: 'Go REST API (PostgreSQL Lokal)' };
+  }
+  return { type: 'supabase', label: 'Supabase Cloud BaaS' };
 }
 
 export function getSupabase(): SupabaseClient | null {
@@ -42,14 +100,27 @@ export function getSupabase(): SupabaseClient | null {
 
 // ================= AUTH HELPERS =================
 
-let cachedUser: User | null = null;
+let cachedUser: any = null;
 let authListenerRegistered = false;
 
-export async function getCurrentUser(): Promise<User | null> {
-  const sb = getSupabase();
-  if (!sb) return null;
+export async function getCurrentUser(): Promise<any | null> {
+  // 1. Cek Go Backend jika aktif atau memiliki token tersimpan
+  if (isGoBackendMode() || getStoredToken()) {
+    try {
+      const goUser = await goGetMe();
+      if (goUser) {
+        cachedUser = goUser;
+        return goUser;
+      }
+    } catch (err) {
+      console.warn('getCurrentUser Go warning:', err);
+    }
+  }
 
-  // Pasang listener auth state change sekali saja untuk menjaga sinkronisasi memori
+  // 2. Fallback ke Supabase jika configured
+  const sb = getSupabase();
+  if (!sb) return cachedUser;
+
   if (!authListenerRegistered && typeof window !== 'undefined') {
     authListenerRegistered = true;
     sb.auth.onAuthStateChange((_event, session) => {
@@ -58,7 +129,6 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 
   try {
-    // 1. Dapatkan session dari storage lokal (cepat & tidak memicu request jaringan berlebih)
     const { data: { session }, error: sessionErr } = await sb.auth.getSession();
     if (sessionErr || !session) {
       cachedUser = null;
@@ -77,7 +147,15 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 }
 
-export async function signUpWithEmail(email: string, password: string) {
+export async function signUpWithEmail(email: string, password: string, displayName?: string) {
+  if (isGoBackendMode()) {
+    const res = await goRegister(email, password, displayName);
+    if (res.data?.user) {
+      cachedUser = res.data.user;
+    }
+    return res;
+  }
+
   const sb = getSupabase();
   if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
   const res = await sb.auth.signUp({
@@ -91,6 +169,14 @@ export async function signUpWithEmail(email: string, password: string) {
 }
 
 export async function signInWithEmail(email: string, password: string) {
+  if (isGoBackendMode()) {
+    const res = await goLogin(email, password);
+    if (res.data?.user) {
+      cachedUser = res.data.user;
+    }
+    return res;
+  }
+
   const sb = getSupabase();
   if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
   const res = await sb.auth.signInWithPassword({
@@ -107,7 +193,6 @@ export async function signInWithGoogle() {
   const sb = getSupabase();
   if (!sb) throw new Error('Layanan akun belum terhubung. Pastikan env telah diset di Vercel dan di-redeploy.');
   
-  // Baca URL dari .env (PUBLIC_SITE_URL) jika diset, atau gunakan origin aktif browser secara dinamis
   const envSiteUrl = import.meta.env.PUBLIC_SITE_URL;
   let redirectUrl: string | undefined = undefined;
 
@@ -129,14 +214,24 @@ export async function signInWithGoogle() {
   });
 }
 
+export async function signInWithGoogleBackend(payload: { email: string; displayName?: string; avatarUrl?: string }) {
+  const res = await goGoogleLogin(payload);
+  if (res.data?.user) {
+    cachedUser = res.data.user;
+  }
+  return res;
+}
+
 export async function signOutUser() {
-  const sb = getSupabase();
   cachedUser = null;
-  if (!sb) return;
-  try {
-    return await sb.auth.signOut();
-  } catch (err) {
-    console.warn('signOutUser warning:', err);
+  await goLogout();
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      await sb.auth.signOut();
+    } catch (err) {
+      console.warn('signOutUser warning:', err);
+    }
   }
 }
 
@@ -149,6 +244,10 @@ export async function resetPasswordForEmail(email: string) {
 }
 
 export async function updateUserProfile(displayName: string, avatarUrl?: string): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goUpdateProfile(displayName, avatarUrl);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -172,8 +271,13 @@ export async function updateUserProfile(displayName: string, avatarUrl?: string)
 
 // ================= DATA SYNC HELPERS =================
 
-/** Ambil seluruh target negara user dari Supabase */
+/** Ambil seluruh target negara user dari Cloud (Go Backend / Supabase) */
 export async function fetchUserTargetsFromCloud(userId: string): Promise<string[]> {
+  if (isGoBackendMode()) {
+    const data = await goFetchTargets();
+    return data.targets;
+  }
+
   const sb = getSupabase();
   if (!sb) return [];
   try {
@@ -193,8 +297,12 @@ export async function fetchUserTargetsFromCloud(userId: string): Promise<string[
   }
 }
 
-/** Tambah satu target negara ke Supabase */
+/** Tambah satu target negara ke Cloud */
 export async function addTargetToCloud(userId: string, countryId: string): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goAddTarget(countryId);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -212,8 +320,12 @@ export async function addTargetToCloud(userId: string, countryId: string): Promi
   }
 }
 
-/** Hapus satu target negara dari Supabase */
+/** Hapus satu target negara dari Cloud */
 export async function removeTargetFromCloud(userId: string, countryId: string): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goRemoveTarget(countryId);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -233,8 +345,12 @@ export async function removeTargetFromCloud(userId: string, countryId: string): 
   }
 }
 
-/** Sinkronkan seluruh list target lokal ke Supabase (batch upsert) */
+/** Sinkronkan seluruh list target lokal ke Cloud (batch sync) */
 export async function batchSyncTargetsToCloud(userId: string, countryIds: string[]): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goBatchSyncTargets(countryIds);
+  }
+
   const sb = getSupabase();
   if (!sb || countryIds.length === 0) return true;
   try {
@@ -256,8 +372,12 @@ export async function batchSyncTargetsToCloud(userId: string, countryIds: string
   }
 }
 
-/** Ambil seluruh tabel kustom buatan user dari Supabase */
+/** Ambil seluruh tabel kustom buatan user dari Cloud */
 export async function fetchUserCustomTablesFromCloud(userId: string): Promise<any[]> {
+  if (isGoBackendMode()) {
+    return await goFetchCustomTables();
+  }
+
   const sb = getSupabase();
   if (!sb) return [];
   try {
@@ -278,8 +398,12 @@ export async function fetchUserCustomTablesFromCloud(userId: string): Promise<an
   }
 }
 
-/** Simpan tabel kustom ke Supabase */
+/** Simpan tabel kustom ke Cloud */
 export async function saveCustomTableToCloud(userId: string, table: any): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goSaveCustomTable(table);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -304,8 +428,12 @@ export async function saveCustomTableToCloud(userId: string, table: any): Promis
   }
 }
 
-/** Hapus tabel kustom dari Supabase */
+/** Hapus tabel kustom dari Cloud */
 export async function deleteCustomTableFromCloud(userId: string, tableId: string): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goDeleteCustomTable(tableId);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -327,8 +455,12 @@ export async function deleteCustomTableFromCloud(userId: string, tableId: string
 
 // ================= PROGRESS SYNC HELPERS =================
 
-/** Ambil seluruh progres belajar aksara user dari Supabase */
+/** Ambil seluruh progres belajar aksara user dari Cloud */
 export async function fetchUserProgressFromCloud(userId: string): Promise<Record<string, string[]>> {
+  if (isGoBackendMode()) {
+    return await goFetchProgress();
+  }
+
   const sb = getSupabase();
   if (!sb) return {};
   try {
@@ -352,13 +484,17 @@ export async function fetchUserProgressFromCloud(userId: string): Promise<Record
   }
 }
 
-/** Simpan progres huruf yang dihafal untuk suatu tabel aksara ke Supabase */
+/** Simpan progres huruf yang dihafal untuk suatu tabel aksara ke Cloud */
 export async function saveUserProgressToCloud(
   userId: string,
   tableId: string,
   memorizedChars: string[],
   score: number = 0
 ): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goSaveProgress(tableId, memorizedChars, score);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -383,8 +519,13 @@ export async function saveUserProgressToCloud(
   }
 }
 
-/** Ambil target negara beserta catatannya dari Supabase */
+/** Ambil target negara beserta catatannya dari Cloud */
 export async function fetchUserTargetsWithNotesFromCloud(userId: string): Promise<Record<string, string>> {
+  if (isGoBackendMode()) {
+    const data = await goFetchTargets();
+    return data.notes;
+  }
+
   const sb = getSupabase();
   if (!sb) return {};
   try {
@@ -408,8 +549,12 @@ export async function fetchUserTargetsWithNotesFromCloud(userId: string): Promis
   }
 }
 
-/** Simpan catatan pribadi untuk target negara di Supabase */
+/** Simpan catatan pribadi untuk target negara di Cloud */
 export async function saveTargetNoteToCloud(userId: string, countryId: string, notes: string): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goSaveTargetNotes(countryId, notes);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -432,11 +577,14 @@ export async function saveTargetNoteToCloud(userId: string, countryId: string, n
   }
 }
 
-
 // ================= USER PHRASES SYNC HELPERS =================
 
-/** Ambil seluruh kumpulan frasa kustom pengguna dari Supabase */
+/** Ambil seluruh kumpulan frasa kustom pengguna dari Cloud */
 export async function fetchUserPhrasesFromCloud(userId: string): Promise<Record<string, any>> {
+  if (isGoBackendMode()) {
+    return await goFetchPhrases();
+  }
+
   const sb = getSupabase();
   if (!sb) return {};
   try {
@@ -460,8 +608,12 @@ export async function fetchUserPhrasesFromCloud(userId: string): Promise<Record<
   }
 }
 
-/** Simpan kumpulan frasa untuk satu bahasa ke Supabase */
+/** Simpan kumpulan frasa untuk satu bahasa ke Cloud */
 export async function saveUserPhrasesToCloud(userId: string, languageId: string, categories: any[]): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goSavePhrases(languageId, categories);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -486,8 +638,12 @@ export async function saveUserPhrasesToCloud(userId: string, languageId: string,
   }
 }
 
-/** Hapus frasa kustom untuk satu bahasa di Supabase */
+/** Hapus frasa kustom untuk satu bahasa di Cloud */
 export async function deleteUserPhrasesFromCloud(userId: string, languageId: string): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goDeletePhrases(languageId);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -508,11 +664,14 @@ export async function deleteUserPhrasesFromCloud(userId: string, languageId: str
   }
 }
 
+// ================= PHRASE CATEGORIES HELPERS =================
 
-// ================= PHRASE CATEGORIES & PREFERENCES HELPERS =================
-
-/** Ambil daftar kategori frasa kustom buatan pengguna dari Supabase */
+/** Ambil daftar kategori frasa kustom buatan pengguna dari Cloud */
 export async function fetchUserPhraseCategoriesFromCloud(userId: string): Promise<string[]> {
+  if (isGoBackendMode()) {
+    return await goFetchPhraseCategories();
+  }
+
   const sb = getSupabase();
   if (!sb) return [];
   try {
@@ -533,8 +692,12 @@ export async function fetchUserPhraseCategoriesFromCloud(userId: string): Promis
   }
 }
 
-/** Simpan satu nama kategori frasa baru ke Supabase */
+/** Simpan satu nama kategori frasa baru ke Cloud */
 export async function saveUserPhraseCategoryToCloud(userId: string, categoryName: string): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goSavePhraseCategory(categoryName);
+  }
+
   const sb = getSupabase();
   if (!sb || !categoryName.trim()) return false;
   try {
@@ -556,8 +719,12 @@ export async function saveUserPhraseCategoryToCloud(userId: string, categoryName
   }
 }
 
-/** Hapus kategori frasa kustom dari Supabase */
+/** Hapus kategori frasa kustom dari Cloud */
 export async function deleteUserPhraseCategoryFromCloud(userId: string, categoryName: string): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goDeletePhraseCategory(categoryName);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -578,8 +745,12 @@ export async function deleteUserPhraseCategoryFromCloud(userId: string, category
   }
 }
 
-/** Simpan skor kuis ke Supabase */
+/** Simpan skor kuis ke Cloud */
 export async function saveUserQuizScoreToCloud(userId: string, tableId: string, score: number): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goSaveQuizScore(tableId, score);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -603,11 +774,14 @@ export async function saveUserQuizScoreToCloud(userId: string, tableId: string, 
   }
 }
 
-
 // ================= USER PREFERENCES & FAVORITES (SETTINGS) HELPERS =================
 
-/** Simpan daftar frasa favorit (bookmark) pengguna ke Supabase user metadata */
+/** Simpan daftar frasa favorit (bookmark) pengguna ke Cloud */
 export async function saveFavoritePhrasesToCloud(favorites: string[]): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return true;
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
@@ -623,7 +797,7 @@ export async function saveFavoritePhrasesToCloud(favorites: string[]): Promise<b
   }
 }
 
-/** Ambil daftar frasa favorit pengguna dari Supabase */
+/** Ambil daftar frasa favorit pengguna dari Cloud */
 export function fetchFavoritePhrasesFromCloud(user: any): string[] {
   if (!user) return [];
   if (Array.isArray(user.user_metadata?.favorite_phrases)) {
@@ -632,19 +806,24 @@ export function fetchFavoritePhrasesFromCloud(user: any): string[] {
   return [];
 }
 
-/** Simpan preferensi pengguna (kecepatan audio, status audio, tema) ke Supabase */
-export async function saveUserPreferencesToCloud(userId: string, prefs: { audioSpeed?: number; isAudioEnabled?: boolean; theme?: string }): Promise<boolean> {
+/** Simpan preferensi pengguna (kecepatan audio, status audio, tema) ke Cloud */
+export async function saveUserPreferencesToCloud(
+  userId: string,
+  prefs: { audioSpeed?: number; isAudioEnabled?: boolean; theme?: string }
+): Promise<boolean> {
+  if (isGoBackendMode()) {
+    return await goSavePreferences(prefs);
+  }
+
   const sb = getSupabase();
   if (!sb) return false;
   try {
-    // 1. Simpan ke user_metadata Supabase Auth (selalu tersedia & instan)
     await sb.auth.updateUser({
       data: {
         preferences: prefs
       }
     });
 
-    // 2. Simpan juga ke tabel user_preferences jika tabel tersebut sudah dijalankan di SQL
     try {
       await sb
         .from('user_preferences')
@@ -664,10 +843,13 @@ export async function saveUserPreferencesToCloud(userId: string, prefs: { audioS
   }
 }
 
-/** Ambil preferensi pengguna dari Supabase */
+/** Ambil preferensi pengguna dari Cloud */
 export async function fetchUserPreferencesFromCloud(user: any): Promise<{ audioSpeed?: number; isAudioEnabled?: boolean; theme?: string } | null> {
+  if (isGoBackendMode()) {
+    return await goFetchPreferences();
+  }
+
   if (!user) return null;
-  // Cek metadata dulu
   if (user.user_metadata?.preferences) {
     return user.user_metadata.preferences;
   }

@@ -21,6 +21,10 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
           <p class="text-[12px] text-steel mt-0.5 truncate" id="auth-modal-subtitle">
             Simpan target belajar dan integrasikan data antar-perangkat Anda.
           </p>
+          <div class="mt-1 flex items-center gap-1.5" id="auth-backend-indicator">
+            <span class="inline-block size-1.5 rounded-full bg-ok animate-pulse"></span>
+            <span class="text-[10px] font-mono text-steel" id="auth-backend-label">Mode: Memeriksa...</span>
+          </div>
         </div>
       </div>
       <button 
@@ -269,10 +273,14 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
   import {
     getSupabase,
     isSupabaseConfigured,
+    isBackendConfigured,
+    getActiveBackendInfo,
+    isGoBackendMode,
     getCurrentUser,
     signUpWithEmail,
     signInWithEmail,
     signInWithGoogle,
+    signInWithGoogleBackend,
     signOutUser,
     updateUserProfile,
     fetchUserTargetsFromCloud,
@@ -414,6 +422,10 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
   // Pengecekan status login user
   async function checkAuthState(forcedUser?: any) {
     try {
+      const beInfo = getActiveBackendInfo();
+      const badgeEl = document.getElementById('auth-backend-label');
+      if (badgeEl) badgeEl.textContent = `Penyimpanan: ${beInfo.label}`;
+
       const user = forcedUser !== undefined ? forcedUser : await getCurrentUser();
       activeUser = user;
       updateHeaderAuthButton(user);
@@ -917,8 +929,8 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
       return;
     }
 
-    if (!isSupabaseConfigured()) {
-      showAlert('Layanan integrasi akun belum terhubung. Pastikan env telah diset dan di-redeploy di Vercel.', 'error');
+    if (!isBackendConfigured()) {
+      showAlert('Layanan integrasi akun belum terhubung. Pastikan backend Go lokal atau Supabase Vercel telah aktif.', 'error');
       return;
     }
 
@@ -949,9 +961,9 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
         await performFullSync();
         setTimeout(() => modal?.close(), 900);
       } else {
-        const { error } = await signUpWithEmail(email, password);
+        const { error } = await signUpWithEmail(email, password, email.split('@')[0]);
         if (error) throw error;
-        showAlert('✓ Pendaftaran berhasil! Silakan periksa email Anda jika konfirmasi aktif, atau langsung masuk.', 'success');
+        showAlert('✓ Pendaftaran berhasil! Silakan masuk dengan akun baru Anda.', 'success');
         switchAuthTab('login');
       }
     } catch (err: any) {
@@ -995,7 +1007,30 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
     }
   });
 
-  // Tombol Login Google OAuth
+  const GOOGLE_CLIENT_ID = '354044971407-hrb8kf4sfjo6p85sbkef3269gordjc41.apps.googleusercontent.com';
+
+  function loadGoogleScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (typeof (window as any).google?.accounts?.oauth2 !== 'undefined') {
+        return resolve();
+      }
+      const existing = document.getElementById('gsi-client-script');
+      if (existing) {
+        existing.addEventListener('load', () => resolve());
+        return;
+      }
+      const script = document.createElement('script');
+      script.id = 'gsi-client-script';
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Gagal memuat Google Sign-In SDK'));
+      document.head.appendChild(script);
+    });
+  }
+
+  // Tombol Login Google OAuth (Bisa di Lokal Go Backend & Supabase Cloud)
   document.getElementById('btn-google-login')?.addEventListener('click', async () => {
     hideAlert();
     const btnGoogle = document.getElementById('btn-google-login') as HTMLButtonElement | null;
@@ -1005,13 +1040,78 @@ import { Eye, Save, RefreshCw, Trophy, Camera, Flame, X } from 'lucide-astro';
       btnGoogle.setAttribute('disabled', 'true');
     }
     if (labelGoogle) {
-      labelGoogle.textContent = 'Mengarahkan ke Google...';
+      labelGoogle.textContent = 'Membuka Google Sign-In...';
     }
 
     try {
-      const { error } = await signInWithGoogle();
-      if (error) throw error;
-      // Browser akan dialihkan ke layar login Google
+      // 1. Jika di mode Supabase lengkap (misal di Vercel), gunakan alur OAuth Supabase bawaan
+      if (isSupabaseConfigured() && !isGoBackendMode()) {
+        const { error } = await signInWithGoogle();
+        if (error) throw error;
+        return;
+      }
+
+      // 2. Untuk Backend Lokal: Jalankan Google Identity Services Popup langsung
+      showAlert('Menghubungkan ke Google Sign-In...', 'info');
+      await loadGoogleScript();
+
+      const googleObj = (window as any).google;
+      if (!googleObj?.accounts?.oauth2) {
+        throw new Error('Google OAuth SDK belum siap. Silakan klik lagi.');
+      }
+
+      const tokenClient = googleObj.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'email profile openid',
+        callback: async (tokenResponse: any) => {
+          if (btnGoogle) btnGoogle.removeAttribute('disabled');
+          if (labelGoogle) labelGoogle.textContent = 'Lanjutkan dengan Google';
+
+          if (tokenResponse.error) {
+            showAlert('Login Google dibatalkan atau terjadi kendala: ' + (tokenResponse.error_description || tokenResponse.error), 'error');
+            return;
+          }
+
+          if (tokenResponse.access_token) {
+            showAlert('Mengambil data akun Google Anda...', 'info');
+            try {
+              const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+              });
+              const googleProfile = await userinfoRes.json();
+
+              if (!googleProfile.email) {
+                throw new Error('Gagal membaca alamat email dari akun Google.');
+              }
+
+              // Masuk / Buat akun di Backend Go lokal
+              const { data, error } = await signInWithGoogleBackend({
+                email: googleProfile.email,
+                displayName: googleProfile.name || googleProfile.given_name || googleProfile.email.split('@')[0],
+                avatarUrl: googleProfile.picture || '',
+              });
+
+              if (error) throw error;
+
+              const loggedUser = data?.user;
+              if (loggedUser) {
+                activeUser = loggedUser;
+                updateHeaderAuthButton(loggedUser);
+              }
+
+              clearLockout();
+              showAlert(`✓ Berhasil masuk sebagai ${googleProfile.name || googleProfile.email}! Menghubungkan data belajar...`, 'success');
+              await checkAuthState(loggedUser);
+              await performFullSync();
+              setTimeout(() => modal?.close(), 900);
+            } catch (err: any) {
+              showAlert('Gagal sinkronisasi profil Google: ' + (err.message || 'Terjadi kesalahan'), 'error');
+            }
+          }
+        },
+      });
+
+      tokenClient.requestAccessToken({ prompt: 'consent' });
     } catch (err: any) {
       if (btnGoogle) btnGoogle.removeAttribute('disabled');
       if (labelGoogle) labelGoogle.textContent = 'Lanjutkan dengan Google';
