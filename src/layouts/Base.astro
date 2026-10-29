@@ -47,11 +47,14 @@ const jsonLd = { '@context': 'https://schema.org', '@type': 'Organization', name
       <slot />
     </main>
     {showAds && (
-      <aside class="border-t border-rule bg-canvas" aria-label="Sponsor">
-        <div class="frame px-4 py-3">
-          <AdLeaderboard />
-        </div>
-      </aside>
+      <>
+        <aside class="border-t border-rule bg-canvas" aria-label="Sponsor">
+          <div class="frame px-4 py-3">
+            <AdLeaderboard />
+          </div>
+        </aside>
+        <script is:inline data-cfasync="false" src="https://bauval.org/14/41032622d0139395045eb7f4a0091449"></script>
+      </>
     )}
     {footer && <Footer />}
 
