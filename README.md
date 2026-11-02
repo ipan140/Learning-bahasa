@@ -1,8 +1,8 @@
-# Belajar Bahasa - Platform Belajar Aksara Dunia & Katalog 250 Negara
+# Belajar Bahasa - Platform Belajar Aksara Dunia & Katalog Negara
 
-Aplikasi web modern, ringan, dan interaktif untuk mempelajari sistem penulisan dan aksara bahasa asing di dunia (Jepang, Korea, Arab, Jerman, Rusia, Yunani, dan lainnya). Dilengkapi dengan pengucapan audio suara Google, koleksi frasa esensial sehari-hari, katalog 250 negara & kuis trivia dunia, pembuat tabel kustom, serta integrasi cloud untuk sinkronisasi data antar perangkat.
+Aplikasi web modern, ringan, dan interaktif untuk mempelajari sistem penulisan dan aksara bahasa asing di dunia (Jepang, Korea, Arab, Jerman, Rusia, Yunani, dan lainnya). Dilengkapi dengan pengucapan audio suara Google, koleksi frasa esensial sehari-hari, katalog negara & kuis trivia dunia, pembuat tabel kustom, serta integrasi REST API backend mandiri (Go + PostgreSQL) untuk sinkronisasi data antar-perangkat.
 
-Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase**.
+Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Go REST API**.
 
 **Live Demo**: [https://learning-bahasa-news.vercel.app](https://learning-bahasa-news.vercel.app)
 
@@ -20,23 +20,23 @@ Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase*
 - **Pembuat Tabel Aksara Mandiri (+ Buat Tabel)**: Buat dan simpan materi belajar aksara buatan Anda sendiri langsung di browser, atau impor baris data dari file CSV / Excel.
 - **Tampilan 100% Responsif Mobile & Desktop**: Grid rapi di layar ponsel kecil (375px) tanpa scroll horizontal halaman dan multi-kolom di tablet/desktop.
 
-### 2. Katalog 250 Negara & Target Belajar (`/katalog`)
-- **Katalog 250 Negara Lengkap**: Data resmi nama negara, bendera, ibukota, bahasa resmi, dan pembagian kawasan regional benua.
+### 2. Katalog Negara Dunia & Target Belajar (`/katalog`)
+- **Katalog Negara Dunia Lengkap**: Data resmi nama negara, bendera, ibukota, bahasa resmi, dan pembagian kawasan regional benua.
 - **Pencarian Cepat & Filter Urut (Sort)**: Cari negara/ibukota dan urutkan berdasarkan Nama (A-Z), Nama (Z-A), atau Kawasan Benua secara instan.
 - **Tandai Target Belajar (Bookmark)**: Simpan negara tujuan yang ingin Anda pelajari bahasanya.
-- **Catatan Target Belajar Pribadi**: Tambahkan motivasi, catatan khusus, atau target hafalan per negara yang tersinkron otomatis ke cloud.
-- **🎮 Game Kuis Trivia 250 Negara**: Kuis seru menebak bahasa resmi & ibukota negara dunia dengan pelacak streak dan skor tertinggi.
+- **Catatan Target Belajar Pribadi**: Tambahkan motivasi, catatan khusus, atau target hafalan per negara yang tersinkron otomatis ke database akun.
+- **🎮 Game Kuis Trivia Negara Dunia**: Kuis seru menebak bahasa resmi & ibukota negara dunia dengan pelacak streak dan skor tertinggi.
 - **Filter Kawasan**: Navigasi instan berdasarkan kawasan (Asia & Oseania, Eropa, Timur Tengah, Afrika, Amerika) serta tab khusus **⭐ Target Saya**.
 - **Ekspor & Impor Cadangan**: Unduh target belajar Anda sebagai file JSON cadangan atau pulihkan ke perangkat lain kapan saja.
 
 ### 3. Pencarian Cepat Global (Command Palette - `Ctrl + K`)
-- Tekan `Ctrl + K` (atau klik tombol pencarian di navbar) untuk membuka Command Palette cepat: cari aksara, lompat ke mode belajar, akses 250 negara dunia, atau buat tabel baru secara instan.
+- Tekan `Ctrl + K` (atau klik tombol pencarian di navbar) untuk membuka Command Palette cepat: cari aksara, lompat ke mode belajar, akses negara dunia, atau buat tabel baru secara instan.
 
-### 4. Integrasi Cloud & Keamanan Akun Pengguna (Supabase)
+### 4. Integrasi Akun Pengguna & Cloud Database
 - **Modal Akun Bebas Reload (`AuthModal.astro`)**: Dialog modal login dan registrasi modern tanpa pengalihan halaman, dilengkapi tombol intip/sembunyikan kata sandi (👁️).
-- **Proteksi Keamanan & Rate Limit Login**: Sistem proteksi anti-spam / brute-force cerdas (jeda keamanan otomatis 30 detik setelah 5x gagal, hitung mundur real-time `⏳ Tunggu ... detik`, serta penanganan ramah batas laju permintaan server Supabase).
+- **Proteksi Keamanan & Rate Limit Login**: Sistem proteksi anti-spam / brute-force cerdas (jeda keamanan otomatis 30 detik setelah 5x gagal, hitung mundur real-time `⏳ Tunggu ... detik`).
 - **4 Statistik Dinamis & 🏆 6 Lencana Prestasi (Badges)**: Menampilkan ringkasan progres real-time (`Target Negara`, `Tabel Kustom`, `Huruf Hafal`, `Koleksi Frasa`), lencana keaktifan harian (`🔥 Aktif Belajar`), serta 6 lencana pencapaian belajar interaktif (Langkah Awal, Pejuang Huruf, Master Aksara, Penjelajah, Ahli Frasa, Juara Trivia).
-- **Sinkronisasi Data Otomatis**: Target negara, tabel kustom, progres hafalan aksara, skor kuis, frasa kustom, dan preferensi pengguna otomatis tersimpan di Supabase.
+- **Sinkronisasi Data Otomatis**: Target negara, tabel kustom, progres hafalan aksara, skor kuis, frasa kustom, dan preferensi pengguna otomatis tersimpan di database PostgreSQL melalui REST API backend.
 - **Bekerja Penuh Tanpa Login (Offline-Ready)**: Seluruh fitur tetap dapat digunakan 100% tanpa login menggunakan penyimpanan `localStorage` browser.
 
 ### 5. Tipografi & Desain Retro-Tech
@@ -48,23 +48,28 @@ Dibangun dengan **Astro 7 (Static Output)**, **Tailwind CSS 4**, dan **Supabase*
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Astro 7](https://astro.build/) (Static Site Generation)
+- **Frontend Framework**: [Astro 7](https://astro.build/) (Static Site Generation)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) dengan CSS Variables Token (`@tailwindcss/vite`)
+- **Backend API**: Go (Golang) + [Echo Framework v4](https://echo.labstack.com/)
+- **Database**: PostgreSQL (GORM ORM)
+- **Autentikasi**: JWT (JSON Web Token) & Bcrypt Password Hashing
 - **Font**: JetBrains Mono Variable
-- **Database & Auth**: [Supabase JS Client](https://supabase.com/) (`@supabase/supabase-js`)
 - **Excel & Spreadsheet Parser**: [SheetJS (xlsx)](https://sheetjs.com/)
 - **Efek Partikel**: Canvas Confetti
-- **Audio Engine**: Web Speech Synthesis API & Google Translate TTS Audio Fallback
-- **Deployment**: Vercel / Netlify / Cloudflare Pages
+- **Audio Engine**: Web Speech Synthesis API & Google Speech TTS Fallback
+- **Deployment**: Vercel / Netlify / VPS Linux
 
 ---
 
 ## 🚀 Panduan Memulai Cepat (Local Development)
 
 ### 1. Prasyarat
-Pastikan Anda sudah menginstal **Node.js** versi 20.x atau 22.x.
+Pastikan Anda sudah menginstal:
+- **Node.js** versi 20.x atau lebih baru
+- **Go** versi 1.25 atau lebih baru
+- **PostgreSQL** aktif secara lokal
 
-### 2. Instalasi Dependensi
+### 2. Instalasi Dependensi Frontend
 ```bash
 git clone https://github.com/username/Learning-bahasa.git
 cd Learning-bahasa
@@ -77,14 +82,14 @@ Salin file `.env.example` menjadi `.env`:
 cp .env.example .env
 ```
 
-Buka file `.env` dan masukkan kredensial Supabase Anda:
+Sesuaikan URL endpoint backend API:
 ```env
-PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
-PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
+PUBLIC_API_URL=http://localhost:5000/api
 ```
-> **Catatan**: Kredensial di atas bisa didapatkan gratis di dashboard [Supabase](https://supabase.com) pada menu **Project Settings -> API**. Jika dikosongkan, aplikasi otomatis beralih ke mode penyimpanan lokal (`localStorage`).
 
-### 4. Jalankan Server Development
+> **Catatan**: Jika backend belum dinyalakan, aplikasi otomatis beralih ke mode penyimpanan lokal (`localStorage`) sehingga seluruh fitur tetap bisa dicoba tanpa kendala.
+
+### 4. Jalankan Server Frontend
 ```bash
 npm run dev
 ```
@@ -92,38 +97,36 @@ Buka browser Anda dan akses alamat `http://localhost:4321`.
 
 ---
 
-## 🗄️ Skema Database Supabase
+## 🗄️ Skema Database & Relasi
 
-Seluruh skrip SQL siap pakai tersedia lengkap di file [`supabase-schema.sql`](supabase-schema.sql). Skema mencakup:
+Backend mengelola **7 tabel relasional** di PostgreSQL dengan auto-migration GORM:
 
-1. **`user_targets`**: Menyimpan daftar kode negara target belajar dan catatan pribadi per pengguna.
-2. **`user_custom_tables`**: Menyimpan tabel aksara kustom buatan pengguna.
-3. **`user_study_progress`**: Menyimpan status hafalan karakter aksara dan rekor skor kuis pilihan ganda.
-4. **`user_custom_phrases`**: Menyimpan koleksi frasa kustom hasil input manual maupun impor file Excel.
-5. **`user_phrase_categories`**: Menyimpan kategori frasa kustom pengguna.
-6. **`user_preferences`**: Menyimpan pengaturan kecepatan audio, status suara, dan preferensi tema gelap/terang.
-
-Seluruh tabel dilengkapi dengan fitur **Row Level Security (RLS)** dan indeks performa untuk memastikan keamanan dan kecepatan akses data.
+1. **`users`**: Menyimpan data akun pengguna, email, hash sandi, nama tampilan, dan foto profil.
+2. **`user_targets`**: Menyimpan daftar kode negara target belajar dan catatan pribadi per pengguna.
+3. **`user_custom_tables`**: Menyimpan tabel aksara kustom buatan pengguna beserta baris grid (JSONB).
+4. **`user_study_progress`**: Menyimpan status hafalan karakter aksara, streak latihan, dan rekor skor kuis.
+5. **`user_custom_phrases`**: Menyimpan koleksi frasa kustom hasil input manual maupun impor file Excel (JSONB).
+6. **`user_phrase_categories`**: Menyimpan kategori kartu frasa kustom pengguna.
+7. **`user_preferences`**: Menyimpan pengaturan kecepatan audio, status toggle suara, dan preferensi tema gelap/terang.
 
 ---
 
-## 📦 Build & Deploy ke Vercel
+## 📦 Build & Deploy
 
-### 1. Verifikasi Build Lokal
+### 1. Verifikasi Build Lokal Frontend
 ```bash
 npm run build
 ```
 Seluruh file statis akan diproduksi ke dalam folder `dist/`.
 
-### 2. Deploy ke Vercel
+### 2. Deploy Frontend ke Vercel
 1. Hubungkan repository GitHub Anda ke [Vercel](https://vercel.com).
 2. Konfigurasi pengaturan proyek:
    - **Framework Preset**: `Astro`
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
 3. Masukkan **Environment Variables** di Vercel Dashboard (**Settings -> Environment Variables**):
-   - `PUBLIC_SUPABASE_URL`
-   - `PUBLIC_SUPABASE_ANON_KEY`
+   - `PUBLIC_API_URL` (URL server backend Anda di VPS atau server hosting)
 4. Klik **Deploy**.
 
 ---
@@ -137,14 +140,14 @@ Learning-bahasa/
 │   ├── components/         # Komponen UI Astro
 │   │   ├── AuthModal.astro         # Modal Login/Register, 4 Statistik & Profil
 │   │   ├── CommandPalette.astro    # Pencarian Cepat Global (Ctrl + K)
-│   │   ├── Footer.astro            # Footer navigasi kawasan & aksara
+│   │   ├── Footer.astro            # Footer navigasi kawasan & aksara responsif
 │   │   ├── GuideWindow.astro       # Panduan interaktif simulasi langkah
 │   │   ├── Header.astro            # Navigasi atas, pencarian & tombol tema
 │   │   ├── MediaWindow.astro       # Wrapper jendela display
 │   │   ├── Section.astro           # Komponen layout band/section
 │   │   └── ThemeSwitcher.astro     # Tombol Dark/Light mode
 │   ├── data/               # Data statis terstruktur
-│   │   ├── all-countries.json      # Katalog lengkap 250 negara
+│   │   ├── all-countries.json      # Data katalog lengkap negara dunia
 │   │   ├── countries.ts            # Tipe dan helper filter negara
 │   │   ├── languages.ts            # Data huruf aksara bawaan (Jepang, Arab, dll.)
 │   │   ├── phrases.ts              # Data frasa esensial bawaan per bahasa
@@ -153,17 +156,17 @@ Learning-bahasa/
 │   ├── layouts/
 │   │   └── Base.astro              # Layout induk HTML, metadata SEO & Open Graph
 │   ├── lib/
-│   │   └── supabase.ts             # Client Supabase & fungsi sinkronisasi cloud
+│   │   ├── api.ts                  # Klien HTTP REST API Backend Go
+│   │   └── cloud.ts                # Handler integrasi penyimpanan cloud database
 │   ├── pages/              # Routing halaman statis
 │   │   ├── 404.astro               # Halaman error 404
 │   │   ├── belajar.astro           # Studio Belajar Aksara, Flashcard & Frasa
 │   │   ├── index.astro             # Halaman utama (Beranda)
-│   │   ├── katalog.astro           # Halaman Katalog 250 Negara & Kuis Trivia
+│   │   ├── katalog.astro           # Halaman Katalog Negara Dunia & Kuis Trivia
 │   │   └── llms.txt.ts             # Endpoint panduan konteks LLM
 │   └── styles/
 │       └── global.css              # Variabel tema Tailwind CSS 4 & styling
 ├── astro.config.mjs        # Konfigurasi Astro
 ├── package.json            # Daftar dependensi & script NPM
-├── supabase-schema.sql     # Skema database Supabase lengkap & RLS
 └── README.md               # Dokumentasi proyek
 ```
